@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { fontSans } from "@/config/fonts";
 import { Link } from "@nextui-org/link";
 import TopNavbar from "@/components/TopNavbar";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: {
@@ -41,7 +41,7 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="flex flex-col h-full">
             {/* Header */}
-            <Toaster />
+            <Toaster richColors expand />
             <TopNavbar />
             {/* Main content */}
             <div className="flex flex-row h-[calc(100vh-5.5rem)]">

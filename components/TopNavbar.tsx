@@ -1,42 +1,21 @@
-"use client";
-
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-} from "@nextui-org/react";
-import { AiOutlineBell } from "react-icons/ai";
-
+import { Navbar } from "@nextui-org/navbar";
+import { NavbarBrand } from "@nextui-org/navbar";
+import { NavbarItem } from "@nextui-org/navbar";
+import { NavbarContent } from "@nextui-org/navbar";
 import NextLink from "next/link";
-
 import { ThemeSwitch } from "@/components/ThemeSwitch";
+import { cookies } from "next/headers";
 
-import {
-  User,
-  createClientComponentClient,
-} from "@supabase/auth-helpers-nextjs";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import LogoutButton from "./LogoutButton";
-import { Link } from "@nextui-org/link";
-import { useEffect, useState } from "react";
-import { Logo } from "./Icons";
-import NextJsLogo from "./NextJsLogo";
+import BookingLogo from "./BookingLogo";
 
-export default function TopNavbar() {
-  const supabase = createClientComponentClient();
-  const [user, setUser] = useState<User | null>(null);
+export default async function TopNavbar() {
+  const supabase = createServerComponentClient({ cookies });
 
-  // FIXME fix it
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        setUser(data.user);
-      }
-    };
-
-    getUser();
-  }, [supabase, setUser]);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <Navbar maxWidth="full" position="sticky" className="rounded-lg">
@@ -46,8 +25,7 @@ export default function TopNavbar() {
       >
         <NavbarBrand>
           <NextLink href="/">
-            <NextJsLogo />
-            {/* <p className="font-thin text-inherit text-3xl font-mono">BOOKING</p> */}
+            <BookingLogo />
           </NextLink>
         </NavbarBrand>
 
