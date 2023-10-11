@@ -6,7 +6,6 @@ import { Button } from "@nextui-org/button";
 import { Checkbox } from "@nextui-org/checkbox";
 import { Input } from "@nextui-org/input";
 import { Spacer } from "@nextui-org/spacer";
-import Messages from "@/app/login/messages";
 import {
   LoginUserFormData,
   loginUserSchema,
@@ -15,7 +14,8 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../Icons";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { AuthError } from "@supabase/supabase-js";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -26,12 +26,13 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setError,
   } = useForm<LoginUserFormData>({
     resolver: zodResolver(loginUserSchema),
   });
 
   const onSubmit = async (data: LoginUserFormData) => {
-    const res = await fetch("/auth/sign-in", {
+    const response = await fetch("/auth/sign-in", {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
@@ -39,8 +40,21 @@ export default function LoginForm() {
       },
     });
 
-    if (!res.ok) {
-      toast.error("Login failed");
+    if (!response.ok) {
+      const error = await (response.json() as Promise<AuthError>);
+      toast.error(error.message);
+
+      // set errors to display on form
+      setError("email", {
+        type: "manual",
+        message: error.message,
+      });
+
+      setError("password", {
+        type: "manual",
+        message: error.message,
+      });
+
       return;
     }
 
@@ -124,8 +138,6 @@ export default function LoginForm() {
           <p className="text-md text-primary">Sign up</p>
         </Link>
       </div>
-
-      <Messages />
     </form>
   );
 }

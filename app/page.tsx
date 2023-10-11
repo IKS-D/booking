@@ -1,10 +1,11 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { title } from "@/components/primitives";
+import { Code } from "@nextui-org/code";
 import { cookies } from "next/headers";
-import { subtitle, title } from "@/components/primitives";
 
 export const dynamic = "force-dynamic";
 
-export default async function Index() {
+export default async function Home() {
   const supabase = createServerComponentClient({ cookies });
 
   const {
@@ -20,7 +21,8 @@ export default async function Index() {
         </h1>
         <br />
         <h1 className={title({ size: "sm" })}>How are you holding up?</h1>
-        <h2 className={subtitle({ class: "mt-4" })}>Good to see you again!</h2>
+        <br />
+        <Code className="mt-3">Current page: ./app/page.tsx</Code>
       </div>
     </section>
   );

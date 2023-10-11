@@ -7,6 +7,9 @@ import { fontSans } from "@/config/fonts";
 import { Link } from "@nextui-org/link";
 import TopNavbar from "@/components/TopNavbar";
 import { Toaster } from "sonner";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import ClientOnly from "@/components/ClientOnly";
 
 export const metadata: Metadata = {
   title: {
@@ -25,11 +28,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createServerComponentClient({ cookies });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -39,31 +50,34 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <div className="flex flex-col h-full">
-            {/* Header */}
-            <Toaster richColors expand />
-            <TopNavbar />
-            {/* Main content */}
-            <div className="flex flex-row h-[calc(100vh-5.5rem)]">
-              <div className="flex flex-col w-screen scrollbox rounded-lg border dark:border-white border-black">
-                <main className="flex items-center justify-center py-8">
-                  {children}
-                </main>
+          <ClientOnly>
+            <div className="flex flex-col h-full">
+              {/* Header */}
+              <Toaster richColors expand />
+              <TopNavbar />
 
-                <footer className="mt-auto flex items-center justify-center py-10">
-                  <Link
-                    isExternal
-                    className="flex items-center gap-1 text-current"
-                    href={siteConfig.links.github}
-                    title="Project Github"
-                  >
-                    <span className="text-default-600">Powered by</span>
-                    <p className="text-primary">IKS D Team</p>
-                  </Link>
-                </footer>
+              {/* Main content */}
+              <div className="flex flex-row h-[calc(100vh-5.5rem)]">
+                <div className="flex flex-col w-screen scrollbox rounded-lg border dark:border-white border-black">
+                  <main className="flex items-center justify-center py-8">
+                    {children}
+                  </main>
+
+                  <footer className="mt-auto flex items-center justify-center py-10">
+                    <Link
+                      isExternal
+                      className="flex items-center gap-1 text-current"
+                      href={siteConfig.links.github}
+                      title="Project Github"
+                    >
+                      <span className="text-default-600">Powered by</span>
+                      <p className="text-primary">IKS D Team</p>
+                    </Link>
+                  </footer>
+                </div>
               </div>
             </div>
-          </div>
+          </ClientOnly>
         </Providers>
       </body>
     </html>
