@@ -53,12 +53,12 @@ export default async function RootLayout({
           <ClientOnly>
             <div className="flex flex-col h-full">
               {/* Header */}
-              <Toaster richColors expand />
+              <Toaster richColors expand position="top-right" />
               <TopNavbar />
 
               {/* Main content */}
               <div className="flex flex-row h-[calc(100vh-5.5rem)]">
-                <div className="flex flex-col w-screen scrollbox rounded-lg border dark:border-white border-black">
+                <div className="pl-[16px] flex flex-col w-screen scrollbox rounded-lg border dark:border-white border-black">
                   <main className="flex items-center justify-center py-8">
                     {children}
                   </main>

@@ -1,6 +1,5 @@
 "use client";
 
-import { delay } from "framer-motion";
 import React, { useState, useEffect } from "react";
 import BookingLogo from "./BookingLogo";
 import { Spacer, Spinner } from "@nextui-org/react";
@@ -13,7 +12,8 @@ const ClientOnly: React.FC<ClientOnlyProps> = ({ children }) => {
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    delay(() => setHasMounted(true), 1000);
+    // delay(() => setHasMounted(true), 1000);
+    setHasMounted(true);
   }, []);
 
   if (!hasMounted)

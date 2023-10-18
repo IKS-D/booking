@@ -42,7 +42,9 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
       onLogout();
     }
 
-    toast(action);
+    if (action === "reservations") {
+      router.push("/reservations");
+    }
   };
 
   return (
@@ -75,10 +77,9 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
             <p className="font-semibold">Signed in as</p>
             <p className="font-semibold">{user.email}</p>
           </DropdownItem>
-          <DropdownItem key="settings">Settings</DropdownItem>
           <DropdownItem key="profile">Profile</DropdownItem>
+          <DropdownItem key="reservations">Reservations</DropdownItem>
           <DropdownItem key="theme">Toggle Theme</DropdownItem>
-          <DropdownItem key="help">Help</DropdownItem>
           <DropdownItem key="logout" color="danger">
             Log Out
           </DropdownItem>
