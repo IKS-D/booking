@@ -20,7 +20,14 @@ export default async function TopNavbar() {
   } = await supabase.auth.getUser();
 
   return (
-    <Navbar maxWidth="full" position="sticky" className="rounded-lg">
+    <Navbar
+      maxWidth="full"
+      position="sticky"
+      className="rounded-lg"
+      classNames={{
+        wrapper: "px-0",
+      }}
+    >
       <NavbarContent
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="start"

@@ -15,7 +15,7 @@ export type Reservation = {
   listing: Listing;
 };
 
-type AdditionalService = {
+export type AdditionalService = {
   id: string;
   name: string;
   description: string;
