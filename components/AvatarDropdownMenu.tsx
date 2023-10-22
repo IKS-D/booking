@@ -8,7 +8,6 @@ import {
   Avatar,
 } from "@nextui-org/react";
 import { User } from "@supabase/supabase-js";
-import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
@@ -28,8 +27,9 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
     await fetch("/auth/sign-out", {
       method: "POST",
     });
-    router.push("/");
+
     // TODO find better way to refresh page
+    router.push("/");
     window.location.reload();
   };
 

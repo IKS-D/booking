@@ -41,11 +41,13 @@ export default async function RootLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={clsx(
-          "min-h-screen bg-background font-sans antialiased sm:p-6 sm:pt-0",
+          "min-h-screen bg-background font-sans antialiased p-2 sm:p-6 sm:py-0",
           fontSans.variable
         )}
       >
@@ -54,28 +56,28 @@ export default async function RootLayout({
             <div className="flex flex-col h-full">
               {/* Header */}
               <Toaster richColors expand position="top-right" />
-              <TopNavbar />
+              <TopNavbar user={user} />
 
               {/* Main content */}
-              <div className="flex flex-row h-[calc(100vh-5.5rem)]">
+              <div className="flex flex-row h-[calc(100vh-7rem)]">
                 <div className="pl-[16px] flex flex-col w-screen scrollbox rounded-lg border dark:border-white border-black">
                   <main className="flex items-center justify-center py-8">
                     {children}
                   </main>
-
-                  <footer className="mt-auto flex items-center justify-center py-10">
-                    <Link
-                      isExternal
-                      className="flex items-center gap-1 text-current"
-                      href={siteConfig.links.github}
-                      title="Project Github"
-                    >
-                      <span className="text-default-600">Powered by</span>
-                      <p className="text-primary">IKS D Team</p>
-                    </Link>
-                  </footer>
                 </div>
               </div>
+
+              <footer className="flex items-center justify-center pt-3 pb-1">
+                <Link
+                  isExternal
+                  className="flex items-center gap-1 text-current"
+                  href={siteConfig.links.github}
+                  title="Project Github"
+                >
+                  <span className="text-default-600">Powered by</span>
+                  <p className="text-primary">IKS D Team</p>
+                </Link>
+              </footer>
             </div>
           </ClientOnly>
         </Providers>

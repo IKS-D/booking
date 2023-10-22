@@ -4,7 +4,10 @@ import { NavbarContent, NavbarItem } from "@nextui-org/navbar";
 import NextLink from "next/link";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import BookingLogo from "./BookingLogo";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import {
+  User,
+  createServerComponentClient,
+} from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import AvatarDropdownMenu from "./AvatarDropdownMenu";
 import { BiBell } from "react-icons/bi";
@@ -12,26 +15,21 @@ import { Spacer } from "@nextui-org/spacer";
 
 export const dynamic = "force-dynamic";
 
-export default async function TopNavbar() {
-  const supabase = createServerComponentClient({ cookies });
+interface TopNavbarProps {
+  user: User | null;
+}
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+export default async function TopNavbar({ user }: TopNavbarProps) {
   return (
     <Navbar
       maxWidth="full"
-      position="sticky"
+      position="static"
       className="rounded-lg"
       classNames={{
         wrapper: "px-0",
       }}
     >
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="start"
-      >
+      <NavbarContent className="flex basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand>
           <NextLink href="/">
             <BookingLogo />
@@ -55,7 +53,7 @@ export default async function TopNavbar() {
               <ThemeSwitch />
               <NextLink
                 href="/login"
-                className="rounded-md no-underline bg-btn-background hover:bg-btn-background-hover text-primary"
+                className="pr-2 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover text-primary"
               >
                 Login
               </NextLink>
