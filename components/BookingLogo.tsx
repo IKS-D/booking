@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React from "react";
-import IksdLogo from "/public/iksd.svg";
+import IksdLogo from "public/iksd.svg";
 
 interface BookingLogoProps {
   className?: string;
