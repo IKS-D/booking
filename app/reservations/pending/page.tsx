@@ -1,7 +1,6 @@
 import getCurrentUser from "@/actions/getCurrentUser";
-import TripsClient from "../../components/reservations/ReservationsContent";
-import { getReservations } from "@/actions/getReservations";
-import ReservationsContent from "../../components/reservations/ReservationsContent";
+import { getPendingReservations } from "@/actions/getReservations";
+import PendingReservationsContent from "@/components/reservations/PendingReservationsContent";
 
 const ReservationsPage = async () => {
   const currentUser = await getCurrentUser();
@@ -14,11 +13,13 @@ const ReservationsPage = async () => {
     );
   }
 
-  const reservations = await getReservations({});
+  const pendingReservations = await getPendingReservations({});
 
-  if (reservations.length === 0) {
+  if (pendingReservations.length === 0) {
     return (
-      <label className="text-lg font-semibold">No reservations found.</label>
+      <label className="text-lg font-semibold">
+        No pending reservations found.
+      </label>
     );
   }
 
@@ -33,8 +34,8 @@ const ReservationsPage = async () => {
         justify-center
       "
     >
-      <ReservationsContent
-        reservations={reservations}
+      <PendingReservationsContent
+        reservations={pendingReservations}
         currentUser={currentUser}
       />
     </div>

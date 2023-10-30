@@ -6,13 +6,39 @@ interface Params {
   authorId?: string;
 }
 
-export default async function getReservations(params: Params) {
+export async function getReservations(params: Params) {
   const { listingId, userId, authorId } = params;
 
   const reservations = Array(20).fill(mockReservation);
 
   return reservations;
 }
+
+export async function getPendingReservations(params: Params) {
+  const { listingId, userId, authorId } = params;
+
+  let reservations = Array(20)
+    .fill(null)
+    .map((_, index) => {
+      const reservation: Reservation = {
+        ...mockReservation,
+        id: `${index}`,
+      };
+
+      return reservation;
+    });
+
+  return reservations;
+}
+
+const mockUser = {
+  id: "1",
+  first_name: "John",
+  last_name: "Doe",
+  email: "mock@mock.com",
+  avatar: "https://i.pravatar.cc/300",
+  created_at: new Date("2020-01-01"),
+};
 
 const mockListing: Listing = {
   id: "1",
@@ -37,5 +63,37 @@ const mockReservation: Reservation = {
   listing: mockListing,
   created_at: new Date("2021-01-01"),
   status: "pending",
-  additional_services: [],
+  guest: mockUser,
+  additional_services: [
+    {
+      id: "1",
+      name: "Breakfast",
+      description: "Breakfast is served every morning.",
+      price: 10,
+    },
+    {
+      id: "2",
+      name: "Airport Transfer",
+      description: "We will pick you up at the airport.",
+      price: 50,
+    },
+    {
+      id: "3",
+      name: "Laundry",
+      description: "We will wash your clothes.",
+      price: 20,
+    },
+    /*     {
+      id: "4",
+      name: "Bike Rental",
+      description: "You can rent a bike.",
+      price: 15,
+    },
+    {
+      id: "5",
+      name: "Parking",
+      description: "You can park your car.",
+      price: 10,
+    }, */
+  ],
 };

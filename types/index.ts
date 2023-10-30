@@ -4,6 +4,15 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
 };
 
+export type User = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar: string;
+  created_at: Date;
+};
+
 export type Reservation = {
   id: string;
   start_date: Date;
@@ -13,6 +22,7 @@ export type Reservation = {
   status: ReservationStatus;
   additional_services: AdditionalService[];
   listing: Listing;
+  guest: User;
 };
 
 export type AdditionalService = {
