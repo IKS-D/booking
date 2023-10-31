@@ -24,4 +24,4 @@ export const config = {
   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
 
-const publicRoutes = ["/login", "/signup", "/", "/listings", "/listings/[id]", "/auth/sign-in"];
+const publicRoutes = ["/login", "/registration/accountcredentials", "/registration/accountinformation", "/", "/listings", "/listings/[id]", "/auth/sign-in"];

@@ -7,17 +7,17 @@ import { Checkbox } from "@nextui-org/checkbox";
 import { Input } from "@nextui-org/input";
 import { Spacer } from "@nextui-org/spacer";
 import {
-  LoginUserFormData,
-  loginUserSchema,
-} from "@/lib/validations/loginUser";
+  RegisterCredentialsFormData,
+  registerCredentialsSchema,
+} from "@/lib/validations/registerCredentials";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "./Icons";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "../Icons";
 import { useRouter } from "next/navigation";
 import { AuthError } from "@supabase/supabase-js";
 
-export default function LoginForm() {
+export default function AccountCredentialsForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -27,41 +27,41 @@ export default function LoginForm() {
     formState: { errors, isSubmitting },
     reset,
     setError,
-  } = useForm<LoginUserFormData>({
-    resolver: zodResolver(loginUserSchema),
+  } = useForm<RegisterCredentialsFormData>({
+    resolver: zodResolver(registerCredentialsSchema),
   });
 
-  const onSubmit = async (data: LoginUserFormData) => {
-    const response = await fetch("/auth/sign-in", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  const onSubmit = async (data: RegisterCredentialsFormData) => {
+    // const response = await fetch("/auth/sign-up", {
+    //   method: "POST",
+    //   body: JSON.stringify(data),
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // });
 
-    if (!response.ok) {
-      const error = await (response.json() as Promise<AuthError>);
-      toast.error(error.message);
+    // if (!response.ok) {
+    //   const error = await (response.json() as Promise<AuthError>);
+    //   toast.error(error.message);
 
-      // set errors to display on form
-      setError("email", {
-        type: "manual",
-        message: error.message,
-      });
+    //   // set errors to display on form
+    //   setError("email", {
+    //     type: "manual",
+    //     message: error.message,
+    //   });
 
-      setError("password", {
-        type: "manual",
-        message: error.message,
-      });
+    //   setError("password", {
+    //     type: "manual",
+    //     message: error.message,
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
 
-    toast.success("Login successful");
+    toast.success("Account credential registration successful");
 
-    // navigate to home page
-    router.push("/");
+    // coninue to account information page
+    router.push("/registration/accountinformation");
     router.refresh();
 
     reset();
@@ -78,6 +78,10 @@ export default function LoginForm() {
       //   action="/auth/sign-in"
       //   method="post"
     >
+      <div className="flex flex-col items-center">
+        <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
+        <p className="text-sm font-bold mb-4">Sign up using email and password</p>
+      </div>
       <Input
         className="max-w-xs h-[75px]"
         {...register("email")}
@@ -115,27 +119,44 @@ export default function LoginForm() {
         errorMessage={errors.password && (errors.password.message as string)}
       />
 
-      <Spacer y={3} />
-      <div className="flex justify-between items-center gap-x-10">
-        <Checkbox>Remember me</Checkbox>
-        <label className="text-md">Forgot password?</label>
-      </div>
+      <Input
+        className="max-w-xs h-[75px]"
+        label="Repeat password"
+        isInvalid={errors.repeatPassword ? true : false}
+        type="password"
+        variant="bordered"
+        placeholder="Repeat your password"
+        {...register("repeatPassword")}
+        errorMessage={errors.password && (errors.password.message as string)}
+      />
 
+      <Spacer y={3} />
       <Button
         disabled={isSubmitting}
         type="submit"
         color="primary"
         className="max-w-xs"
       >
-        Sign in
+        Continue
+      </Button>
+
+      <div className="flex flex-col items-center">
+        <p className="text-sm font-bold mb-4">Or</p>
+      </div>
+      
+      <Button
+        color="primary"
+        className="max-w-xs"
+      >
+        Sign up with Google
       </Button>
 
       {/* or sign up */}
       <Spacer y={1} />
       <div className="flex flex-col items-center">
-        <label className="text-md">Don't have an account?</label>
-        <Link href="/registration/accountcredentials">
-          <p className="text-md text-primary">Sign up</p>
+        <label className="text-md">Already have an a account?</label>
+        <Link href="/login">
+          <p className="text-md text-primary">Sign in</p>
         </Link>
       </div>
     </form>

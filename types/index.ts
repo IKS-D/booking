@@ -47,3 +47,4 @@ export type Listing = {
 
 type ReservationStatus = "pending" | "canceled" | "confirmed";
 type ListingCategory = "apartment" | "house" | "room" | "flat";
+type AccountStatus = "active" | "inactive"
