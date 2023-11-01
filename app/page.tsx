@@ -1,12 +1,24 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { title } from "@/components/primitives";
 import { Code } from "@nextui-org/code";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const supabase = createServerComponentClient({ cookies });
+  const cookieStore = cookies();
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
 
   const {
     data: { user },

@@ -87,7 +87,7 @@ export default function CreateReservationForm() {
 
   return (
     <div
-      className={`flex justify-between h-[500px] rounded-lg border border-neutral-700 p-4`}
+      className={`flex justify-between h-[600px] rounded-lg border border-neutral-700 p-4`}
     >
       <main className="w-full">
         {showSuccessMsg ? (

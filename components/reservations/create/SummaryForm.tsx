@@ -89,7 +89,7 @@ const SummaryForm = ({ reservation, listing }: SummaryFormProps) => {
           <>
             <Table
               isCompact
-              isHeaderSticky
+              // isHeaderSticky
               removeWrapper
               classNames={{
                 base: "max-h-[250px] scrollbox overflow-scroll mt-4",
