@@ -49,6 +49,14 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
     if (action === "host-reservations") {
       router.push("/reservations/pending");
     }
+
+    if (action === "listings") {
+      router.push("/listings");
+    }
+
+    if (action === "personal-listings") {
+      router.push("/listings/personal");
+    }
   };
 
   return (
@@ -86,6 +94,8 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
           <DropdownItem key="host-reservations">
             Your Properties Reservations
           </DropdownItem>
+          <DropdownItem key="listings">Listings</DropdownItem>
+          <DropdownItem key="personal-listings">Your personal listings</DropdownItem>
           <DropdownItem key="theme">Toggle Theme</DropdownItem>
           <DropdownItem key="logout" color="danger">
             Log Out
