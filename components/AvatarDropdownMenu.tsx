@@ -57,6 +57,10 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
     if (action === "personal-listings") {
       router.push("/listings/personal");
     }
+
+    if (action === "reports") {
+      router.push("/reports");
+    }
   };
 
   return (
@@ -96,6 +100,7 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
           </DropdownItem>
           <DropdownItem key="listings">Listings</DropdownItem>
           <DropdownItem key="personal-listings">Your personal listings</DropdownItem>
+          <DropdownItem key="reports">Your personal reports</DropdownItem>
           <DropdownItem key="theme">Toggle Theme</DropdownItem>
           <DropdownItem key="logout" color="danger">
             Log Out
