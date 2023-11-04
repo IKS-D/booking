@@ -108,9 +108,17 @@ export default function LoginForm() {
         variant="bordered"
       />
 
-      <label>Date of birth</label>
-      <Calendar
-        
+      <Input
+        className="max-w-xs h-[75px]"
+        type="date"
+        {...register("dateOfBirth")}
+        errorMessage={errors.dateOfBirth && (errors.dateOfBirth.message as string)}
+        isInvalid={errors.dateOfBirth ? true : false}
+        isClearable
+        label="Date of birth"
+        name="dateOfBirth"
+        placeholder="Enter your date of birth"
+        variant="bordered"
       />
 
       <Input
@@ -137,7 +145,29 @@ export default function LoginForm() {
         variant="bordered"
       />
 
-      {/*Also need to have country and city inputs here somehow*/}
+      <Input
+        className="max-w-xs h-[75px]"
+        {...register("country")}
+        errorMessage={errors.country && (errors.country.message as string)}
+        isInvalid={errors.country ? true : false}
+        isClearable
+        label="Country"
+        name="country"
+        placeholder="Enter the name of your country"
+        variant="bordered"
+      />
+
+      <Input
+        className="max-w-xs h-[75px]"
+        {...register("city")}
+        errorMessage={errors.city && (errors.city.message as string)}
+        isInvalid={errors.city ? true : false}
+        isClearable
+        label="City"
+        name="city"
+        placeholder="Enter the name of your city"
+        variant="bordered"
+      />
 
       <Spacer y={3} />
 
