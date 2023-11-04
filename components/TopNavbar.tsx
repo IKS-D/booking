@@ -4,14 +4,9 @@ import { NavbarContent, NavbarItem } from "@nextui-org/navbar";
 import NextLink from "next/link";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import BookingLogo from "./BookingLogo";
-import {
-  User,
-  createServerComponentClient,
-} from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import AvatarDropdownMenu from "./AvatarDropdownMenu";
 import { BiBell } from "react-icons/bi";
-import { Spacer } from "@nextui-org/spacer";
+import { User } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 
