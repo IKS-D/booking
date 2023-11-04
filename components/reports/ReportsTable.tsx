@@ -17,7 +17,7 @@ import {
 import { Report } from "@/types";
 import { EyeIcon } from "../Icons";
 import ReportDetailsModal from "@/components/reports/ReportDetailsModal";
-import CreateNewRerportButton from "@/components/reports/CreateNewReportButton";
+import CreateNewReportButton from "@/components/reports/CreateNewReportButton";
 
 import { DeleteIcon } from "../Icons";
 import { Reservation } from "@/types";
@@ -175,8 +175,7 @@ export default function ReportsTable({
         </TableBody>
       </Table>
       <div className="flex justify-center mt-10">
-        <CreateNewRerportButton
-          onOpenChange={newModal.onOpenChange}
+        <CreateNewReportButton
         />
       </div>   
     </>

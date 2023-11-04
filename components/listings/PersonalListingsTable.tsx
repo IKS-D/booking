@@ -13,7 +13,6 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { FaPen } from 'react-icons/fa';
-import { EyeIcon } from "../Icons";
 import { Listing } from "@/types";
 import ListingRemovalConfirmModal from "@/components/listings/ListingRemovalConfirmModal";
 import ListingEditModal from "@/components/listings/ListingEditModal";
@@ -157,17 +156,24 @@ export default function PersonalListingsTable({
         case "actions":
           return (
             <div className="relative flex items-center gap-2">
-              <Tooltip content="Details">
-                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                  <>
-                    <EyeIcon
-                      onClick={(e) => {
+              <Tooltip color="danger" content="Remove listing">
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <DeleteIcon
+                    onClick={(e) => {
                         e.stopPropagation();
-                        setReservation(reservation);
-                        detailsModal.onOpenChange();
+                        removeListing(listing);
                       }}
                     />
-                  </>
+                </span>
+              </Tooltip>
+              <Tooltip color="success" content="Edit listing information">
+                <span className="text-lg text-success cursor-pointer active:opacity-50">
+                  < FaPen
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        editListing(listing);
+                      }}
+                  />
                 </span>
               </Tooltip>
             </div>
