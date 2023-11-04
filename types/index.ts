@@ -6,16 +6,11 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 
 export type User = {
   id: string;
-  email: string;
-  password: string;
   first_name: string;
   last_name: string;
-  date_of_birth: Date;
-  phone_number: string;
+  email: string;
   avatar: string;
   created_at: Date;
-  country: string;
-  city: string;
 };
 
 export type Reservation = {
@@ -50,6 +45,13 @@ export type Listing = {
   images: string[];
 };
 
+export type Report = {
+  id: string;
+  title: string;
+  created_at: Date;
+  start_date: Date;
+  end_date: Date;
+}
+
 type ReservationStatus = "pending" | "canceled" | "confirmed";
-type ListingCategory = "apartment" | "house" | "room" | "flat";
-type AccountStatus = "active" | "inactive"
+export type ListingCategory = "apartment" | "house" | "room" | "flat";
