@@ -45,5 +45,13 @@ export type Listing = {
   images: string[];
 };
 
+export type Report = {
+  id: string;
+  title: string;
+  created_at: Date;
+  start_date: Date;
+  end_date: Date;
+}
+
 type ReservationStatus = "pending" | "canceled" | "confirmed";
-type ListingCategory = "apartment" | "house" | "room" | "flat";
+export type ListingCategory = "apartment" | "house" | "room" | "flat";
