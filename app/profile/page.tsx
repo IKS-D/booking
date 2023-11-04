@@ -38,7 +38,7 @@ export default async function Profile() {
   return (
     <section className="flex flex-col items-center justify-center gap-4 text-foreground">
         <div className="text-2xl font-bold mb-2">
-            Welcome to your profile page, {user.email}!
+            Welcome to your profile page, {user?.email}!
         </div>
   
         <div className="text-sm font-bold mb-4">Your profile picture:</div>

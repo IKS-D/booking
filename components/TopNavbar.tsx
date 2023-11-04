@@ -47,7 +47,7 @@ export default async function TopNavbar({ user }: TopNavbarProps) {
             <div className="items-center justify-center flex gap-4">
               <ThemeSwitch />
               <NextLink
-                href="/registration/accountcredentials"
+                href="/registration"
                 className="pr-2 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover text-primary"
               >
                 Register

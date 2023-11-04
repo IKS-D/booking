@@ -6,11 +6,16 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 
 export type User = {
   id: string;
+  email: string;
+  password: string;
   first_name: string;
   last_name: string;
-  email: string;
+  date_of_birth: Date;
+  phone_number: string;
   avatar: string;
   created_at: Date;
+  country: string;
+  city: string;
 };
 
 export type Reservation = {

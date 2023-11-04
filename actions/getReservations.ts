@@ -36,6 +36,11 @@ const mockUser = {
   first_name: "John",
   last_name: "Doe",
   email: "mock@mock.com",
+  password: "password",
+  date_of_birth: new Date(2000, 0, 1),
+  phone_number: "+37011111111",
+  country: "United Kingdom",
+  city: "London",
   avatar: "https://i.pravatar.cc/300",
   created_at: new Date("2020-01-01"),
 };
