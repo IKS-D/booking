@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Avatar,
+  DropdownSection,
 } from "@nextui-org/react";
 import { User } from "@supabase/supabase-js";
 import { useTheme } from "next-themes";
@@ -93,18 +94,30 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
             <p className="font-semibold">Signed in as</p>
             <p className="font-semibold">{user.email}</p>
           </DropdownItem>
-          <DropdownItem key="profile">Profile</DropdownItem>
-          <DropdownItem key="reservations">Reservations</DropdownItem>
-          <DropdownItem key="host-reservations">
-            Your Properties Reservations
-          </DropdownItem>
-          <DropdownItem key="listings">Listings</DropdownItem>
-          <DropdownItem key="personal-listings">Your personal listings</DropdownItem>
-          <DropdownItem key="reports">Your personal reports</DropdownItem>
-          <DropdownItem key="theme">Toggle Theme</DropdownItem>
-          <DropdownItem key="logout" color="danger">
-            Log Out
-          </DropdownItem>
+
+          <DropdownSection title="Menu" showDivider>
+            <DropdownItem key="profile">Profile</DropdownItem>
+            <DropdownItem key="reservations">Reservations</DropdownItem>
+            <DropdownItem key="listings">Listings</DropdownItem>
+          </DropdownSection>
+
+          <DropdownSection title="Host panel" showDivider>
+            <DropdownItem key="host-reservations">
+              Your listings reservations
+            </DropdownItem>
+
+            <DropdownItem key="personal-listings">
+              Your personal listings
+            </DropdownItem>
+            <DropdownItem key="reports">Your personal reports</DropdownItem>
+          </DropdownSection>
+
+          <DropdownSection title="Actions">
+            <DropdownItem key="theme">Toggle Theme</DropdownItem>
+            <DropdownItem key="logout" color="danger">
+              Log Out
+            </DropdownItem>
+          </DropdownSection>
         </DropdownMenu>
       </Dropdown>
     </div>

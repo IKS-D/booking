@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import ReservationCard from "@/components/reservations/ReservationCard";
 import { Reservation } from "@/types";
 import { subtitle, title } from "@/components/primitives";
@@ -20,6 +21,8 @@ import {
   Input,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
+import MessageModal from "..//messaging//MessageModal";  
+
 
 interface ReservationDetailsProps {
   reservation: Reservation;
@@ -33,6 +36,8 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
   onOpenChange,
 }) => {
   const router = useRouter();
+
+const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
 
   return (
     <>
@@ -118,7 +123,13 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
                   </div>
                 ) : null}
               </ModalBody>
-              <ModalFooter>
+              <ModalFooter>                
+              <Button
+                  color="primary"
+                  onPress={() => setIsMessageModalOpen(true)}
+              >
+                  Send Message
+              </Button>
                 <Button
                   color="secondary"
                   onPress={() => {
@@ -135,6 +146,10 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
                 >
                   Close
                 </Button>
+                <MessageModal
+                  isOpen={isMessageModalOpen}
+                  onOpenChange={() => setIsMessageModalOpen(!isMessageModalOpen)}
+                />
               </ModalFooter>
             </>
           )}
