@@ -23,7 +23,6 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
 
   useEffect(() => {
-    // When the modal is opened, initialize the editedListing with the current listing values
     if (isOpen && listing) {
       setEditedListing(listing);
     }
@@ -50,10 +49,8 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
 
   const handleConfirm = () => {
     if (editedListing) {
-      // Call the onConfirm callback with the edited listing
       onConfirm(editedListing);
 
-      // Close the modal
       onOpenChange();
     }
   };
