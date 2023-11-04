@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { IoIosPaperPlane } from "react-icons/io";
 import { getMessages } from "@/actions/getMessages";
+import EditMessageModal from "./EditMessageModal";
 import {
     Modal,
     ModalContent,
@@ -37,6 +38,9 @@ import {
   }) => {
     const [message, setMessage] = React.useState("");
     const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
+    const [isEditingModalOpen, setIsEditingModalOpen] = useState(false);
+    const [editingMessage, setEditingMessage] = useState<ChatMessage | null>(null);
+
   
     const handleSendMessage = () => {
         const newMessage = {
@@ -78,7 +82,16 @@ import {
                     }
                     <div className={`p-3 rounded-lg ${msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-200 text-black"}`}>
                         {msg.content}
-                        <span className="ml-2 text-xs text-gray-600">{msg.timestamp}</span> {/* Display timestamp */}
+                        <span className="ml-2 text-xs text-gray-600">{msg.timestamp}</span> 
+                        <button
+                                className="ml-2"
+                                onClick={() => {
+                                    setEditingMessage(msg);
+                                    setIsEditingModalOpen(true);
+                                }}
+                                >
+                                ...
+                            </button>
                     </div>
                 </div>
             ))}
@@ -102,6 +115,17 @@ import {
             <IoIosPaperPlane className="w-5 h-5" />
           </Button>
         </ModalFooter>
+        <EditMessageModal 
+            isOpen={isEditingModalOpen} 
+            onOpenChange={() => setIsEditingModalOpen(false)}
+            message={editingMessage}
+            onSave={(editedMessage) => {
+                setChatMessages(prev => prev.map(msg => msg.id === editedMessage.id ? editedMessage : msg));
+            }}
+            onDelete={(messageId) => {
+                setChatMessages(prev => prev.filter(msg => msg.id !== messageId));
+              }}
+        />
         </ModalContent>
       </Modal>
     );
