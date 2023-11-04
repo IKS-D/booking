@@ -1,6 +1,7 @@
 import getCurrentUser from "@/actions/getCurrentUser";
 import { getPersonalListings } from "@/actions/getListings";
 import PersonalListingsContent from "../../../components/listings/PersonalListingsContent";
+import CreateNewListingButton from "../../../components/listings/CreateNewListingButton";
 
 const PersonalListingsPage = async () => {
     const currentUser = await getCurrentUser();
@@ -19,7 +20,9 @@ const PersonalListingsPage = async () => {
       return (
         <div>
             <label className="text-lg font-semibold">No personal listings found</label>
-            <label className="text-lg font-semibold">Create new listing</label>
+            <div className="flex justify-center mt-10">
+              <CreateNewListingButton/>
+            </div>
         </div>
       );
     }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalFooter } from "@nextui-org/modal";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input, Textarea } from "@nextui-org/react";
 import { Listing } from "@/types";
 
 interface ListingEditModalProps {
@@ -38,6 +38,16 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
     }
   };
 
+  const handleUploadFiles = (files: File[]) =>{
+    const newPhotos = files.map((file) => URL.createObjectURL(file));
+    if(editedListing){
+      setEditedListing({
+        ...editedListing,
+        images: [...editedListing.images, ...newPhotos],
+      });
+    }
+  }
+
   const handleConfirm = () => {
     if (editedListing) {
       // Call the onConfirm callback with the edited listing
@@ -50,17 +60,17 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onOpenChange}>
-      <ModalContent>
+      <ModalContent className="p-7">
         <ModalHeader className="mb-10">Edit Listing</ModalHeader>
         {listing && (
           <div>
-            <Input className="mb-10"
+            <Input className="mb-5"
               label="Title"
               labelPlacement="outside"
               value={editedListing?.title || ""}
               onChange={(event) => handleInputChange("title", event.target.value)}
             />
-            <Input className="mb-10"
+            <Textarea className="mb-10"
               label="Description"
               labelPlacement="outside"
               value={editedListing?.description || ""}
@@ -82,12 +92,14 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
             />
             <Input className="mb-10"
                 label="New photos"
-                labelPlacement="outside"
+                labelPlacement="outside-left"
                 type="file"
                 multiple
-                // onChange={(event) => {
-                //     setPhotoFiles(event.target.files);
-                // }}
+                onChange={(e) => {
+                  const chosenFiles = Array.prototype.slice.call(e.target.files)
+
+                  handleUploadFiles(chosenFiles);
+                }}
             />
             {/* Add similar Input components for other properties */}
           </div>)
