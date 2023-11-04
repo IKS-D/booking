@@ -13,6 +13,7 @@ import { DatePickerWithRange } from "../DatePickerWithRange";
 const CreateListingForm: React.FC = () => {
 
     const [formData, setFormData] = React.useState<Partial<Report>>({});
+    const [listingData, setListingData] = React.useState<Partial<Listing>>({});
 
     // const [descriptionError, setDescriptionError] = React.useState(false);
     // const [cityError, setCityError] = React.useState(false);
@@ -22,9 +23,16 @@ const CreateListingForm: React.FC = () => {
     // const [priceError, setPriceError] = React.useState(false);
   
     const [titleError, setTitleError] = React.useState(false);
+    const [selectionError, setSelectionError] = React.useState(false);
     const [dateRangeError, setDateRangeError] = React.useState(false);
 
     const router = useRouter();
+
+    const listings = [
+      "Flat in Kaunas",
+      "Mansion in LA",
+      "Chicago RockNRoll",
+    ];
 
     const handleFormSubmit = () => {
       router.push("/reports");
@@ -37,6 +45,10 @@ const CreateListingForm: React.FC = () => {
               setTitleError(true);
               hasErrors = true;
           }
+          if (!listingData.title) {
+            setSelectionError(true);
+            hasErrors = true;
+        }
           if (!formData.start_date || !formData.end_date) {
             console.log("IVYKISBOO");
             setDateRangeError(true);
@@ -63,6 +75,24 @@ const CreateListingForm: React.FC = () => {
                     setTitleError(false)
                   }}
             />
+            <Select
+                    isRequired
+                    label="Which listing is the report for?"
+                    isInvalid={selectionError}
+                    labelPlacement="outside"
+                    placeholder="Select the listing"
+                    className="max-w-xs mb-5"
+                    onChange={(event) =>{
+                      setListingData({ ...listingData, title: event.target.value})
+                      setSelectionError(false)
+                    }}
+                  >
+                    {listings.map((listing) => (
+                      <SelectItem key={listing} value={listing}>
+                        {listing}
+                      </SelectItem>
+                    ))}
+                </Select>
             <label className={`text-sm mb-2 ${dateRangeError ? 'text-danger' : ''}`}>Date range <span className="text-danger">*</span></label>
             <DatePickerWithRange 
                 className={`mb-5 ${dateRangeError ? 'text-danger' : ''}`}
