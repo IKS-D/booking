@@ -153,6 +153,7 @@ export default function RegistrationForm() {
                       </button>
                     }
                     label="Password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     variant="bordered"
                     placeholder="Enter your password"
@@ -167,6 +168,7 @@ export default function RegistrationForm() {
                   <Input
                     className="max-w-md h-[75px]"
                     label="Repeat password"
+                    name="confirm_password"
                     type="password"
                     variant="bordered"
                     placeholder="Repeat your password"
@@ -196,7 +198,7 @@ export default function RegistrationForm() {
                 <Input
                   className="max-w-md h-[75px]"
                   label="First name"
-                  name="firstName"
+                  name="first_name"
                   placeholder="Enter your first name"
                   variant="bordered"
                   value={formData.first_name}
@@ -210,7 +212,7 @@ export default function RegistrationForm() {
                 <Input
                   className="max-w-md h-[75px]"                    
                   label="Last name"
-                  name="lastName"
+                  name="last_name"
                   placeholder="Enter your last name"
                   variant="bordered"
                   value={formData.last_name}
@@ -225,7 +227,7 @@ export default function RegistrationForm() {
                   className="max-w-md h-[75px]"
                   type="date"
                   label="Date of birth"
-                  name="dateOfBirth"
+                  name="date_of_birth"
                   variant="bordered"
                   value={formData.date_of_birth ? formData.date_of_birth.toISOString().split('T')[0] : ''}
                   onChange={(event) => {
@@ -240,7 +242,7 @@ export default function RegistrationForm() {
                 <Input
                   className="max-w-md h-[75px]"
                   label="Phone number"
-                  name="phone"
+                  name="phone_number"
                   placeholder="Enter your phone number"
                   variant="bordered"
                   value={formData.phone_number}
@@ -282,8 +284,8 @@ export default function RegistrationForm() {
                 <p className="text-lg font-bold mb-4">Enter your profile picture</p>
                 <Input
                   className="max-w-xs h-[75px]"
-                  label="Picture"
-                  name="picture"
+                  label="Avatar"
+                  name="avatar"
                   placeholder="Enter a URL for your picture"
                   variant="bordered"
                   value={formData.avatar}
