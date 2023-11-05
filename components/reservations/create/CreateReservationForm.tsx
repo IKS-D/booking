@@ -9,9 +9,12 @@ import { AdditionalService, Reservation } from "@/types";
 import SelectDateRangeForm from "./SelectDateRangeForm";
 import AdditionalServicesForm from "./AdditionalServicesForm";
 import SummaryForm from "./SummaryForm";
+import { useRouter } from "next/navigation";
 
 export default function CreateReservationForm() {
   const [formData, setFormData] = useState<Partial<Reservation>>({});
+
+  const router = useRouter();
 
   const additionalServices: AdditionalService[] = [
     {
@@ -82,6 +85,7 @@ export default function CreateReservationForm() {
   } = useMultiplestepForm(3);
 
   const handleOnSubmit = () => {
+    router.push("/reservations");
     toast.success("Reservation created successfully");
   };
 
