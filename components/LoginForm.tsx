@@ -134,7 +134,7 @@ export default function LoginForm() {
       <Spacer y={1} />
       <div className="flex flex-col items-center">
         <label className="text-md">Don't have an account?</label>
-        <Link href="/signup">
+        <Link href="/registration">
           <p className="text-md text-primary">Sign up</p>
         </Link>
       </div>

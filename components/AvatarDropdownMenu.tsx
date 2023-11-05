@@ -43,6 +43,10 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
       onLogout();
     }
 
+    if (action === "profile") {
+      router.push("/profile");
+    }
+
     if (action === "reservations") {
       router.push("/reservations");
     }

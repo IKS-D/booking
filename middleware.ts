@@ -73,7 +73,7 @@ export const config = {
 
 const publicRoutes = [
   "/login",
-  "/signup",
+  "/registration",
   "/",
   "/listings",
   "/listings/[id]",
