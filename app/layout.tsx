@@ -57,6 +57,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta
+          name="verify-paysera"
+          content="bb15087f5faa89006586a36595ae09d0"
+        ></meta>
+      </head>
       <body
         className={clsx(
           "min-h-screen bg-background font-sans antialiased p-2 sm:p-6 sm:py-0",
