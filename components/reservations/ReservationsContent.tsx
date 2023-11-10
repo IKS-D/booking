@@ -4,6 +4,10 @@ import ReservationCard from "@/components/reservations/ReservationCard";
 import { Reservation } from "@/types";
 import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
+import { Button } from "@nextui-org/react";
+import { buildPayseraPaymentLink } from "@/lib/payseraAPI";
+import generatePayseraLink from "@/actions/generatePayseraLink";
+import createPayment from "@/actions/generatePayseraLink";
 
 interface ReservationsContentProps {
   reservations: Reservation[];
@@ -18,6 +22,7 @@ const ReservationsContent: React.FC<ReservationsContentProps> = ({
     <div className="max-w-full items-center">
       <label className={title({ size: "sm" })}>Reservations</label>
       <label className={subtitle({})}>All your reservations</label>
+
       <div
         className="
           grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5

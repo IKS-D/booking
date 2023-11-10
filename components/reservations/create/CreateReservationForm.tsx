@@ -10,6 +10,7 @@ import SelectDateRangeForm from "./SelectDateRangeForm";
 import AdditionalServicesForm from "./AdditionalServicesForm";
 import SummaryForm from "./SummaryForm";
 import { useRouter } from "next/navigation";
+import createPayment from "@/actions/generatePayseraLink";
 
 export default function CreateReservationForm() {
   const [formData, setFormData] = useState<Partial<Reservation>>({});
@@ -159,6 +160,17 @@ export default function CreateReservationForm() {
                 >
                   {isLastStep ? "Confirm reservation" : "Next Step"}
                 </Button>
+                {isLastStep && (
+                  <Button
+                    color="primary"
+                    variant="ghost"
+                    type="submit"
+                    className="ml-2"
+                    formAction={createPayment}
+                  >
+                    Pay with Paysera
+                  </Button>
+                )}
               </div>
             </div>
           </form>
