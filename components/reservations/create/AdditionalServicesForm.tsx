@@ -20,8 +20,8 @@ const AdditionalServicesForm = ({
   additionalServices,
   onAdditionalServicesUpdate,
 }: AdditionalServicesFormProps) => {
-  const [selectedKeys, setSelectedKeys] = React.useState<Set<React.Key>>(
-    new Set<React.Key>(selectedServices?.map((service) => service.id))
+  const [selectedKeys, setSelectedKeys] = React.useState<Set<string>>(
+    new Set<string>(selectedServices?.map((service) => service.id))
   );
 
   const selectedValue = React.useMemo(() => {
@@ -49,7 +49,7 @@ const AdditionalServicesForm = ({
     return values.reduce((a, b) => a + b, 0);
   }, [selectedKeys]);
 
-  const onSelectionChange = (keys: Set<React.Key>) => {
+  const onSelectionChange = (keys: Set<string>) => {
     setSelectedKeys(keys);
 
     const selectedKeysArray = Array.from(keys);

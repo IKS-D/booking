@@ -73,7 +73,17 @@ export default async function RootLayout({
           <ClientOnly>
             <div className="flex flex-col h-full">
               {/* Header */}
-              <Toaster richColors expand position="top-right" />
+              <Toaster
+                richColors
+                theme="dark"
+                position="top-center"
+                offset={0}
+                toastOptions={{
+                  // className: "mt-[46px]",
+                  className: "mt-[76px]",
+                  duration: 3000,
+                }}
+              />
               <TopNavbar user={user} />
 
               {/* Main content */}
