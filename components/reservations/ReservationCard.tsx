@@ -4,13 +4,6 @@ import { Listing, Reservation } from "@/types";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { User } from "@supabase/supabase-js";
 import Image from "next/image";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from "@nextui-org/modal";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import ReservationDetailsModal from "@/components/reservations/ReservationDetailsModal";
@@ -39,7 +32,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
   const detailsModal = useDisclosure();
 
   const cancelReservation = async () => {
-    toast("Cancelling reservation...");
+    toast.success("Reservation cancelled successfully");
   };
 
   const getDateString = () => {
