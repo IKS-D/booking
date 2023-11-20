@@ -1,5 +1,4 @@
 import getCurrentUser from "@/actions/getCurrentUser";
-import TripsClient from "../../components/reservations/ReservationsContent";
 import { getReservations } from "@/actions/getReservations";
 import ReservationsContent from "../../components/reservations/ReservationsContent";
 
@@ -16,7 +15,7 @@ const ReservationsPage = async () => {
 
   const reservations = await getReservations({});
 
-  if (reservations.length === 0) {
+  if (!reservations || reservations.length === 0) {
     return (
       <label className="text-lg font-semibold">No reservations found.</label>
     );

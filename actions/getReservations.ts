@@ -1,4 +1,6 @@
 import { Listing, Reservation } from "@/types";
+import { Database } from "@/types/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 interface Params {
   listingId?: string;
@@ -7,6 +9,21 @@ interface Params {
 }
 
 export async function getReservations(params: Params) {
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // let { data: reservations, error } = await supabase.from("reservation")
+  //   .select(`
+  //   *
+  // `);
+
+  // if (error) {
+  //   console.error(error);
+  //   return;
+  // }
+
   const { listingId, userId, authorId } = params;
 
   const reservations = Array(20).fill(mockReservation);
