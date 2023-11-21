@@ -9,16 +9,42 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      listing: {
+      hosts: {
+        Row: {
+          bank_account: string
+          id: number
+          personal_code: string
+        }
+        Insert: {
+          bank_account: string
+          id?: never
+          personal_code: string
+        }
+        Update: {
+          bank_account?: string
+          id?: never
+          personal_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_user"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      listings: {
         Row: {
           address: string
           category: number
           city: string
           country: string
           creation_date: string
-          daily_price: unknown
+          daily_price: number
           description: string
-          fk_manager: number
+          fk_hosts: number
           id: number
           number_of_seats: number
           photos: string
@@ -31,10 +57,10 @@ export interface Database {
           city: string
           country: string
           creation_date: string
-          daily_price: unknown
+          daily_price: number
           description: string
-          fk_manager: number
-          id: number
+          fk_hosts: number
+          id?: never
           number_of_seats: number
           photos: string
           suspension_status: boolean
@@ -46,10 +72,10 @@ export interface Database {
           city?: string
           country?: string
           creation_date?: string
-          daily_price?: unknown
+          daily_price?: number
           description?: string
-          fk_manager?: number
-          id?: number
+          fk_hosts?: number
+          id?: never
           number_of_seats?: number
           photos?: string
           suspension_status?: boolean
@@ -57,22 +83,22 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_manager"
-            columns: ["fk_manager"]
+            foreignKeyName: "fk_hosts"
+            columns: ["fk_hosts"]
             isOneToOne: false
-            referencedRelation: "manager"
+            referencedRelation: "hosts"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "listing_category_fkey"
+            foreignKeyName: "listings_category_fkey"
             columns: ["category"]
             isOneToOne: false
-            referencedRelation: "listing_category"
+            referencedRelation: "listings_category"
             referencedColumns: ["id"]
           }
         ]
       }
-      listing_category: {
+      listings_category: {
         Row: {
           id: number
           name: string
@@ -87,33 +113,7 @@ export interface Database {
         }
         Relationships: []
       }
-      manager: {
-        Row: {
-          bank_account: string
-          id: number
-          personal_code: string
-        }
-        Insert: {
-          bank_account: string
-          id: number
-          personal_code: string
-        }
-        Update: {
-          bank_account?: string
-          id?: number
-          personal_code?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_user"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      message: {
+      messages: {
         Row: {
           fk_receiver: number
           fk_reservation: number
@@ -129,7 +129,7 @@ export interface Database {
           fk_receiver: number
           fk_reservation: number
           fk_sender: number
-          id: number
+          id?: never
           read_time?: string | null
           received_time?: string | null
           sent_time: string
@@ -140,7 +140,7 @@ export interface Database {
           fk_receiver?: number
           fk_reservation?: number
           fk_sender?: number
-          id?: number
+          id?: never
           read_time?: string | null
           received_time?: string | null
           sent_time?: string
@@ -152,33 +152,33 @@ export interface Database {
             foreignKeyName: "fk_receiver"
             columns: ["fk_receiver"]
             isOneToOne: false
-            referencedRelation: "user"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_reservation"
+            foreignKeyName: "fk_reservations"
             columns: ["fk_reservation"]
             isOneToOne: false
-            referencedRelation: "reservation"
+            referencedRelation: "reservations"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fk_sender"
             columns: ["fk_sender"]
             isOneToOne: false
-            referencedRelation: "user"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "message_status_fkey"
+            foreignKeyName: "messages_status_fkey"
             columns: ["status"]
             isOneToOne: false
-            referencedRelation: "message_status"
+            referencedRelation: "messages_status"
             referencedColumns: ["id"]
           }
         ]
       }
-      message_status: {
+      messages_status: {
         Row: {
           id: number
           name: string
@@ -193,7 +193,7 @@ export interface Database {
         }
         Relationships: []
       }
-      notification: {
+      notifications: {
         Row: {
           fk_reservation: number
           id: number
@@ -203,29 +203,29 @@ export interface Database {
         }
         Insert: {
           fk_reservation: number
-          id: number
+          id?: never
           sent_time: string
           text: string
           title: string
         }
         Update: {
           fk_reservation?: number
-          id?: number
+          id?: never
           sent_time?: string
           text?: string
           title?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_reservation"
+            foreignKeyName: "fk_reservations"
             columns: ["fk_reservation"]
             isOneToOne: false
-            referencedRelation: "reservation"
+            referencedRelation: "reservations"
             referencedColumns: ["id"]
           }
         ]
       }
-      ordered_service: {
+      ordered_services: {
         Row: {
           fk_reservation: number
           fk_service: number
@@ -234,33 +234,33 @@ export interface Database {
         Insert: {
           fk_reservation: number
           fk_service: number
-          id: number
+          id?: never
         }
         Update: {
           fk_reservation?: number
           fk_service?: number
-          id?: number
+          id?: never
         }
         Relationships: [
           {
-            foreignKeyName: "fk_reservation"
+            foreignKeyName: "fk_reservations"
             columns: ["fk_reservation"]
             isOneToOne: false
-            referencedRelation: "reservation"
+            referencedRelation: "reservations"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_service"
+            foreignKeyName: "fk_services"
             columns: ["fk_service"]
             isOneToOne: true
-            referencedRelation: "service"
+            referencedRelation: "services"
             referencedColumns: ["id"]
           }
         ]
       }
-      payment: {
+      payments: {
         Row: {
-          amount: unknown
+          amount: number
           date: string
           first_name: string
           fk_reservation: number
@@ -272,11 +272,11 @@ export interface Database {
           status: number
         }
         Insert: {
-          amount: unknown
+          amount: number
           date: string
           first_name: string
           fk_reservation: number
-          id: number
+          id?: never
           last_name: string
           payer_email: string
           payment_method: string
@@ -284,11 +284,11 @@ export interface Database {
           status: number
         }
         Update: {
-          amount?: unknown
+          amount?: number
           date?: string
           first_name?: string
           fk_reservation?: number
-          id?: number
+          id?: never
           last_name?: string
           payer_email?: string
           payment_method?: string
@@ -297,15 +297,15 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_reservation"
+            foreignKeyName: "fk_reservations"
             columns: ["fk_reservation"]
             isOneToOne: true
-            referencedRelation: "reservation"
+            referencedRelation: "reservations"
             referencedColumns: ["id"]
           }
         ]
       }
-      photo: {
+      photos: {
         Row: {
           fk_listing: number
           id: number
@@ -313,31 +313,31 @@ export interface Database {
         }
         Insert: {
           fk_listing: number
-          id: number
+          id?: never
           url: string
         }
         Update: {
           fk_listing?: number
-          id?: number
+          id?: never
           url?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_listing"
+            foreignKeyName: "fk_listings"
             columns: ["fk_listing"]
             isOneToOne: false
-            referencedRelation: "listing"
+            referencedRelation: "listings"
             referencedColumns: ["id"]
           }
         ]
       }
-      report: {
+      reports: {
         Row: {
           creation_date: string
           end_date: string
           file_url: string
+          fk_hosts: number
           fk_listing: number
-          fk_manager: number
           id: number
           start_date: string
           title: string
@@ -346,9 +346,9 @@ export interface Database {
           creation_date: string
           end_date: string
           file_url: string
+          fk_hosts: number
           fk_listing: number
-          fk_manager: number
-          id: number
+          id?: never
           start_date: string
           title: string
         }
@@ -356,30 +356,30 @@ export interface Database {
           creation_date?: string
           end_date?: string
           file_url?: string
+          fk_hosts?: number
           fk_listing?: number
-          fk_manager?: number
-          id?: number
+          id?: never
           start_date?: string
           title?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_listing"
-            columns: ["fk_listing"]
+            foreignKeyName: "fk_hosts"
+            columns: ["fk_hosts"]
             isOneToOne: false
-            referencedRelation: "listing"
+            referencedRelation: "hosts"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_manager"
-            columns: ["fk_manager"]
+            foreignKeyName: "fk_listings"
+            columns: ["fk_listing"]
             isOneToOne: false
-            referencedRelation: "manager"
+            referencedRelation: "listings"
             referencedColumns: ["id"]
           }
         ]
       }
-      reservation: {
+      reservations: {
         Row: {
           creation_date: string
           end_date: string
@@ -388,53 +388,53 @@ export interface Database {
           id: number
           start_date: string
           status: number
-          total_price: unknown
+          total_price: number
         }
         Insert: {
           creation_date: string
           end_date: string
           fk_listing: number
           fk_user: number
-          id: number
+          id?: never
           start_date: string
           status: number
-          total_price: unknown
+          total_price: number
         }
         Update: {
           creation_date?: string
           end_date?: string
           fk_listing?: number
           fk_user?: number
-          id?: number
+          id?: never
           start_date?: string
           status?: number
-          total_price?: unknown
+          total_price?: number
         }
         Relationships: [
           {
-            foreignKeyName: "fk_listing"
+            foreignKeyName: "fk_listings"
             columns: ["fk_listing"]
             isOneToOne: false
-            referencedRelation: "listing"
+            referencedRelation: "listings"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fk_user"
             columns: ["fk_user"]
             isOneToOne: false
-            referencedRelation: "user"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "reservation_status_fkey"
+            foreignKeyName: "reservations_status_fkey"
             columns: ["status"]
             isOneToOne: false
-            referencedRelation: "reservation_status"
+            referencedRelation: "reservations_status"
             referencedColumns: ["id"]
           }
         ]
       }
-      reservation_status: {
+      reservations_status: {
         Row: {
           id: number
           name: string
@@ -449,39 +449,39 @@ export interface Database {
         }
         Relationships: []
       }
-      service: {
+      services: {
         Row: {
           description: string
           fk_listing: number
           id: number
-          price: unknown
+          price: number
           title: string
         }
         Insert: {
           description: string
           fk_listing: number
-          id: number
-          price: unknown
+          id?: never
+          price: number
           title: string
         }
         Update: {
           description?: string
           fk_listing?: number
-          id?: number
-          price?: unknown
+          id?: never
+          price?: number
           title?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_listing"
+            foreignKeyName: "fk_listings"
             columns: ["fk_listing"]
             isOneToOne: false
-            referencedRelation: "listing"
+            referencedRelation: "listings"
             referencedColumns: ["id"]
           }
         ]
       }
-      user: {
+      users: {
         Row: {
           birth_date: string
           city: string
@@ -492,7 +492,7 @@ export interface Database {
           last_name: string
           password: string
           phone: string
-          photo: string
+          photos: string
           registration_date: string
           update_date: string
         }
@@ -502,11 +502,11 @@ export interface Database {
           country: string
           email: string
           first_name: string
-          id: number
+          id?: never
           last_name: string
           password: string
           phone: string
-          photo: string
+          photos: string
           registration_date: string
           update_date: string
         }
@@ -516,11 +516,11 @@ export interface Database {
           country?: string
           email?: string
           first_name?: string
-          id?: number
+          id?: never
           last_name?: string
           password?: string
           phone?: string
-          photo?: string
+          photos?: string
           registration_date?: string
           update_date?: string
         }
