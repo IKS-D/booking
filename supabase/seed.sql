@@ -1,61 +1,58 @@
 --@(#) script.ddl
-CREATE TABLE public.users (
-	id int generated always as identity primary key,
-	email varchar (255) NOT NULL,
-	password varchar (255) NOT NULL,
+CREATE TABLE public.profiles (
+	id uuid not null references auth.users on delete cascade,
 	first_name varchar (30) NOT NULL,
 	last_name varchar (30) NOT NULL,
 	birth_date date NOT NULL,
 	phone varchar (20) NOT NULL,
 	photos varchar (255) NOT NULL,
-	registration_date timestamp NOT NULL,
-	update_date timestamp NOT NULL,
 	country varchar (60) NOT NULL,
-	city varchar (60) NOT NULL
+	city varchar (60) NOT NULL,
+	UNIQUE(id)
 );
 
-CREATE TABLE public.reservations_status (
+CREATE TABLE public.reservation_status (
 	id int primary key,
 	name varchar (60) NOT NULL
 );
 
 INSERT INTO
-	reservations_status(id, name)
+	reservation_status(id, name)
 VALUES
-	(1, 'submitted');
+	(1, 'pending');
 
 INSERT INTO
-	reservations_status(id, name)
+	reservation_status(id, name)
 VALUES
 	(2, 'confirmed');
 
 INSERT INTO
-	reservations_status(id, name)
+	reservation_status(id, name)
 VALUES
 	(3, 'rejected');
 
-CREATE TABLE public.listings_category (
+CREATE TABLE public.listing_category (
 	id int primary key,
 	name varchar (60) NOT NULL
 );
 
 INSERT INTO
-	listings_category(id, name)
+	listing_category(id, name)
 VALUES
 	(1, 'House');
 
 INSERT INTO
-	listings_category(id, name)
+	listing_category(id, name)
 VALUES
 	(2, 'Apartment');
 
 INSERT INTO
-	listings_category(id, name)
+	listing_category(id, name)
 VALUES
 	(3, 'Room');
 
 INSERT INTO
-	listings_category(id, name)
+	listing_category(id, name)
 VALUES
 	(4, 'Apartments');
 
@@ -85,10 +82,10 @@ VALUES
 	(4, 'deleted');
 
 CREATE TABLE public.hosts (
-	id int generated always as identity primary key,
+	id uuid not null references auth.users on delete cascade,
 	personal_code varchar (255) NOT NULL,
 	bank_account varchar (40) NOT NULL,
-	CONSTRAINT fk_user FOREIGN KEY(id) REFERENCES public.users (id)
+	UNIQUE(id)
 );
 
 CREATE TABLE public.listings (
@@ -101,12 +98,12 @@ CREATE TABLE public.listings (
 	address varchar (100) NOT NULL,
 	country varchar (60) NOT NULL,
 	creation_date timestamp NOT NULL,
-	number_of_seats int NOT NULL,
-	daily_price int NOT NULL,
-	category int NOT NULL,
-	fk_hosts int NOT NULL,
-	FOREIGN KEY(category) REFERENCES public.listings_category (id),
-	CONSTRAINT fk_hosts FOREIGN KEY(fk_hosts) REFERENCES public.hosts (id)
+	number_of_places int NOT NULL,
+	day_price int NOT NULL,
+	category_id int NOT NULL,
+	host_id uuid NOT NULL,
+	FOREIGN KEY(category_id) REFERENCES public.listing_category (id),
+	FOREIGN KEY(host_id) REFERENCES public.hosts (id)
 );
 
 CREATE TABLE public.reports (
@@ -116,17 +113,17 @@ CREATE TABLE public.reports (
 	start_date date NOT NULL,
 	end_date date NOT NULL,
 	file_url varchar (255) NOT NULL,
-	fk_listing int NOT NULL,
-	fk_hosts int NOT NULL,
-	CONSTRAINT fk_listings FOREIGN KEY(fk_listing) REFERENCES public.listings (id),
-	CONSTRAINT fk_hosts FOREIGN KEY(fk_hosts) REFERENCES public.hosts (id)
+	listing_id int NOT NULL,
+	host_id uuid NOT NULL,
+	FOREIGN KEY(listing_id) REFERENCES public.listings (id),
+	FOREIGN KEY(host_id) REFERENCES public.hosts (id)
 );
 
 CREATE TABLE public.photos (
 	id int generated always as identity primary key,
 	url varchar (255) NOT NULL,
-	fk_listing int NOT NULL,
-	CONSTRAINT fk_listings FOREIGN KEY(fk_listing) REFERENCES public.listings(id)
+	listing_id int NOT NULL,
+	FOREIGN KEY(listing_id) REFERENCES public.listings(id)
 );
 
 CREATE TABLE public.services (
@@ -134,8 +131,8 @@ CREATE TABLE public.services (
 	title varchar (60) NOT NULL,
 	description varchar (255) NOT NULL,
 	price int NOT NULL,
-	fk_listing int NOT NULL,
-	CONSTRAINT fk_listings FOREIGN KEY(fk_listing) REFERENCES public.listings (id)
+	listing_id int NOT NULL,
+	FOREIGN KEY(listing_id) REFERENCES public.listings (id)
 );
 
 CREATE TABLE public.reservations (
@@ -145,11 +142,11 @@ CREATE TABLE public.reservations (
 	total_price int NOT NULL,
 	creation_date timestamp NOT NULL,
 	status int NOT NULL,
-	fk_listing int NOT NULL,
-	fk_user int NOT NULL,
-	FOREIGN KEY(status) REFERENCES public.reservations_status (id),
-	CONSTRAINT fk_listings FOREIGN KEY(fk_listing) REFERENCES public.listings (id),
-	CONSTRAINT fk_User FOREIGN KEY(fk_user) REFERENCES public.users (id)
+	listing_id int NOT NULL,
+	user_id uuid NOT NULL,
+	FOREIGN KEY(status) REFERENCES public.reservation_status (id),
+	FOREIGN KEY(listing_id) REFERENCES public.listings (id),
+	FOREIGN KEY(user_id) REFERENCES public.profiles (id)
 );
 
 CREATE TABLE public.payments (
@@ -162,9 +159,9 @@ CREATE TABLE public.payments (
 	payer_email varchar (60) NOT NULL,
 	amount int NOT NULL,
 	status int NOT NULL,
-	fk_reservation int NOT NULL,
-	UNIQUE(fk_reservation),
-	CONSTRAINT fk_reservations FOREIGN KEY(fk_reservation) REFERENCES public.reservations (id)
+	reservation_id int NOT NULL,
+	UNIQUE(reservation_id),
+	FOREIGN KEY(reservation_id) REFERENCES public.reservations (id)
 );
 
 CREATE TABLE public.notifications (
@@ -172,17 +169,17 @@ CREATE TABLE public.notifications (
 	sent_time timestamp NOT NULL,
 	title varchar (60) NOT NULL,
 	text text NOT NULL,
-	fk_reservation int NOT NULL,
-	CONSTRAINT fk_reservations FOREIGN KEY(fk_reservation) REFERENCES public.reservations (id)
+	reservation_id int NOT NULL,
+	FOREIGN KEY(reservation_id) REFERENCES public.reservations (id)
 );
 
 CREATE TABLE public.ordered_services (
 	id int generated always as identity primary key,
-	fk_service int NOT NULL,
-	fk_reservation int NOT NULL,
-	UNIQUE(fk_service),
-	CONSTRAINT fk_services FOREIGN KEY(fk_service) REFERENCES public.services (id),
-	CONSTRAINT fk_reservations FOREIGN KEY(fk_reservation) REFERENCES public.reservations (id)
+	service_id int NOT NULL,
+	reservation_id int NOT NULL,
+	UNIQUE(service_id),
+	FOREIGN KEY(service_id) REFERENCES public.services (id),
+	FOREIGN KEY(reservation_id) REFERENCES public.reservations (id)
 );
 
 CREATE TABLE public.messages (
@@ -192,11 +189,11 @@ CREATE TABLE public.messages (
 	read_time timestamp NULL,
 	text text NOT NULL,
 	status int NOT NULL,
-	fk_sender int NOT NULL,
-	fk_reservation int NOT NULL,
-	fk_receiver int NOT NULL,
+	sender_id uuid NOT NULL,
+	received_id uuid NOT NULL,
+	reservation_id int NOT NULL,
 	FOREIGN KEY(status) REFERENCES public.messages_status (id),
-	CONSTRAINT fk_sender FOREIGN KEY(fk_sender) REFERENCES public.users (id),
-	CONSTRAINT fk_reservations FOREIGN KEY(fk_reservation) REFERENCES public.reservations (id),
-	CONSTRAINT fk_receiver FOREIGN KEY(fk_receiver) REFERENCES public.users (id)
+	FOREIGN KEY(sender_id) REFERENCES auth.users (id),
+	FOREIGN KEY(received_id) REFERENCES auth.users (id),
+	FOREIGN KEY(reservation_id) REFERENCES public.reservations (id)
 );

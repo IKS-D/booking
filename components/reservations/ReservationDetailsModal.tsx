@@ -1,10 +1,7 @@
 "use client";
 
 import React from "react";
-import ReservationCard from "@/components/reservations/ReservationCard";
-import { Reservation } from "@/types";
 import { subtitle, title } from "@/components/primitives";
-import { format } from "date-fns";
 import {
   Modal,
   ModalContent,
@@ -12,20 +9,14 @@ import {
   ModalBody,
   ModalFooter,
 } from "@nextui-org/modal";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  Image,
-  Input,
-} from "@nextui-org/react";
+import { Button, Image, Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import MessageModal from "..//messaging//MessageModal";  
-
+import MessageModal from "..//messaging//MessageModal";
+import { ReservationWithDetails } from "@/actions/getReservations";
+import { format } from "date-fns";
 
 interface ReservationDetailsProps {
-  reservation: Reservation;
+  reservation: ReservationWithDetails;
   isOpen: boolean;
   onOpenChange: () => void;
 }
@@ -37,7 +28,7 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
 }) => {
   const router = useRouter();
 
-const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
 
   return (
     <>
@@ -55,21 +46,21 @@ const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
               </ModalHeader>
               <ModalBody className="mb-6">
                 <Image
-                  src={reservation.listing.images[0]}
-                  alt={reservation.listing.title}
+                  src={reservation.listing?.photos}
+                  alt={reservation.listing?.title}
                   radius="lg"
                   width={300}
                   className="mb-6"
                 />
 
                 <label className={title({ size: "sm" })}>
-                  {reservation.listing.title}
+                  {reservation.listing?.title}
                 </label>
 
                 <div className="flex flex-row gap-2 mt-6">
                   <Input
                     label="Start date"
-                    value={format(reservation.start_date, "PP")}
+                    value={format(new Date(reservation.start_date), "PP")}
                     readOnly
                     disabled
                     variant="bordered"
@@ -77,7 +68,7 @@ const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
                   />
                   <Input
                     label="End date"
-                    value={format(reservation.end_date, "PP")}
+                    value={format(new Date(reservation.end_date), "PP")}
                     readOnly
                     disabled
                     variant="bordered"
@@ -85,7 +76,7 @@ const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
                   />
                   <Input
                     label="Status"
-                    value={reservation.status.toString()}
+                    value={reservation.status.name.toString()}
                     readOnly
                     disabled
                     variant="bordered"
@@ -96,7 +87,7 @@ const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
                 <div className="flex flex-row gap-2">
                   <Input
                     label="Adress"
-                    value={`${reservation.listing.address}, ${reservation.listing.city}`}
+                    value={`${reservation.listing?.address}, ${reservation.listing?.city}`}
                     readOnly
                     disabled
                     variant="bordered"
@@ -104,15 +95,15 @@ const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
                   />
                 </div>
 
-                {reservation.additional_services.length > 0 ? (
+                {reservation.ordered_services.length > 0 ? (
                   <div className="flex flex-col gap-2 mt-4">
                     <label className={subtitle({})}>Additional services</label>
 
                     <div className="flex flex-row gap-2">
-                      {reservation.additional_services.map((service) => (
+                      {reservation.ordered_services.map((service) => (
                         <Input
-                          label={service.name}
-                          value={`${service.price} €`}
+                          label={service.service?.title}
+                          value={`${service.service?.price} €`}
                           readOnly
                           disabled
                           variant="bordered"
@@ -123,17 +114,17 @@ const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
                   </div>
                 ) : null}
               </ModalBody>
-              <ModalFooter>                
-              <Button
+              <ModalFooter>
+                <Button
                   color="primary"
                   onPress={() => setIsMessageModalOpen(true)}
-              >
+                >
                   Send Message
-              </Button>
+                </Button>
                 <Button
                   color="secondary"
                   onPress={() => {
-                    router.push(`/listings/${reservation.listing.id}`);
+                    router.push(`/listings/${reservation.listing?.id}`);
                     onClose();
                   }}
                 >
@@ -148,7 +139,9 @@ const [isMessageModalOpen, setIsMessageModalOpen] = React.useState(false);
                 </Button>
                 <MessageModal
                   isOpen={isMessageModalOpen}
-                  onOpenChange={() => setIsMessageModalOpen(!isMessageModalOpen)}
+                  onOpenChange={() =>
+                    setIsMessageModalOpen(!isMessageModalOpen)
+                  }
                 />
               </ModalFooter>
             </>

@@ -21,3 +21,6 @@ type Combine<T1, T2> = Prettify<
 type Mutable<T> = {
   -readonly [K in keyof T]: T[K];
 };
+
+// Helper utility to unwrap a promise
+type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;

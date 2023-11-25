@@ -1,6 +1,5 @@
 "use client";
 
-import { Listing, Reservation } from "@/types";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { User } from "@supabase/supabase-js";
 import Image from "next/image";
@@ -8,26 +7,27 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import ReservationDetailsModal from "@/components/reservations/ReservationDetailsModal";
 import ReservationCancelConfirmModal from "@/components/reservations/ReservationCancelModal";
+import { ReservationWithDetails } from "@/actions/getReservations";
 
 interface ReservationCardProps {
-  listing: Listing;
-  reservation: Reservation;
+  reservation: ReservationWithDetails;
   onAction?: (id: string) => void;
   disabled?: boolean;
   actionLabel?: string;
-  actionId?: string;
   currentUser?: User | null;
 }
 
 const ReservationCard: React.FC<ReservationCardProps> = ({
-  listing,
   reservation,
   onAction,
   disabled,
   actionLabel,
-  actionId = "",
   currentUser,
 }) => {
+  const listing = reservation.listing!;
+
+  console.log(listing);
+
   const cancelModal = useDisclosure();
   const detailsModal = useDisclosure();
 
@@ -39,7 +39,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
     const start = reservation.start_date;
     const end = reservation.end_date;
 
-    return `${format(start, "PP")} - ${format(end, "PP")}`;
+    return `${format(new Date(start), "PP")} - ${format(new Date(end), "PP")}`;
   };
 
   return (
@@ -82,7 +82,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
               group-hover:scale-110 
               transition
             "
-              src={listing.images[0]}
+              src={listing?.photos || ""}
               alt="Listing"
             />
 
@@ -100,8 +100,9 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 
           <div className="font-semibold text-lg">{listing.title}</div>
           <div className="text-default-600 font-ligth">
-            {listing.category.charAt(0).toUpperCase() +
-              listing.category.slice(1)}
+            {listing.category &&
+              listing.category?.name.charAt(0).toUpperCase() +
+                listing.category?.name.slice(1)}
           </div>
 
           <div className="font-semibold">{getDateString()}</div>

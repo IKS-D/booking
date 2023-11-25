@@ -13,7 +13,7 @@ const ReservationsPage = async () => {
     );
   }
 
-  const reservations = await getReservations({});
+  const { data : reservations, error } = await getReservations(currentUser.id);
 
   if (!reservations || reservations.length === 0) {
     return (

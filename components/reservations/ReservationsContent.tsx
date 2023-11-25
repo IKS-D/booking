@@ -1,12 +1,12 @@
 "use client";
 
 import ReservationCard from "@/components/reservations/ReservationCard";
-import { Reservation } from "@/types";
 import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
+import { ReservationWithDetails } from "@/actions/getReservations";
 
 interface ReservationsContentProps {
-  reservations: Reservation[];
+  reservations: ReservationWithDetails[];
   currentUser?: User | null;
 }
 
@@ -26,12 +26,10 @@ const ReservationsContent: React.FC<ReservationsContentProps> = ({
           justify-center
         "
       >
-        {reservations.map((reservation: Reservation) => (
+        {reservations.map((reservation) => (
           <ReservationCard
             key={reservation.id}
-            listing={reservation.listing}
             reservation={reservation}
-            actionId={reservation.id}
             onAction={() => {}}
             disabled={false}
             actionLabel="Cancel reservation"

@@ -1,6 +1,9 @@
 import getCurrentUser from "@/actions/getCurrentUser";
-import { getPendingReservations } from "@/actions/getReservations";
+import { getHostPendingReservations } from "@/actions/getReservations";
 import PendingReservationsContent from "@/components/reservations/PendingReservationsContent";
+
+
+export const revalidate = 0;
 
 const ReservationsPage = async () => {
   const currentUser = await getCurrentUser();
@@ -13,9 +16,9 @@ const ReservationsPage = async () => {
     );
   }
 
-  const pendingReservations = await getPendingReservations({});
+  const { data: pendingReservations, error } = await getHostPendingReservations(currentUser.id);
 
-  if (pendingReservations.length === 0) {
+  if (pendingReservations && pendingReservations.length === 0) {
     return (
       <label className="text-lg font-semibold">
         No pending reservations found.
@@ -35,7 +38,7 @@ const ReservationsPage = async () => {
       "
     >
       <PendingReservationsContent
-        reservations={pendingReservations}
+        reservations={pendingReservations!}
         currentUser={currentUser}
       />
     </div>

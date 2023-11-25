@@ -1,13 +1,13 @@
 "use client";
 
-import { Reservation } from "@/types";
 import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
 import PendingReservationTable from "./PendingReservationTable";
 import { toast } from "sonner";
+import { ReservationWithDetails } from "@/actions/getReservations";
 
 interface PendingReservationsContentProps {
-  reservations: Reservation[];
+  reservations: ReservationWithDetails[];
   currentUser?: User | null;
 }
 

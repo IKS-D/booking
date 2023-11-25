@@ -13,10 +13,11 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { DeleteIcon, EyeIcon } from "../Icons";
-import { Reservation } from "@/types";
 import { IoMdCheckmark as CheckmarkIcon } from "react-icons/io";
 import ReservationDetailsModal from "./ReservationDetailsModal";
 import { format } from "date-fns";
+import { ReservationWithDetails as Reservation } from "@/actions/getReservations";
+import { title } from "../primitives";
 
 const columns = [
   { name: "ID", uid: "name" },
@@ -78,7 +79,7 @@ export default function PendingReservationTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {reservation.listing.title}
+                {reservation.listing?.title}
               </p>
             </div>
           );
@@ -86,7 +87,7 @@ export default function PendingReservationTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {reservation.guest.first_name} {reservation.guest.last_name}
+                {reservation.guest?.first_name} {reservation.guest?.last_name}
               </p>
             </div>
           );
@@ -94,7 +95,7 @@ export default function PendingReservationTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {format(reservation.start_date, "PP")}
+                {format(new Date(reservation.start_date), "PP")}
               </p>
             </div>
           );
@@ -102,7 +103,7 @@ export default function PendingReservationTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {format(reservation.end_date, "PP")}
+                {format(new Date(reservation.end_date), "PP")}
               </p>
             </div>
           );
@@ -111,7 +112,7 @@ export default function PendingReservationTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {reservation.total_price} €
+                {reservation.total_price / 100} €
               </p>
             </div>
           );
@@ -119,18 +120,18 @@ export default function PendingReservationTable({
           return (
             <Chip
               className="capitalize"
-              color={statusColorMap[reservation.status]}
+              color={statusColorMap[reservation.status.name]}
               size="sm"
               variant="flat"
             >
-              {reservation.status}
+              {reservation.status.name}
             </Chip>
           );
         case "actions":
           return (
             <div className="relative flex items-center gap-2">
               <ReservationDetailsModal
-                reservation={reservation}
+                reservation={reservation!}
                 isOpen={detailsModal.isOpen}
                 onOpenChange={detailsModal.onOpenChange}
               />
