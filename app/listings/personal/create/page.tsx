@@ -1,20 +1,20 @@
-import getCurrentUser from "@/actions/getCurrentUser";
+import getCurrentUser from "@/actions/users/getCurrentUser";
 import CreateListingForm from "../../../../components/listings/CreateListingForm";
 
 const PersonalListingsPage = async () => {
-    const currentUser = await getCurrentUser();
+  const currentUser = await getCurrentUser();
 
-    if (!currentUser) {
-        return (
-        <label className="text-lg font-semibold">
-            Please sign in to continue
-        </label>
-        );
-    }
-  
+  if (!currentUser) {
     return (
-      <div
-        className="
+      <label className="text-lg font-semibold">
+        Please sign in to continue
+      </label>
+    );
+  }
+
+  return (
+    <div
+      className="
           mx-auto
           xl:px-20 
           md:px-10
@@ -22,11 +22,10 @@ const PersonalListingsPage = async () => {
           px-4
           justify-center
         "
-      >
-        <CreateListingForm
-        />
-      </div>
-    );
-  };
-  
-  export default PersonalListingsPage;
+    >
+      <CreateListingForm />
+    </div>
+  );
+};
+
+export default PersonalListingsPage;

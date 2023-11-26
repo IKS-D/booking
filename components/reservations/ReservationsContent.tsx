@@ -3,7 +3,7 @@
 import ReservationCard from "@/components/reservations/ReservationCard";
 import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
-import { ReservationWithDetails } from "@/actions/getReservations";
+import { ReservationWithDetails } from "@/actions/reservations/getReservations";
 
 interface ReservationsContentProps {
   reservations: ReservationWithDetails[];

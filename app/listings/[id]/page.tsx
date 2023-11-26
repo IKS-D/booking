@@ -1,27 +1,27 @@
-import { getListing } from "@/actions/getListings";
+import { getListing } from "@/actions/listings/getListings";
 import ListingContent from "../../../components/listings/ListingContent";
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
 export default async function ListingPage({
-    params,
-  }: {
-    params: { id: string }
-  }) {
-    const id = params.id // Extract the 'id' from the URL
+  params,
+}: {
+  params: { id: string };
+}) {
+  const id = params.id; // Extract the 'id' from the URL
 
-    const listing = await getListing({ listingId: id as string });
+  const listing = await getListing({ listingId: id as string });
 
-    if (listing.error) {
-        return(
-            <label className="text-lg font-semibold">
-                Such listing does not exist
-            </label>
-        );
-    }
-    
+  if (listing.error) {
     return (
-        <div
-            className="
+      <label className="text-lg font-semibold">
+        Such listing does not exist
+      </label>
+    );
+  }
+
+  return (
+    <div
+      className="
                 mx-auto
                 xl:px-20 
                 md:px-10
@@ -29,10 +29,8 @@ export default async function ListingPage({
                 px-4
                 justify-center
             "
-        >
-            <ListingContent
-                listing={listing}
-            />
-        </div>
-    );
-};
+    >
+      <ListingContent listing={listing} />
+    </div>
+  );
+}

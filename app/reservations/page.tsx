@@ -1,5 +1,5 @@
-import getCurrentUser from "@/actions/getCurrentUser";
-import { getReservations } from "@/actions/getReservations";
+import getCurrentUser from "@/actions/users/getCurrentUser";
+import { getReservations } from "@/actions/reservations/getReservations";
 import ReservationsContent from "../../components/reservations/ReservationsContent";
 
 const ReservationsPage = async () => {
@@ -13,7 +13,7 @@ const ReservationsPage = async () => {
     );
   }
 
-  const { data : reservations, error } = await getReservations(currentUser.id);
+  const { data: reservations, error } = await getReservations(currentUser.id);
 
   if (!reservations || reservations.length === 0) {
     return (

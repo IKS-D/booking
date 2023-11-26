@@ -1,7 +1,6 @@
-import getCurrentUser from "@/actions/getCurrentUser";
-import { getHostPendingReservations } from "@/actions/getReservations";
+import getCurrentUser from "@/actions/users/getCurrentUser";
+import { getHostPendingReservations } from "@/actions/reservations/getReservations";
 import PendingReservationsContent from "@/components/reservations/PendingReservationsContent";
-
 
 export const revalidate = 0;
 
@@ -16,7 +15,9 @@ const ReservationsPage = async () => {
     );
   }
 
-  const { data: pendingReservations, error } = await getHostPendingReservations(currentUser.id);
+  const { data: pendingReservations, error } = await getHostPendingReservations(
+    currentUser.id
+  );
 
   if (pendingReservations && pendingReservations.length === 0) {
     return (

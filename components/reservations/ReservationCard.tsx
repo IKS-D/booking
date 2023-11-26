@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import ReservationDetailsModal from "@/components/reservations/ReservationDetailsModal";
 import ReservationCancelConfirmModal from "@/components/reservations/ReservationCancelModal";
-import { ReservationWithDetails } from "@/actions/getReservations";
+import { ReservationWithDetails } from "@/actions/reservations/getReservations";
 
 interface ReservationCardProps {
   reservation: ReservationWithDetails;
@@ -85,20 +85,9 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
               src={listing?.photos || ""}
               alt="Listing"
             />
-
-            {/* Can be used to add icons on top of the image
-             <div
-              className="
-            absolute
-            top-3
-            right-3
-            "
-            >
-               <HeartButton listingId={listing.id} currentUser={currentUser} />
-            </div> */}
           </div>
 
-          <div className="font-semibold text-lg">{listing.title}</div>
+          <div className="font-semibold text-lg truncate">{listing.title}</div>
           <div className="text-default-600 font-ligth">
             {listing.category &&
               listing.category?.name.charAt(0).toUpperCase() +

@@ -6,7 +6,7 @@ export default function page() {
     <div
       className="
         w-[500px]
-        justify-center
+        m-auto
       "
     >
       <CreateReservationForm />

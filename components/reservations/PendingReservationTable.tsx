@@ -16,7 +16,7 @@ import { DeleteIcon, EyeIcon } from "../Icons";
 import { IoMdCheckmark as CheckmarkIcon } from "react-icons/io";
 import ReservationDetailsModal from "./ReservationDetailsModal";
 import { format } from "date-fns";
-import { ReservationWithDetails as Reservation } from "@/actions/getReservations";
+import { ReservationWithDetails as Reservation } from "@/actions/reservations/getReservations";
 import { title } from "../primitives";
 
 const columns = [

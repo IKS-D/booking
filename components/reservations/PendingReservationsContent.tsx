@@ -4,7 +4,7 @@ import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
 import PendingReservationTable from "./PendingReservationTable";
 import { toast } from "sonner";
-import { ReservationWithDetails } from "@/actions/getReservations";
+import { ReservationWithDetails } from "@/actions/reservations/getReservations";
 
 interface PendingReservationsContentProps {
   reservations: ReservationWithDetails[];

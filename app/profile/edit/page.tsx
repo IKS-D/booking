@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
-import EditProfileForm from "@/components/profile/edit/EditProfileForm"
-import getCurrentUser from "@/actions/getCurrentUser";
+import EditProfileForm from "@/components/profile/edit/EditProfileForm";
+import getCurrentUser from "@/actions/users/getCurrentUser";
 
 export default async function EditProfile() {
   const cookieStore = cookies();
@@ -8,11 +8,10 @@ export default async function EditProfile() {
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4">
-        <div className="text-2xl font-bold mb-2">
-            Edit your profile information
-        </div>
-        <EditProfileForm/>
+      <div className="text-2xl font-bold mb-2">
+        Edit your profile information
+      </div>
+      <EditProfileForm />
     </div>
   );
-  
 }

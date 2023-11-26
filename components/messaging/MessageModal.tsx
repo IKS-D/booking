@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { IoIosPaperPlane } from "react-icons/io";
-import { getMessages } from "@/actions/getMessages";
+import { getMessages } from "@/actions/messaging/getMessages";
 import EditMessageModal from "./EditMessageModal";
 import {
     Modal,

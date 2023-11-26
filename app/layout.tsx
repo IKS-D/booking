@@ -88,10 +88,9 @@ export default async function RootLayout({
 
               {/* Main content */}
               <div className="flex flex-row h-[calc(100vh-7rem)]">
-                <div className="pl-[16px] flex flex-col w-screen scrollbox rounded-lg border dark:border-white border-black">
-                  <main className="flex items-center justify-center py-8">
-                    {children}
-                  </main>
+                {/* Outline border */}
+                <div className="pl-[16px] w-full scrollbox rounded-lg border dark:border-white border-black">
+                  <main className="h-full py-8">{children}</main>
                 </div>
               </div>
 

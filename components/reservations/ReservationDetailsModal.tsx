@@ -12,7 +12,7 @@ import {
 import { Button, Image, Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import MessageModal from "..//messaging//MessageModal";
-import { ReservationWithDetails } from "@/actions/getReservations";
+import { ReservationWithDetails } from "@/actions/reservations/getReservations";
 import { format } from "date-fns";
 
 interface ReservationDetailsProps {
