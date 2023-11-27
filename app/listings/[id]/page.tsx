@@ -8,11 +8,11 @@ export default async function ListingPage({
 }) {
   const id = params.id; // Extract the 'id' from the URL
 
-  const { date: listing, error } = await getListing({
+  const listing = await getListing({
     listingId: id as string,
   });
 
-  if (error) {
+  if (listing.error) {
     return (
       <label className="text-lg font-semibold">
         Such listing does not exist

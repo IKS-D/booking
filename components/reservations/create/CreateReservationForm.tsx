@@ -12,9 +12,15 @@ import SummaryForm from "./SummaryForm";
 import { CreateReservationSchema } from "@/lib/validations/schema";
 import { DateRange } from "react-day-picker";
 import { useRouter } from "next/navigation";
+import {
+  createPayment,
+  createPaymentAction,
+} from "@/actions/reservations/generatePayseraLink";
 import { insertReservation } from "@/actions/reservations/reservationsQueries";
 import { ListingWithDetails } from "@/actions/listings/getListings";
 import { User } from "@supabase/supabase-js";
+import { differenceInDays } from "date-fns";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface CreateReservationFormProps {
   listing: ListingWithDetails;
@@ -25,6 +31,7 @@ export default function CreateReservationForm({
   listing,
   user,
 }: CreateReservationFormProps) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Partial<Reservation>>({});
   const [error, setError] = useState<{
     start_date?: string[] | undefined;
@@ -42,6 +49,21 @@ export default function CreateReservationForm({
     showSuccessMsg,
   } = useMultiplestepForm(3);
 
+  const totalPrice = () => {
+    const servicesPrice =
+      formData.services?.reduce((a, b) => a + b.price, 0) || 0;
+
+    const totalPrice =
+      servicesPrice +
+      (listing?.day_price || 0) *
+        differenceInDays(
+          formData.end_date || new Date(),
+          formData.start_date || new Date()
+        );
+
+    return totalPrice;
+  };
+
   const validateForm = (dateRange: DateRange) => {
     const result = CreateReservationSchema.safeParse({
       start_date: dateRange.from,
@@ -58,9 +80,10 @@ export default function CreateReservationForm({
   };
 
   const handleOnSubmit = async () => {
+    setLoading(true);
     toast.success("Reservation created successfully");
 
-    const { error } = await insertReservation({
+    const { reservation, error } = await insertReservation({
       listingId: listing.id,
       userId: user.id,
       orderedServices:
@@ -69,6 +92,7 @@ export default function CreateReservationForm({
         })) || [],
       startDate: formData.start_date!.toISOString(),
       endDate: formData.end_date!.toISOString(),
+      totalPrice: totalPrice(),
     });
 
     if (error) {
@@ -76,7 +100,8 @@ export default function CreateReservationForm({
       return;
     }
 
-    router.push("/reservations");
+    await createPayment(reservation?.total_price!, reservation?.id!);
+    // router.push("/reservations");
   };
 
   return (
@@ -90,9 +115,10 @@ export default function CreateReservationForm({
           </AnimatePresence>
         ) : (
           <form
-            onSubmit={handleOnSubmit}
+            // onSubmit={handleOnSubmit}
             className="w-full flex flex-col justify-between h-full"
           >
+            {loading && <LoadingSpinner />}
             <AnimatePresence mode="wait">
               {currentStepIndex === 0 && (
                 <div className="flex flex-col">

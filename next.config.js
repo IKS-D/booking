@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  logging: {
+    level: "verbose",
+    fullUrl: true,
+  },
   experimental: {
     webpackBuildWorker: true,
     turbo: {

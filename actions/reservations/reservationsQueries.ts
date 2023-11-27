@@ -1,7 +1,7 @@
 "use server";
 
 import supabase from "@/supabase/supabase";
-import { DbResultOk } from "@/supabase/database.types";
+import { DbResultOk, TableInserts, TableRows } from "@/supabase/database.types";
 import { revalidatePath } from "next/cache";
 import { parse } from "path";
 import sendEmail from "./sendEmail";
@@ -115,26 +115,20 @@ export async function cancelReservation(reservationId: string) {
   return { error };
 }
 
-/* FIXME PLZ 
-{
-  code: '23505',
-  details: 'Key (service_id)=(1) already exists.',
-  hint: null,
-  message: 'duplicate key value violates unique constraint "ordered_services_service_id_key"'
-}
-*/
 export async function insertReservation({
   listingId,
   userId,
   orderedServices,
   startDate,
   endDate,
+  totalPrice,
 }: {
   listingId: number;
   userId: string;
   orderedServices: { service: number }[];
   startDate: string;
   endDate: string;
+  totalPrice: number;
 }) {
   let { data: reservation, error } = await supabase
     .from("reservations")
@@ -145,7 +139,7 @@ export async function insertReservation({
       start_date: startDate,
       end_date: endDate,
       status: 1,
-      total_price: 0,
+      total_price: totalPrice,
     })
     .select()
     .single();
@@ -160,7 +154,7 @@ export async function insertReservation({
 
   await sendEmail(reservation);
 
-  return { error };
+  return { reservation, error };
 }
 
 export async function insertOrderedServices(
@@ -173,6 +167,16 @@ export async function insertOrderedServices(
       service_id: orderedService.service,
     }))
   );
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { error };
+}
+
+export async function insertPayment(payment: TableInserts<"payments">) {
+  let { error } = await supabase.from("payments").insert(payment).select();
 
   if (error) {
     console.error(error);

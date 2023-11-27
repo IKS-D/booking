@@ -18,11 +18,13 @@ const ReservationsContent: React.FC<ReservationsContentProps> = ({
     <div className="max-w-full items-center">
       <label className={title({ size: "sm" })}>Reservations</label>
       <label className={subtitle({})}>All your reservations</label>
+
       <div
         className="
           grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5
           gap-8  
           mt-10
+          pb-10
           justify-center
         "
       >

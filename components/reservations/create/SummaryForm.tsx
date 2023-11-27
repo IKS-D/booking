@@ -83,6 +83,7 @@ const SummaryForm = ({ reservation, listing }: SummaryFormProps) => {
             value={`${totalPrice / 100} €`}
             className="w-1/2"
           />
+          <input type="hidden" name="totalPrice" value={totalPrice} />
         </div>
 
         {reservation.services && (

@@ -19,8 +19,6 @@ export default async (reservation: any) => {
       subject: "New reservation " + reservation.id,
       react: EmailTemplate({ firstName: "Mantas" }) as React.ReactElement,
     });
-
-    console.log(data);
   } catch (error) {
     console.error(error);
   }
