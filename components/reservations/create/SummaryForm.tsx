@@ -11,16 +11,16 @@ import {
   TableRow,
 } from "@nextui-org/react";
 import { Listing, Reservation } from "@/types";
+import { ListingWithDetails } from "@/actions/listings/getListings";
 
 interface SummaryFormProps {
   reservation: Partial<Reservation>;
-  // TODO replace with real listing
-  listing?: Listing;
+  listing: ListingWithDetails;
 }
 
 const SummaryForm = ({ reservation, listing }: SummaryFormProps) => {
   const servicesPrice =
-    reservation.additional_services?.reduce((a, b) => a + b.price, 0) || 0;
+    reservation.services?.reduce((a, b) => a + b.price, 0) || 0;
 
   const totalPrice =
     servicesPrice +
@@ -73,19 +73,20 @@ const SummaryForm = ({ reservation, listing }: SummaryFormProps) => {
             isReadOnly
             label={"Additional Services Price"}
             variant="bordered"
-            value={`${servicesPrice} €`}
+            value={`${servicesPrice / 100} €`}
             className="w-1/2"
           />
           <Input
             isReadOnly
             label={"Total Price"}
             variant="bordered"
-            value={`${totalPrice} €`}
+            value={`${totalPrice / 100} €`}
             className="w-1/2"
           />
+          <input type="hidden" name="totalPrice" value={totalPrice} />
         </div>
 
-        {reservation.additional_services && (
+        {reservation.services && (
           <>
             <Table
               isCompact
@@ -102,11 +103,11 @@ const SummaryForm = ({ reservation, listing }: SummaryFormProps) => {
                 <TableColumn>Price</TableColumn>
               </TableHeader>
               <TableBody emptyContent="No additional services selected">
-                {reservation.additional_services.map((service) => (
+                {reservation.services.map((service) => (
                   <TableRow key={service.id}>
-                    <TableCell>{service.name}</TableCell>
+                    <TableCell>{service.title}</TableCell>
                     <TableCell>{service.description}</TableCell>
-                    <TableCell>{service.price + " €"}</TableCell>
+                    <TableCell>{service.price / 100 + " €"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

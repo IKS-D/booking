@@ -25,14 +25,14 @@ export type Reservation = {
   total_price: number;
   created_at: Date;
   status: ReservationStatus;
-  additional_services: AdditionalService[];
+  services: Service[];
   listing: Listing;
   guest: User;
 };
 
-export type AdditionalService = {
-  id: string;
-  name: string;
+export type Service = {
+  id: number;
+  title: string;
   description: string;
   price: number;
 };
@@ -56,7 +56,7 @@ export type Report = {
   created_at: Date;
   start_date: Date;
   end_date: Date;
-}
+};
 
 type ReservationStatus = "pending" | "canceled" | "confirmed";
 export type ListingCategory = "apartment" | "house" | "room" | "flat";

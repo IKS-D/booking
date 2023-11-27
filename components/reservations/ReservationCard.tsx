@@ -1,6 +1,5 @@
 "use client";
 
-import { Listing, Reservation } from "@/types";
 import { Button, useDisclosure } from "@nextui-org/react";
 import { User } from "@supabase/supabase-js";
 import Image from "next/image";
@@ -8,30 +7,35 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import ReservationDetailsModal from "@/components/reservations/ReservationDetailsModal";
 import ReservationCancelConfirmModal from "@/components/reservations/ReservationCancelModal";
+import {
+  ReservationWithDetails,
+  cancelReservation,
+} from "@/actions/reservations/reservationsQueries";
 
 interface ReservationCardProps {
-  listing: Listing;
-  reservation: Reservation;
+  reservation: ReservationWithDetails;
   onAction?: (id: string) => void;
-  disabled?: boolean;
+  disabledCancel?: boolean;
   actionLabel?: string;
-  actionId?: string;
   currentUser?: User | null;
 }
 
 const ReservationCard: React.FC<ReservationCardProps> = ({
-  listing,
   reservation,
   onAction,
-  disabled,
+  disabledCancel: disabled,
   actionLabel,
-  actionId = "",
   currentUser,
 }) => {
+  const listing = reservation.listing!;
+
+  console.log(listing);
+
   const cancelModal = useDisclosure();
   const detailsModal = useDisclosure();
 
-  const cancelReservation = async () => {
+  const onCancelReservation = async () => {
+    await cancelReservation(reservation.id.toString());
     toast.success("Reservation cancelled successfully");
   };
 
@@ -39,7 +43,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
     const start = reservation.start_date;
     const end = reservation.end_date;
 
-    return `${format(start, "PP")} - ${format(end, "PP")}`;
+    return `${format(new Date(start), "PP")} - ${format(new Date(end), "PP")}`;
   };
 
   return (
@@ -48,7 +52,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
         reservation={reservation}
         isOpen={cancelModal.isOpen}
         onOpenChange={cancelModal.onOpenChange}
-        onConfirm={cancelReservation}
+        onConfirm={onCancelReservation}
       />
 
       <ReservationDetailsModal
@@ -82,34 +86,24 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
               group-hover:scale-110 
               transition
             "
-              src={listing.images[0]}
+              src={listing?.photos || ""}
               alt="Listing"
             />
-
-            {/* Can be used to add icons on top of the image
-             <div
-              className="
-            absolute
-            top-3
-            right-3
-            "
-            >
-               <HeartButton listingId={listing.id} currentUser={currentUser} />
-            </div> */}
           </div>
 
-          <div className="font-semibold text-lg">{listing.title}</div>
+          <div className="font-semibold text-lg truncate">{listing.title}</div>
           <div className="text-default-600 font-ligth">
-            {listing.category.charAt(0).toUpperCase() +
-              listing.category.slice(1)}
+            {listing.category &&
+              listing.category?.name.charAt(0).toUpperCase() +
+                listing.category?.name.slice(1)}
           </div>
 
           <div className="font-semibold">{getDateString()}</div>
 
           {onAction && actionLabel && (
             <Button
-              color="danger"
-              variant="bordered"
+              color={disabled ? "default" : "danger"}
+              variant="ghost"
               isDisabled={disabled}
               onClick={cancelModal.onOpenChange}
             >

@@ -5,74 +5,40 @@ import { Button } from "@nextui-org/react";
 import { AnimatePresence } from "framer-motion";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { AdditionalService, Reservation } from "@/types";
+import { Reservation } from "@/types";
 import SelectDateRangeForm from "./SelectDateRangeForm";
 import AdditionalServicesForm from "./AdditionalServicesForm";
 import SummaryForm from "./SummaryForm";
+import { CreateReservationSchema } from "@/lib/validations/schema";
+import { DateRange } from "react-day-picker";
 import { useRouter } from "next/navigation";
-import createPayment from "@/actions/generatePayseraLink";
+import {
+  createPayment,
+  createPaymentAction,
+} from "@/actions/reservations/generatePayseraLink";
+import { insertReservation } from "@/actions/reservations/reservationsQueries";
+import { ListingWithDetails } from "@/actions/listings/getListings";
+import { User } from "@supabase/supabase-js";
+import { differenceInDays } from "date-fns";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
-export default function CreateReservationForm() {
+interface CreateReservationFormProps {
+  listing: ListingWithDetails;
+  user: User;
+}
+
+export default function CreateReservationForm({
+  listing,
+  user,
+}: CreateReservationFormProps) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Partial<Reservation>>({});
+  const [error, setError] = useState<{
+    start_date?: string[] | undefined;
+    end_date?: string[] | undefined;
+  }>();
 
   const router = useRouter();
-
-  const additionalServices: AdditionalService[] = [
-    {
-      id: "1",
-      name: "Breakfast",
-      description: "Breakfast in the room",
-      price: 10,
-    },
-    {
-      id: "2",
-      name: "Lunch",
-      description: "Lunch in the room",
-      price: 15,
-    },
-    {
-      id: "3",
-      name: "Dinner",
-      description: "Dinner in the room",
-      price: 15,
-    },
-    {
-      id: "4",
-      name: "Laundry",
-      description: "Laundry service",
-      price: 10,
-    },
-    {
-      id: "5",
-      name: "Cleaning",
-      description: "Cleaning service",
-      price: 10,
-    },
-    {
-      id: "6",
-      name: "Room Service",
-      description: "Room service",
-      price: 10,
-    },
-    {
-      id: "7",
-      name: "Extra Bed",
-      description: "Extra bed",
-      price: 10,
-    },
-    {
-      id: "8",
-      name: "Extra Towels",
-      description: "Extra towels",
-      price: 10,
-    },
-    {
-      id: "9",
-      name: "Extra Pillows",
-      description: "Extra pillows",
-      price: 10,
-    },
-  ];
 
   const {
     previousStep,
@@ -80,14 +46,62 @@ export default function CreateReservationForm() {
     currentStepIndex,
     isFirstStep,
     isLastStep,
-    steps,
-    goTo,
     showSuccessMsg,
   } = useMultiplestepForm(3);
 
-  const handleOnSubmit = () => {
-    router.push("/reservations");
+  const totalPrice = () => {
+    const servicesPrice =
+      formData.services?.reduce((a, b) => a + b.price, 0) || 0;
+
+    const totalPrice =
+      servicesPrice +
+      (listing?.day_price || 0) *
+        differenceInDays(
+          formData.end_date || new Date(),
+          formData.start_date || new Date()
+        );
+
+    return totalPrice;
+  };
+
+  const validateForm = (dateRange: DateRange) => {
+    const result = CreateReservationSchema.safeParse({
+      start_date: dateRange.from,
+      end_date: dateRange.to,
+    });
+
+    if (!result.success) {
+      setError(result.error.flatten().fieldErrors);
+      return false;
+    }
+
+    setError(undefined);
+    return true;
+  };
+
+  const handleOnSubmit = async () => {
+    setLoading(true);
     toast.success("Reservation created successfully");
+
+    const { reservation, error } = await insertReservation({
+      listingId: listing.id,
+      userId: user.id,
+      orderedServices:
+        formData.services?.map((service): { service: number } => ({
+          service: service.id,
+        })) || [],
+      startDate: formData.start_date!.toISOString(),
+      endDate: formData.end_date!.toISOString(),
+      totalPrice: totalPrice(),
+    });
+
+    if (error) {
+      toast.error("Something went wrong");
+      return;
+    }
+
+    await createPayment(reservation?.total_price!, reservation?.id!);
+    // router.push("/reservations");
   };
 
   return (
@@ -101,40 +115,62 @@ export default function CreateReservationForm() {
           </AnimatePresence>
         ) : (
           <form
-            onSubmit={handleOnSubmit}
+            // onSubmit={handleOnSubmit}
             className="w-full flex flex-col justify-between h-full"
           >
+            {loading && <LoadingSpinner />}
             <AnimatePresence mode="wait">
               {currentStepIndex === 0 && (
-                <SelectDateRangeForm
-                  key="step1"
-                  formData={formData}
-                  onDateRangeUpdate={(dateRange) => {
-                    setFormData({
-                      ...formData,
-                      start_date: dateRange.from,
-                      end_date: dateRange.to,
-                    });
-                  }}
-                />
+                <div className="flex flex-col">
+                  <SelectDateRangeForm
+                    key="step1"
+                    formData={formData}
+                    onDateRangeUpdate={(dateRange) => {
+                      validateForm(dateRange);
+                      setFormData({
+                        ...formData,
+                        start_date: dateRange.from,
+                        end_date: dateRange.to,
+                      });
+                    }}
+                  />
+                  <div className="mt-2">
+                    {error?.start_date &&
+                      error.start_date.map((err) => (
+                        <p className="pl-1 font-medium text-xs text-red-500">
+                          {err}
+                        </p>
+                      ))}
+                    {error?.end_date &&
+                      error.end_date.map((err) => (
+                        <p className="pl-1 font-medium text-xs text-red-500">
+                          {err}
+                        </p>
+                      ))}
+                  </div>
+                </div>
               )}
 
               {currentStepIndex === 1 && (
                 <AdditionalServicesForm
                   key="step2"
-                  additionalServices={additionalServices}
-                  selectedServices={formData.additional_services}
+                  services={listing.services}
+                  selectedServices={formData.services}
                   onAdditionalServicesUpdate={(data) => {
                     setFormData({
                       ...formData,
-                      additional_services: data,
+                      services: data,
                     });
                   }}
                 />
               )}
 
               {currentStepIndex === 2 && (
-                <SummaryForm key="step3" reservation={formData} />
+                <SummaryForm
+                  key="step3"
+                  reservation={formData}
+                  listing={listing}
+                />
               )}
             </AnimatePresence>
             <div className="w-full items-center flex justify-between">
@@ -154,23 +190,25 @@ export default function CreateReservationForm() {
               </div>
               <div className="flex items-center">
                 <Button
-                  onClick={isLastStep ? handleOnSubmit : nextStep}
+                  onClick={
+                    isLastStep
+                      ? handleOnSubmit
+                      : () => {
+                          if (
+                            validateForm({
+                              from: formData.start_date,
+                              to: formData.end_date,
+                            })
+                          ) {
+                            nextStep();
+                          }
+                        }
+                  }
                   variant="ghost"
                   color="secondary"
                 >
                   {isLastStep ? "Confirm reservation" : "Next Step"}
                 </Button>
-                {isLastStep && (
-                  <Button
-                    color="primary"
-                    variant="ghost"
-                    type="submit"
-                    className="ml-2"
-                    formAction={createPayment}
-                  >
-                    Pay with Paysera
-                  </Button>
-                )}
               </div>
             </div>
           </form>

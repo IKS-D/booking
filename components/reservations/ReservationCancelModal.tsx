@@ -1,8 +1,5 @@
 "use client";
 
-import ReservationCard from "@/components/reservations/ReservationCard";
-import { Reservation } from "@/types";
-import { subtitle, title } from "@/components/primitives";
 import {
   Modal,
   ModalContent,
@@ -11,9 +8,10 @@ import {
   ModalFooter,
 } from "@nextui-org/modal";
 import { Button } from "@nextui-org/react";
+import { ReservationWithDetails } from "@/actions/reservations/reservationsQueries";
 
 interface ReservationCancelProps {
-  reservation: Reservation;
+  reservation: ReservationWithDetails;
   isOpen: boolean;
   onOpenChange: () => void;
   onConfirm: () => void;
@@ -38,7 +36,7 @@ const ReservationCancelConfirmModal: React.FC<ReservationCancelProps> = ({
                 <p>
                   You are about to cancel your reservation in{" "}
                   <label className="text-primary">
-                    {reservation.listing.title}
+                    {reservation.listing?.title}
                   </label>
                 </p>
               </ModalBody>

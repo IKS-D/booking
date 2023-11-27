@@ -1,4 +1,4 @@
-import { getReports } from "@/actions/getReports";
+import { getReports } from "@/actions/listings/getReports";
 import ReportsTable from "../../../components/reports/ReportsTable";
 import ReportCreationForm from "../../../components/reports/ReportCreationForm";
 import CreateNewReportButton from "../../../components/reports/CreateNewReportButton";
@@ -15,8 +15,7 @@ const ReportCreatePage = async () => {
         justify-center
       "
     >
-      
-    <ReportCreationForm/>
+      <ReportCreationForm />
     </div>
   );
 };

@@ -1,35 +1,37 @@
-import getCurrentUser from "@/actions/getCurrentUser";
-import { getPersonalListings } from "@/actions/getListings";
+import getCurrentUser from "@/actions/users/getCurrentUser";
+import { getPersonalListings } from "@/actions/listings/getListings";
 import PersonalListingsContent from "../../../components/listings/PersonalListingsContent";
 import CreateNewListingButton from "../../../components/listings/CreateNewListingButton";
 
 const PersonalListingsPage = async () => {
-    const currentUser = await getCurrentUser();
+  const currentUser = await getCurrentUser();
 
-    if (!currentUser) {
-        return (
-        <label className="text-lg font-semibold">
-            Please sign in to continue
-        </label>
-        );
-    }
-  
-    const personalListings = await getPersonalListings({});
-
-    if (personalListings.length === 0) {
-      return (
-        <div>
-            <label className="text-lg font-semibold">No personal listings found</label>
-            <div className="flex justify-center mt-10">
-              <CreateNewListingButton/>
-            </div>
-        </div>
-      );
-    }
-  
+  if (!currentUser) {
     return (
-      <div
-        className="
+      <label className="text-lg font-semibold">
+        Please sign in to continue
+      </label>
+    );
+  }
+
+  const personalListings = await getPersonalListings({});
+
+  if (personalListings.length === 0) {
+    return (
+      <div>
+        <label className="text-lg font-semibold">
+          No personal listings found
+        </label>
+        <div className="flex justify-center mt-10">
+          <CreateNewListingButton />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="
           mx-auto
           xl:px-20 
           md:px-10
@@ -37,13 +39,13 @@ const PersonalListingsPage = async () => {
           px-4
           justify-center
         "
-      >
-        <PersonalListingsContent
-            listings={personalListings}
-            currentUser={currentUser}
-        />
-      </div>
-    );
-  };
-  
-  export default PersonalListingsPage;
+    >
+      <PersonalListingsContent
+        listings={personalListings}
+        currentUser={currentUser}
+      />
+    </div>
+  );
+};
+
+export default PersonalListingsPage;

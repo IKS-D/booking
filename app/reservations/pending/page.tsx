@@ -1,6 +1,9 @@
-import getCurrentUser from "@/actions/getCurrentUser";
-import { getPendingReservations } from "@/actions/getReservations";
+import getCurrentUser from "@/actions/users/getCurrentUser";
+import { getHostPendingReservations } from "@/actions/reservations/reservationsQueries";
 import PendingReservationsContent from "@/components/reservations/PendingReservationsContent";
+import { title } from "@/components/primitives";
+
+export const revalidate = 0;
 
 const ReservationsPage = async () => {
   const currentUser = await getCurrentUser();
@@ -13,15 +16,9 @@ const ReservationsPage = async () => {
     );
   }
 
-  const pendingReservations = await getPendingReservations({});
-
-  if (pendingReservations.length === 0) {
-    return (
-      <label className="text-lg font-semibold">
-        No pending reservations found.
-      </label>
-    );
-  }
+  const { data: pendingReservations } = await getHostPendingReservations(
+    currentUser.id
+  );
 
   return (
     <div
@@ -35,7 +32,7 @@ const ReservationsPage = async () => {
       "
     >
       <PendingReservationsContent
-        reservations={pendingReservations}
+        reservations={pendingReservations!}
         currentUser={currentUser}
       />
     </div>

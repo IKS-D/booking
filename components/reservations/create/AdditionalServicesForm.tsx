@@ -7,21 +7,21 @@ import {
 } from "@nextui-org/dropdown";
 import AnimatedFormWrapper from "../AnimatedFormWrapper";
 import { Button, Input } from "@nextui-org/react";
-import { AdditionalService } from "@/types";
+import { Service } from "@/types";
 
 interface AdditionalServicesFormProps {
-  selectedServices?: AdditionalService[];
-  additionalServices: AdditionalService[];
-  onAdditionalServicesUpdate: (data: AdditionalService[]) => void;
+  selectedServices?: Service[];
+  services: Service[];
+  onAdditionalServicesUpdate: (data: Service[]) => void;
 }
 
 const AdditionalServicesForm = ({
   selectedServices,
-  additionalServices,
+  services: additionalServices,
   onAdditionalServicesUpdate,
 }: AdditionalServicesFormProps) => {
   const [selectedKeys, setSelectedKeys] = React.useState<Set<string>>(
-    new Set<string>(selectedServices?.map((service) => service.id))
+    new Set<string>(selectedServices?.map((service) => service.id.toString()))
   );
 
   const selectedValue = React.useMemo(() => {
@@ -30,9 +30,8 @@ const AdditionalServicesForm = ({
     const selectedKeysArray = Array.from(selectedKeys);
 
     const values = additionalServices
-      // @ts-ignore
-      .filter((service) => selectedKeysArray.includes(service.id))
-      .map((service) => service.name);
+      .filter((service) => selectedKeysArray.includes(service.id.toString()))
+      .map((service) => service.title);
 
     return values.join(", ").replaceAll("_", " ");
   }, [selectedKeys]);
@@ -43,7 +42,7 @@ const AdditionalServicesForm = ({
     const selectedKeysArray = Array.from(selectedKeys);
 
     const values = additionalServices
-      .filter((service) => selectedKeysArray.includes(service.id))
+      .filter((service) => selectedKeysArray.includes(service.id.toString()))
       .map((service) => service.price);
 
     return values.reduce((a, b) => a + b, 0);
@@ -54,8 +53,12 @@ const AdditionalServicesForm = ({
 
     const selectedKeysArray = Array.from(keys);
     const selectedServices = additionalServices.filter((service) =>
-      selectedKeysArray.includes(service.id)
+      selectedKeysArray.includes(service.id.toString())
     );
+
+    console.log("selectedServices", selectedServices);
+    console.log("selectedKeys", selectedKeys);
+
     onAdditionalServicesUpdate(selectedServices);
   };
 
@@ -90,9 +93,9 @@ const AdditionalServicesForm = ({
               <DropdownItem
                 key={service.id}
                 description={service.description}
-                endContent={`${service.price}€`}
+                endContent={`${service.price / 100}€`}
               >
-                {service.name}
+                {service.title}
               </DropdownItem>
             ))}
           </DropdownMenu>
@@ -119,7 +122,7 @@ const AdditionalServicesForm = ({
               isReadOnly
               label={"Total Price"}
               variant="bordered"
-              value={`${servicesPrice} €`}
+              value={`${servicesPrice / 100} €`}
               className="w-1/2"
             />
           </>

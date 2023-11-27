@@ -1,4 +1,4 @@
-import { getListings } from "@/actions/getListings";
+import { getListings } from "@/actions/listings/getListings";
 import ListingsContent from "../../components/listings/ListingsContent";
 
 const ListingsPage = async () => {
@@ -21,9 +21,7 @@ const ListingsPage = async () => {
         justify-center
       "
     >
-      <ListingsContent
-      listings={listings}
-      />
+      <ListingsContent listings={listings} />
     </div>
   );
 };

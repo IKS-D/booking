@@ -1,16 +1,12 @@
 "use client";
 
 import ReservationCard from "@/components/reservations/ReservationCard";
-import { Reservation } from "@/types";
 import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
-import { Button } from "@nextui-org/react";
-import { buildPayseraPaymentLink } from "@/lib/payseraAPI";
-import generatePayseraLink from "@/actions/generatePayseraLink";
-import createPayment from "@/actions/generatePayseraLink";
+import { ReservationWithDetails } from "@/actions/reservations/reservationsQueries";
 
 interface ReservationsContentProps {
-  reservations: Reservation[];
+  reservations: ReservationWithDetails[];
   currentUser?: User | null;
 }
 
@@ -28,17 +24,19 @@ const ReservationsContent: React.FC<ReservationsContentProps> = ({
           grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5
           gap-8  
           mt-10
+          pb-10
           justify-center
         "
       >
-        {reservations.map((reservation: Reservation) => (
+        {reservations.map((reservation) => (
           <ReservationCard
             key={reservation.id}
-            listing={reservation.listing}
             reservation={reservation}
-            actionId={reservation.id}
             onAction={() => {}}
-            disabled={false}
+            disabledCancel={
+              reservation.status.name === "cancelled" ||
+              reservation.status.name === "rejected"
+            }
             actionLabel="Cancel reservation"
             currentUser={currentUser}
           />

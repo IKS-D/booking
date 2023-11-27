@@ -1,6 +1,5 @@
-import getCurrentUser from "@/actions/getCurrentUser";
-import TripsClient from "../../components/reservations/ReservationsContent";
-import { getReservations } from "@/actions/getReservations";
+import getCurrentUser from "@/actions/users/getCurrentUser";
+import { getReservations } from "@/actions/reservations/reservationsQueries";
 import ReservationsContent from "../../components/reservations/ReservationsContent";
 
 const ReservationsPage = async () => {
@@ -14,9 +13,9 @@ const ReservationsPage = async () => {
     );
   }
 
-  const reservations = await getReservations({});
+  const { data: reservations, error } = await getReservations(currentUser.id);
 
-  if (reservations.length === 0) {
+  if (!reservations || reservations.length === 0) {
     return (
       <label className="text-lg font-semibold">No reservations found.</label>
     );

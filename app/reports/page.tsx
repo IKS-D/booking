@@ -1,19 +1,18 @@
-import { getReports } from "@/actions/getReports";
+import { getReports } from "@/actions/listings/getReports";
 import ReportsTable from "../../components/reports/ReportsTable";
 import CreateNewReportButton from "../../components/reports/CreateNewReportButton";
 
 const ReportsPage = async () => {
-
   const reports = await getReports();
 
   if (reports.length === 0) {
     return (
-    <>
+      <>
         <label className="text-lg font-semibold">No reports found.</label>
         <div className="flex justify-center mt-10">
-                <CreateNewReportButton/>
+          <CreateNewReportButton />
         </div>
-    </>
+      </>
     );
   }
 
@@ -28,10 +27,7 @@ const ReportsPage = async () => {
         justify-center
       "
     >
-      <ReportsTable
-      reports={reports}
-      />
-
+      <ReportsTable reports={reports} />
     </div>
   );
 };
