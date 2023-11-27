@@ -4,7 +4,11 @@ import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
 import PendingReservationTable from "./PendingReservationTable";
 import { toast } from "sonner";
-import { ReservationWithDetails } from "@/actions/reservations/getReservations";
+import {
+  ReservationWithDetails,
+  rejectReservation,
+  confirmReservation,
+} from "@/actions/reservations/reservationsQueries";
 
 interface PendingReservationsContentProps {
   reservations: ReservationWithDetails[];
@@ -26,9 +30,11 @@ const PendingReservationsContent: React.FC<PendingReservationsContentProps> = ({
         pendingReservations={reservations}
         onConfirm={(res) => {
           toast.success(`Reservation ${res.id} confirmed!`);
+          confirmReservation(res.id.toString());
         }}
         onCancel={(res) => {
           toast.error(`Reservation ${res.id} canceled!`);
+          rejectReservation(res.id.toString());
         }}
       />
     </div>

@@ -31,6 +31,11 @@ INSERT INTO
 VALUES
 	(3, 'rejected');
 
+INSERT INTO
+	reservation_status(id, name)
+VALUES
+	(4, 'cancelled');
+
 CREATE TABLE public.listing_category (
 	id int primary key,
 	name varchar (60) NOT NULL
@@ -177,7 +182,6 @@ CREATE TABLE public.ordered_services (
 	id int generated always as identity primary key,
 	service_id int NOT NULL,
 	reservation_id int NOT NULL,
-	UNIQUE(service_id),
 	FOREIGN KEY(service_id) REFERENCES public.services (id),
 	FOREIGN KEY(reservation_id) REFERENCES public.reservations (id)
 );

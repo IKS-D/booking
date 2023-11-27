@@ -232,12 +232,12 @@ export interface Database {
           service_id: number;
         };
         Insert: {
-          id?: never;
+          id?: number;
           reservation_id: number;
           service_id: number;
         };
         Update: {
-          id?: never;
+          id?: number;
           reservation_id?: number;
           service_id?: number;
         };
@@ -252,7 +252,7 @@ export interface Database {
           {
             foreignKeyName: "ordered_services_service_id_fkey";
             columns: ["service_id"];
-            isOneToOne: true;
+            isOneToOne: false;
             referencedRelation: "services";
             referencedColumns: ["id"];
           }

@@ -16,7 +16,7 @@ import { DeleteIcon, EyeIcon } from "../Icons";
 import { IoMdCheckmark as CheckmarkIcon } from "react-icons/io";
 import ReservationDetailsModal from "./ReservationDetailsModal";
 import { format } from "date-fns";
-import { ReservationWithDetails as Reservation } from "@/actions/reservations/getReservations";
+import { ReservationWithDetails as Reservation } from "@/actions/reservations/reservationsQueries";
 import { title } from "../primitives";
 
 const columns = [
@@ -216,7 +216,17 @@ export default function PendingReservationTable({
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={items}>
+        <TableBody
+          emptyContent={
+            <div className="flex flex-col items-center justify-center">
+              <CheckmarkIcon className="text-6xl text-success" />
+              <label className="font-bold text-lg text-white">
+                You have no pending reservations
+              </label>
+            </div>
+          }
+          items={items}
+        >
           {(item) => (
             <TableRow key={item.id}>
               {(columnKey) => (

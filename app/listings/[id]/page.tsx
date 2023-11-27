@@ -1,6 +1,5 @@
 import { getListing } from "@/actions/listings/getListings";
 import ListingContent from "../../../components/listings/ListingContent";
-import { redirect } from "next/navigation";
 
 export default async function ListingPage({
   params,
@@ -9,9 +8,11 @@ export default async function ListingPage({
 }) {
   const id = params.id; // Extract the 'id' from the URL
 
-  const listing = await getListing({ listingId: id as string });
+  const { date: listing, error } = await getListing({
+    listingId: id as string,
+  });
 
-  if (listing.error) {
+  if (error) {
     return (
       <label className="text-lg font-semibold">
         Such listing does not exist

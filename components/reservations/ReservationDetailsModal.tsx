@@ -12,7 +12,7 @@ import {
 import { Button, Image, Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import MessageModal from "..//messaging//MessageModal";
-import { ReservationWithDetails } from "@/actions/reservations/getReservations";
+import { ReservationWithDetails } from "@/actions/reservations/reservationsQueries";
 import { format } from "date-fns";
 
 interface ReservationDetailsProps {
@@ -76,7 +76,13 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
                   />
                   <Input
                     label="Status"
-                    value={reservation.status.name.toString()}
+                    value={
+                      reservation.status.name
+                        .toString()
+                        .charAt(0)
+                        .toUpperCase() +
+                      reservation.status.name.toString().slice(1)
+                    }
                     readOnly
                     disabled
                     variant="bordered"
@@ -103,11 +109,10 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
                       {reservation.ordered_services.map((service) => (
                         <Input
                           label={service.service?.title}
-                          value={`${service.service?.price} €`}
+                          value={`${(service.service?.price || 0) / 100} €`}
                           readOnly
                           disabled
                           variant="bordered"
-                          // className="w-1/3"
                         />
                       ))}
                     </div>

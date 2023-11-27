@@ -3,7 +3,7 @@
 import ReservationCard from "@/components/reservations/ReservationCard";
 import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
-import { ReservationWithDetails } from "@/actions/reservations/getReservations";
+import { ReservationWithDetails } from "@/actions/reservations/reservationsQueries";
 
 interface ReservationsContentProps {
   reservations: ReservationWithDetails[];
@@ -31,7 +31,10 @@ const ReservationsContent: React.FC<ReservationsContentProps> = ({
             key={reservation.id}
             reservation={reservation}
             onAction={() => {}}
-            disabled={false}
+            disabledCancel={
+              reservation.status.name === "cancelled" ||
+              reservation.status.name === "rejected"
+            }
             actionLabel="Cancel reservation"
             currentUser={currentUser}
           />

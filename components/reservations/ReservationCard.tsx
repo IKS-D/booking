@@ -7,12 +7,15 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import ReservationDetailsModal from "@/components/reservations/ReservationDetailsModal";
 import ReservationCancelConfirmModal from "@/components/reservations/ReservationCancelModal";
-import { ReservationWithDetails } from "@/actions/reservations/getReservations";
+import {
+  ReservationWithDetails,
+  cancelReservation,
+} from "@/actions/reservations/reservationsQueries";
 
 interface ReservationCardProps {
   reservation: ReservationWithDetails;
   onAction?: (id: string) => void;
-  disabled?: boolean;
+  disabledCancel?: boolean;
   actionLabel?: string;
   currentUser?: User | null;
 }
@@ -20,7 +23,7 @@ interface ReservationCardProps {
 const ReservationCard: React.FC<ReservationCardProps> = ({
   reservation,
   onAction,
-  disabled,
+  disabledCancel: disabled,
   actionLabel,
   currentUser,
 }) => {
@@ -31,7 +34,8 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
   const cancelModal = useDisclosure();
   const detailsModal = useDisclosure();
 
-  const cancelReservation = async () => {
+  const onCancelReservation = async () => {
+    await cancelReservation(reservation.id.toString());
     toast.success("Reservation cancelled successfully");
   };
 
@@ -48,7 +52,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
         reservation={reservation}
         isOpen={cancelModal.isOpen}
         onOpenChange={cancelModal.onOpenChange}
-        onConfirm={cancelReservation}
+        onConfirm={onCancelReservation}
       />
 
       <ReservationDetailsModal
@@ -98,8 +102,8 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 
           {onAction && actionLabel && (
             <Button
-              color="danger"
-              variant="bordered"
+              color={disabled ? "default" : "danger"}
+              variant="ghost"
               isDisabled={disabled}
               onClick={cancelModal.onOpenChange}
             >

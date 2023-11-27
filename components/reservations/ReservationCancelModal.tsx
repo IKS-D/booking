@@ -8,7 +8,7 @@ import {
   ModalFooter,
 } from "@nextui-org/modal";
 import { Button } from "@nextui-org/react";
-import { ReservationWithDetails } from "@/actions/reservations/getReservations";
+import { ReservationWithDetails } from "@/actions/reservations/reservationsQueries";
 
 interface ReservationCancelProps {
   reservation: ReservationWithDetails;

@@ -1,5 +1,5 @@
 import getCurrentUser from "@/actions/users/getCurrentUser";
-import { getReservations } from "@/actions/reservations/getReservations";
+import { getReservations } from "@/actions/reservations/reservationsQueries";
 import ReservationsContent from "../../components/reservations/ReservationsContent";
 
 const ReservationsPage = async () => {
