@@ -13,11 +13,9 @@ export async function POST(request: Request) {
   const ss2 = requestUrl.searchParams.get("ss2");
 
   if (!data || !ss1 || !ss2) {
-    // print all request data
-    console.info("body", request.body);
-    console.info("headers", request.headers);
-    console.info("method", request.method);
-    console.info("url", request.url);
+    // get body from request
+    const body = await request.text();
+    console.info("body", body);
 
     return new Response("OK", {
       headers: {
