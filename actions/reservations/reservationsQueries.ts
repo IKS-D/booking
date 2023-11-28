@@ -1,10 +1,9 @@
 "use server";
 
 import supabase from "@/supabase/supabase";
-import { DbResultOk, TableInserts, TableRows } from "@/supabase/database.types";
+import { DbResultOk, TableInserts } from "@/supabase/database.types";
 import { revalidatePath } from "next/cache";
-import { parse } from "path";
-import sendEmail from "./sendEmail";
+import { sendNewReservationEmail } from "./email";
 
 type ReservationsWithDetails = DbResultOk<ReturnType<typeof getReservations>>;
 export type ReservationWithDetails = ReservationsWithDetails[0];
@@ -32,6 +31,18 @@ export async function getHostPendingReservations(hostId: string) {
   }
 
   return { data: reservations, error: error };
+}
+
+export async function getReservationById(reservationId: number) {
+  let { data: reservation, error } = await getReservationsBase()
+    .eq("id", reservationId)
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data: reservation, error: error };
 }
 
 function getReservationsBase() {
@@ -152,7 +163,9 @@ export async function insertReservation({
     await insertOrderedServices(reservation.id, orderedServices);
   }
 
-  await sendEmail(reservation);
+  if (reservation?.id) {
+    await sendNewReservationEmail(reservation.id);
+  }
 
   return { reservation, error };
 }

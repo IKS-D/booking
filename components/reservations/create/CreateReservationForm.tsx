@@ -11,11 +11,7 @@ import AdditionalServicesForm from "./AdditionalServicesForm";
 import SummaryForm from "./SummaryForm";
 import { CreateReservationSchema } from "@/lib/validations/schema";
 import { DateRange } from "react-day-picker";
-import { useRouter } from "next/navigation";
-import {
-  createPayment,
-  createPaymentAction,
-} from "@/actions/reservations/generatePayseraLink";
+import { createPayment } from "@/actions/reservations/generatePayseraLink";
 import { insertReservation } from "@/actions/reservations/reservationsQueries";
 import { ListingWithDetails } from "@/actions/listings/getListings";
 import { User } from "@supabase/supabase-js";
@@ -37,9 +33,6 @@ export default function CreateReservationForm({
     start_date?: string[] | undefined;
     end_date?: string[] | undefined;
   }>();
-
-  const router = useRouter();
-
   const {
     previousStep,
     nextStep,
@@ -100,8 +93,7 @@ export default function CreateReservationForm({
       return;
     }
 
-    await createPayment(reservation?.total_price!, reservation?.id!);
-    // router.push("/reservations");
+    await createPayment(reservation?.total_price!, reservation?.id!, user.id!);
   };
 
   return (
@@ -207,7 +199,7 @@ export default function CreateReservationForm({
                   variant="ghost"
                   color="secondary"
                 >
-                  {isLastStep ? "Confirm reservation" : "Next Step"}
+                  {isLastStep ? "Confirm reservation and Pay" : "Next Step"}
                 </Button>
               </div>
             </div>

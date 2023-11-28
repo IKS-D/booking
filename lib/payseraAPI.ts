@@ -11,6 +11,8 @@ type PayseraAPIParams = {
   cancelurl: string;
   callbackurl: string;
   version: string;
+  p_firstname?: string;
+  p_lastname?: string;
   lang?: string;
   amount?: string;
   currency?: string;
@@ -80,8 +82,8 @@ export const decodePayseraData = (data: string, ss1: string, _ss2: string) => {
   const payment: TableInserts<"payments"> = {
     amount: parseInt(params.amount),
     date: new Date().toISOString(),
-    first_name: params.name,
-    last_name: params.surename,
+    first_name: params.p_firstname,
+    last_name: params.p_lastname,
     payer_email: params.p_email,
     payment_method: params.payment,
     payment_number: params.requestid,

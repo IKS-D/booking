@@ -16,7 +16,7 @@ const SuccessPayment = () => {
   );
 
   return (
-    <div className="flex flex-col w-screen items-center justify-center text-center">
+    <div className="flex flex-col w-full items-center justify-center text-center">
       <label className={title()}>Successful Payment</label>
       <label className={subtitle()}>
         Thank you for your payment. Your payment was successful.
@@ -43,6 +43,22 @@ const SuccessPayment = () => {
         <Input
           label="Email"
           value={payment.payer_email}
+          readOnly
+          disabled
+          variant="bordered"
+        />
+
+        <Input
+          label="Payer name and surname"
+          value={payment.first_name + " " + payment.last_name}
+          readOnly
+          disabled
+          variant="bordered"
+        />
+
+        <Input
+          label="Payment method"
+          value={payment.payment_method}
           readOnly
           disabled
           variant="bordered"
