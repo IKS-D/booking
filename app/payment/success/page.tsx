@@ -9,25 +9,11 @@ import React from "react";
 
 const SuccessPayment = () => {
   const searchParams = useSearchParams();
-  const data = decodePayseraData(
+  const payment = decodePayseraData(
     searchParams.get("data")!,
     searchParams.get("ss1")!,
     searchParams.get("ss2")!
   );
-
-  const parsedData =
-    data &&
-    data.map((item) => {
-      const [name, value] = item.split("=");
-      return { name, value };
-    });
-
-  // create map of data
-  const dataMap = new Map<string, string>();
-  parsedData &&
-    parsedData.map((item) => {
-      dataMap.set(item.name, item.value);
-    });
 
   return (
     <div className="flex flex-col w-screen items-center justify-center text-center">
@@ -40,7 +26,7 @@ const SuccessPayment = () => {
         <label className={title({ size: "sm" })}>Payment details</label>
         <Input
           label="Reservation ID"
-          value={dataMap.get("orderid")}
+          value={payment.reservation_id.toString()}
           readOnly
           disabled
           variant="bordered"
@@ -48,9 +34,7 @@ const SuccessPayment = () => {
 
         <Input
           label="Payment amount"
-          value={`${Number(dataMap.get("amount")) / 100} ${dataMap.get(
-            "currency"
-          )}`}
+          value={`${payment.amount / 100} €`}
           readOnly
           disabled
           variant="bordered"
@@ -58,7 +42,7 @@ const SuccessPayment = () => {
 
         <Input
           label="Email"
-          value={dataMap.get("p_email")}
+          value={payment.payer_email}
           readOnly
           disabled
           variant="bordered"

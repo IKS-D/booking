@@ -1,4 +1,6 @@
+import { TableInserts, TableRows } from "@/supabase/database.types";
 import * as crypto from "crypto";
+import { TypeOnlyCompatibleAliasDeclaration } from "typescript";
 export const md5 = (contents: string) =>
   crypto.createHash("md5").update(contents).digest("hex");
 
@@ -52,7 +54,11 @@ export const buildPayseraPaymentLink = (params: PayseraParams) => {
 };
 
 export const decodePayseraData = (data: string, ss1: string, _ss2: string) => {
-  const password = "4ed5c9cd8be0af037bbf1f10f82d8267";
+  const password = process.env.NEXT_PUBLIC_PAYSERA_PASSWORD;
+
+  if (!password) {
+    throw new Error("Paysera Project Password not found");
+  }
 
   let replacedData = data.replace(/-/g, "+").replace(/_/g, "/");
 
@@ -64,5 +70,24 @@ export const decodePayseraData = (data: string, ss1: string, _ss2: string) => {
     throw new Error("ss1 does not match. Possible data corruption");
   }
 
-  return decodedData.split("&");
+  const values = decodedData.split("&");
+  const params: Record<string, string> = {};
+  values.forEach((value) => {
+    const [key, val] = value.split("=");
+    params[key] = val;
+  });
+
+  const payment: TableInserts<"payments"> = {
+    amount: parseInt(params.amount),
+    date: new Date().toISOString(),
+    first_name: params.name,
+    last_name: params.surename,
+    payer_email: params.p_email,
+    payment_method: params.payment,
+    payment_number: params.requestid,
+    reservation_id: parseInt(params.orderid),
+    status: parseInt(params.status),
+  };
+
+  return payment;
 };
