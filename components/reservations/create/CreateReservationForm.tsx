@@ -94,6 +94,7 @@ export default function CreateReservationForm({
     }
 
     await createPayment(reservation?.total_price!, reservation?.id!, user.id!);
+    // setLoading(false);
   };
 
   return (

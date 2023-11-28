@@ -164,7 +164,7 @@ export async function insertReservation({
   }
 
   if (reservation?.id) {
-    await sendNewReservationEmail(reservation.id);
+    sendNewReservationEmail(reservation.id);
   }
 
   return { reservation, error };

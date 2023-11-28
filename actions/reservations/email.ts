@@ -24,9 +24,9 @@ export const sendNewReservationEmail = async (reservation_id: number) => {
 
   try {
     await resend.emails.send({
-      from: "Iksd <onboarding@resend.dev>",
+      from: "Booking <onboarding@resend.dev>",
       to: [process.env.NEXT_PUBLIC_EMAIL!],
-      subject: "New reservation " + reservation.id,
+      subject: "You have a new reservation on Booking",
       react: NewReservationEmailTemplate({
         reservation: reservation,
       }) as React.ReactElement,
