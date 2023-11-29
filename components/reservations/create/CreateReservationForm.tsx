@@ -83,6 +83,26 @@ export default function CreateReservationForm() {
 
   const handleOnSubmit = () => {
     toast.success("Reservation created successfully");
+
+    const { reservation, error } = await insertReservation({
+      listingId: listing.id,
+      userId: user.id,
+      orderedServices:
+        formData.services?.map((service): { service: number } => ({
+          service: service.id,
+        })) || [],
+      startDate: formData.start_date!.toDateString(),
+      endDate: formData.end_date!.toDateString(),
+      totalPrice: totalPrice(),
+    });
+
+    if (error) {
+      toast.error("Something went wrong");
+      return;
+    }
+
+    await createPayment(reservation?.total_price!, reservation?.id!, user.id!);
+    // setLoading(false);
   };
 
   return (
