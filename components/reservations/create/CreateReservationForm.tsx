@@ -83,8 +83,8 @@ export default function CreateReservationForm({
         formData.services?.map((service): { service: number } => ({
           service: service.id,
         })) || [],
-      startDate: formData.start_date!.toISOString(),
-      endDate: formData.end_date!.toISOString(),
+      startDate: formData.start_date!.toDateString(),
+      endDate: formData.end_date!.toDateString(),
       totalPrice: totalPrice(),
     });
 

@@ -1,5 +1,5 @@
 import { insertPayment } from "@/actions/reservations/reservationsQueries";
-import { decodePayseraData } from "@/lib/payseraAPI";
+import { decodePayseraData } from "@/actions/reservations/payseraAPI";
 
 export const dynamic = "force-dynamic";
 

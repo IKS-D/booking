@@ -1,6 +1,6 @@
 "use server";
 
-import { NewReservationEmailTemplate } from "../../components/EmailTemplate";
+import { NewReservationEmailTemplate } from "../../components/email/NewReservationEmailTemplate";
 import { Resend } from "resend";
 import { getReservationById, getReservations } from "./reservationsQueries";
 

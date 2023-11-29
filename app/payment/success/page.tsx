@@ -1,7 +1,7 @@
 "use client";
 
 import { subtitle, title } from "@/components/primitives";
-import { decodePayseraData } from "@/lib/payseraAPI";
+import { decodePayseraData } from "@/actions/reservations/payseraAPI";
 import { Button, Input } from "@nextui-org/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";

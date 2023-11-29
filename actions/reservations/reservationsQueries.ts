@@ -144,6 +144,7 @@ export async function insertReservation({
   let { data: reservation, error } = await supabase
     .from("reservations")
     .insert({
+      // new Date().toLocaleString("en-GB", { timeZone: "Europe/Vilnius" })
       creation_date: new Date().toISOString(),
       listing_id: listingId,
       user_id: userId,

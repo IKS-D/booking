@@ -24,10 +24,11 @@ const defaultParams: PayseraAPIParams = {
   orderid: "0",
   accepturl: "https://iksd.vercel.app/payment/success",
   cancelurl: "https://iksd.vercel.app/payment/cancel",
-  callbackurl: "https://iksd.vercel.app/",
+  callbackurl: "https://iksd.vercel.app/payment/callback",
   version: "1.6",
   test: "1",
   lang: "LIT",
+  currency: "EUR",
 };
 
 type PayseraParams = Partial<PayseraAPIParams>;

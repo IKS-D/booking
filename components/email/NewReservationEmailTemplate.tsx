@@ -22,9 +22,7 @@ interface NewReservationEmailTemplateProps {
   reservation: ReservationWithDetails;
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "https://iksd.vercel.app";
+const baseUrl = "https://iksd.vercel.app";
 
 export const NewReservationEmailTemplate: React.FC<
   Readonly<NewReservationEmailTemplateProps>
