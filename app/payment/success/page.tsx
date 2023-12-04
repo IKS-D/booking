@@ -2,10 +2,10 @@
 
 import { subtitle, title } from "@/components/primitives";
 import { decodePayseraData } from "@/actions/reservations/payseraAPI";
-import { Button, Input } from "@nextui-org/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React from "react";
+import { Input } from "@nextui-org/input";
+import { Button } from "@nextui-org/button";
 
 const SuccessPayment = () => {
   const searchParams = useSearchParams();
