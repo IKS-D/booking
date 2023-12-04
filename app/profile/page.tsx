@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import ProfileCard from "@/components/profile/ProfileCard";
 import OwnerProfileCard from "@/components/profile/OwnerProfileCard";
-import getCurrentUser from "@/actions/users/getCurrentUser";
+import getCurrentUser from "@/actions/users/usersQueries";
 import { EditIcon, DeleteIcon } from "@/components/Icons";
 import { Link } from "@nextui-org/react";
 

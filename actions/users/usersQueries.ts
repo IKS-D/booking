@@ -1,3 +1,5 @@
+"use server";
+
 import { DbResultOk } from "@/supabase/database.types";
 import supabase from "@/supabase/supabase";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
@@ -46,7 +48,16 @@ export async function getCurrentUserProfile() {
   return profile;
 }
 
-export type UserProfile = ReturnType<typeof getUserProfileById>;
+export async function profileExists(userId: string) {
+  // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
+  let { data: profile, error } = await supabase.from("profiles").select("*").eq("id", userId); 
+  if(!error && (!profile || profile.length == 0)){
+    return false;
+  }
+  return true;
+}
+
+export type UserProfiles = DbResultOk<ReturnType<typeof getUserProfileById>>;
 
 export async function getUserProfileById(id: string) {
   const { data: profile, error } = await supabase
@@ -59,5 +70,46 @@ export async function getUserProfileById(id: string) {
     console.error(error);
   }
 
-  return profile;
+  return { data: profile, error: error };
+}
+
+export async function insertProfile({
+  userId,
+  firstName,
+  lastName,
+  dateOfBirth,
+  phoneNumber,
+  photo,
+  country,
+  city,
+}: {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  phoneNumber: string;
+  photo: string;
+  country: string;
+  city: string;
+}) {
+  let { data: profile, error } = await supabase
+    .from("profiles")
+    .insert({
+      id: userId,
+      first_name: firstName,
+      last_name: lastName,
+      birth_date: dateOfBirth,
+      phone: phoneNumber,
+      photos: photo,
+      country: country,
+      city: city,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { profile, error };
 }

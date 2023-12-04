@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import EditProfileForm from "@/components/profile/edit/EditProfileForm";
-import getCurrentUser from "@/actions/users/getCurrentUser";
+import getCurrentUser from "@/actions/users/usersQueries";
 
 export default async function EditProfile() {
   const cookieStore = cookies();
