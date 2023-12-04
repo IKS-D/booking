@@ -6,9 +6,9 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url);
-  const formData = await request.formData();
-  const email = String(formData.get("email"));
-  const password = String(formData.get("password"));
+  const formData = await request.json();
+  const email = formData.email;
+  const password = formData.password;
 
   const cookieStore = cookies();
 
@@ -30,29 +30,59 @@ export async function POST(request: Request) {
     }
   );
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${requestUrl.origin}/auth/callback`,
-    },
-  });
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      // options: {
+      //   emailRedirectTo: `${requestUrl.origin}/auth/callback`,
+      // },
+    });
 
-  if (error) {
-    return NextResponse.redirect(
-      `${requestUrl.origin}/login?error=Could not authenticate user`,
+    if(error) {
+      return new NextResponse(
+        JSON.stringify({ error: error.message }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+    }
+
+    return new NextResponse(
+      JSON.stringify({ message: "User registered successfully", data: data }),
       {
-        // a 301 status is required to redirect from a POST to a GET route
-        status: 301,
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    return new NextResponse(
+      JSON.stringify({ error: "Internal Server Error", error_message: error }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
 
-  return NextResponse.redirect(
-    `${requestUrl.origin}/login?message=Check email to continue sign in process`,
-    {
-      // a 301 status is required to redirect from a POST to a GET route
-      status: 301,
-    }
-  );
+  // if (error) {
+  //   return NextResponse.redirect(
+  //     `${requestUrl.origin}/registration/user?error=Could not authenticate user`,
+  //     {
+  //       // a 301 status is required to redirect from a POST to a GET route
+  //       status: 301,
+  //     }
+  //   );
+  //   // NextResponse.json({data, error})
+  // }
+
+  // return NextResponse.redirect(
+  //   `${requestUrl.origin}/?message=User registered successfully`,
+  //   {
+  //     // a 301 status is required to redirect from a POST to a GET route
+  //     status: 301,
+  //   }
+  // );
+  // NextResponse.json({data})
 }

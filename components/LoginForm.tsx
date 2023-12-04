@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { AuthError } from "@supabase/supabase-js";
 import { Spinner } from "@nextui-org/react";
 import LoadingSpinner from "./LoadingSpinner";
+import OAuthForm from "./OAuthForm";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -146,6 +147,11 @@ export default function LoginForm() {
           <Link href="/registration">
             <p className="text-md text-primary">Sign up</p>
           </Link>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <label className="text-md mb-2">Or</label>
+          <OAuthForm />
         </div>
       </form>
     </>
