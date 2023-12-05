@@ -1,8 +1,7 @@
 "use server";
 
-import { DbResultOk } from "@/supabase/database.types";
 import supabase from "@/supabase/supabase";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export default async function getCurrentUser() {
@@ -57,7 +56,7 @@ export async function profileExists(userId: string) {
   return true;
 }
 
-export type UserProfiles = DbResultOk<ReturnType<typeof getUserProfileById>>;
+export type UserProfile = ReturnType<typeof getUserProfileById>;
 
 export async function getUserProfileById(id: string) {
   const { data: profile, error } = await supabase
@@ -70,7 +69,7 @@ export async function getUserProfileById(id: string) {
     console.error(error);
   }
 
-  return { data: profile, error: error };
+  return profile;
 }
 
 export async function insertProfile({
@@ -100,7 +99,7 @@ export async function insertProfile({
       last_name: lastName,
       birth_date: dateOfBirth,
       phone: phoneNumber,
-      photos: photo,
+      photo: photo,
       country: country,
       city: city,
     })

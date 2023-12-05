@@ -116,35 +116,26 @@ export interface Database {
       messages: {
         Row: {
           id: number;
-          read_time: string | null;
           received_id: string;
-          received_time: string | null;
           reservation_id: number;
           sender_id: string;
           sent_time: string;
-          status: number;
           text: string;
         };
         Insert: {
-          id?: never;
-          read_time?: string | null;
+          id?: number;
           received_id: string;
-          received_time?: string | null;
           reservation_id: number;
           sender_id: string;
           sent_time: string;
-          status: number;
           text: string;
         };
         Update: {
-          id?: never;
-          read_time?: string | null;
+          id?: number;
           received_id?: string;
-          received_time?: string | null;
           reservation_id?: number;
           sender_id?: string;
           sent_time?: string;
-          status?: number;
           text?: string;
         };
         Relationships: [
@@ -168,30 +159,8 @@ export interface Database {
             isOneToOne: false;
             referencedRelation: "users";
             referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "messages_status_fkey";
-            columns: ["status"];
-            isOneToOne: false;
-            referencedRelation: "messages_status";
-            referencedColumns: ["id"];
           }
         ];
-      };
-      messages_status: {
-        Row: {
-          id: number;
-          name: string;
-        };
-        Insert: {
-          id: number;
-          name: string;
-        };
-        Update: {
-          id?: number;
-          name?: string;
-        };
-        Relationships: [];
       };
       notifications: {
         Row: {
@@ -340,7 +309,7 @@ export interface Database {
           id: string;
           last_name: string;
           phone: string;
-          photos: string;
+          photo: string;
         };
         Insert: {
           birth_date: string;
@@ -350,7 +319,7 @@ export interface Database {
           id: string;
           last_name: string;
           phone: string;
-          photos: string;
+          photo: string;
         };
         Update: {
           birth_date?: string;
@@ -360,7 +329,7 @@ export interface Database {
           id?: string;
           last_name?: string;
           phone?: string;
-          photos?: string;
+          photo?: string;
         };
         Relationships: [
           {
@@ -537,3 +506,83 @@ export interface Database {
     };
   };
 }
+
+export type Tables<
+  PublicTableNameOrOptions extends
+    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
+      Database["public"]["Views"])
+  ? (Database["public"]["Tables"] &
+      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : never;
+
+export type TablesInsert<
+  PublicTableNameOrOptions extends
+    | keyof Database["public"]["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : never;
+
+export type TablesUpdate<
+  PublicTableNameOrOptions extends
+    | keyof Database["public"]["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : never;
+
+export type Enums<
+  PublicEnumNameOrOptions extends
+    | keyof Database["public"]["Enums"]
+    | { schema: keyof Database },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    : never = never
+> = PublicEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
+  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
+  : never;

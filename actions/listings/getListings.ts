@@ -1,6 +1,6 @@
-import { DbResultOk } from "@/supabase/database.types";
 import supabase from "@/supabase/supabase";
 import { Listing } from "@/types";
+import { QueryData, QueryResult } from "@supabase/supabase-js";
 
 interface Params {
   listingId?: string;
@@ -9,7 +9,7 @@ interface Params {
 }
 
 // If making changes to this code, make sure it doesn't break create reservation page
-export type ListingWithDetails = DbResultOk<ReturnType<typeof getListingById>>;
+export type ListingWithDetails = QueryData<ReturnType<typeof getListingById>>;
 
 export async function getListingById(listingId: number) {
   const { data, error } = await supabase

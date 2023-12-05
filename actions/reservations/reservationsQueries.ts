@@ -1,11 +1,12 @@
 "use server";
 
 import supabase from "@/supabase/supabase";
-import { DbResultOk, TableInserts } from "@/supabase/database.types";
 import { revalidatePath } from "next/cache";
 import { sendNewReservationEmail } from "./email";
+import { QueryData, QueryError, QueryResult } from "@supabase/supabase-js";
+import { TablesInsert } from "@/supabase/database-generated.types";
 
-type ReservationsWithDetails = DbResultOk<ReturnType<typeof getReservations>>;
+type ReservationsWithDetails = QueryData<ReturnType<typeof getReservations>>;
 export type ReservationWithDetails = ReservationsWithDetails[0];
 
 export async function getReservations(userId: string) {
@@ -189,7 +190,7 @@ export async function insertOrderedServices(
   return { error };
 }
 
-export async function insertPayment(payment: TableInserts<"payments">) {
+export async function insertPayment(payment: TablesInsert<"payments">) {
   let { error } = await supabase.from("payments").insert(payment).select();
 
   if (error) {
