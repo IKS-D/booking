@@ -169,15 +169,6 @@ CREATE TABLE public.payments (
 	FOREIGN KEY(reservation_id) REFERENCES public.reservations (id)
 );
 
-CREATE TABLE public.notifications (
-	id int generated always as identity primary key,
-	sent_time timestamp NOT NULL,
-	title varchar (60) NOT NULL,
-	text text NOT NULL,
-	reservation_id int NOT NULL,
-	FOREIGN KEY(reservation_id) REFERENCES public.reservations (id)
-);
-
 CREATE TABLE public.ordered_services (
 	id int generated always as identity primary key,
 	service_id int NOT NULL,

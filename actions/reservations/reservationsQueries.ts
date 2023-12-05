@@ -2,7 +2,7 @@
 
 import supabase from "@/supabase/supabase";
 import { revalidatePath } from "next/cache";
-import { sendNewReservationEmail } from "./email";
+import { sendNewReservationEmailHost } from "./email";
 import { QueryData, QueryError, QueryResult } from "@supabase/supabase-js";
 import { TablesInsert } from "@/supabase/database-generated.types";
 
@@ -166,7 +166,7 @@ export async function insertReservation({
   }
 
   if (reservation?.id) {
-    sendNewReservationEmail(reservation.id);
+    await sendNewReservationEmailHost(reservation.id);
   }
 
   return { reservation, error };

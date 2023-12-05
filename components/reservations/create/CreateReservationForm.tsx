@@ -74,7 +74,6 @@ export default function CreateReservationForm({
 
   const handleOnSubmit = async () => {
     setLoading(true);
-    toast.success("Reservation created successfully");
 
     const { reservation, error } = await insertReservation({
       listingId: listing.id,
@@ -93,7 +92,14 @@ export default function CreateReservationForm({
       return;
     }
 
-    await createPayment(reservation?.total_price!, reservation?.id!, user.id!);
+    toast.success("Reservation created successfully");
+
+    const payseraLink = await createPayment(
+      reservation?.total_price!,
+      reservation?.id!,
+      user.id!
+    );
+    window.location.href = payseraLink;
     // setLoading(false);
   };
 
@@ -102,110 +108,104 @@ export default function CreateReservationForm({
       className={`flex justify-between h-[600px] rounded-lg border border-neutral-700 p-4`}
     >
       <main className="w-full">
-        {showSuccessMsg ? (
+        <form
+          // onSubmit={handleOnSubmit}
+          className="w-full flex flex-col justify-between h-full"
+        >
+          {loading && <LoadingSpinner />}
           <AnimatePresence mode="wait">
-            {/* <SuccessMessage /> */}
-          </AnimatePresence>
-        ) : (
-          <form
-            // onSubmit={handleOnSubmit}
-            className="w-full flex flex-col justify-between h-full"
-          >
-            {loading && <LoadingSpinner />}
-            <AnimatePresence mode="wait">
-              {currentStepIndex === 0 && (
-                <div className="flex flex-col">
-                  <SelectDateRangeForm
-                    key="step1"
-                    formData={formData}
-                    onDateRangeUpdate={(dateRange) => {
-                      validateForm(dateRange);
-                      setFormData({
-                        ...formData,
-                        start_date: dateRange.from,
-                        end_date: dateRange.to,
-                      });
-                    }}
-                  />
-                  <div className="mt-2">
-                    {error?.start_date &&
-                      error.start_date.map((err) => (
-                        <p className="pl-1 font-medium text-xs text-red-500">
-                          {err}
-                        </p>
-                      ))}
-                    {error?.end_date &&
-                      error.end_date.map((err) => (
-                        <p className="pl-1 font-medium text-xs text-red-500">
-                          {err}
-                        </p>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {currentStepIndex === 1 && (
-                <AdditionalServicesForm
-                  key="step2"
-                  services={listing.services}
-                  selectedServices={formData.services}
-                  onAdditionalServicesUpdate={(data) => {
+            {currentStepIndex === 0 && (
+              <div className="flex flex-col">
+                <SelectDateRangeForm
+                  key="step1"
+                  formData={formData}
+                  onDateRangeUpdate={(dateRange) => {
+                    validateForm(dateRange);
                     setFormData({
                       ...formData,
-                      services: data,
+                      start_date: dateRange.from,
+                      end_date: dateRange.to,
                     });
                   }}
                 />
-              )}
+                <div className="mt-2">
+                  {error?.start_date &&
+                    error.start_date.map((err) => (
+                      <p className="pl-1 font-medium text-xs text-red-500">
+                        {err}
+                      </p>
+                    ))}
+                  {error?.end_date &&
+                    error.end_date.map((err) => (
+                      <p className="pl-1 font-medium text-xs text-red-500">
+                        {err}
+                      </p>
+                    ))}
+                </div>
+              </div>
+            )}
 
-              {currentStepIndex === 2 && (
-                <SummaryForm
-                  key="step3"
-                  reservation={formData}
-                  listing={listing}
-                />
-              )}
-            </AnimatePresence>
-            <div className="w-full items-center flex justify-between">
-              <div className="">
-                <Button
-                  onClick={previousStep}
-                  type="button"
-                  variant="ghost"
-                  className={`${
-                    isFirstStep
-                      ? "invisible"
-                      : "visible p-0 text-neutral-200 hover:text-white"
-                  }`}
-                >
-                  Go Back
-                </Button>
-              </div>
-              <div className="flex items-center">
-                <Button
-                  onClick={
-                    isLastStep
-                      ? handleOnSubmit
-                      : () => {
-                          if (
-                            validateForm({
-                              from: formData.start_date,
-                              to: formData.end_date,
-                            })
-                          ) {
-                            nextStep();
-                          }
-                        }
-                  }
-                  variant="ghost"
-                  color="secondary"
-                >
-                  {isLastStep ? "Confirm reservation and Pay" : "Next Step"}
-                </Button>
-              </div>
+            {currentStepIndex === 1 && (
+              <AdditionalServicesForm
+                key="step2"
+                services={listing.services}
+                selectedServices={formData.services}
+                onAdditionalServicesUpdate={(data) => {
+                  setFormData({
+                    ...formData,
+                    services: data,
+                  });
+                }}
+              />
+            )}
+
+            {currentStepIndex === 2 && (
+              <SummaryForm
+                key="step3"
+                reservation={formData}
+                listing={listing}
+              />
+            )}
+          </AnimatePresence>
+          <div className="w-full items-center flex justify-between">
+            <div className="">
+              <Button
+                onClick={previousStep}
+                type="button"
+                variant="ghost"
+                className={`${
+                  isFirstStep
+                    ? "invisible"
+                    : "visible p-0 text-neutral-200 hover:text-white"
+                }`}
+              >
+                Go Back
+              </Button>
             </div>
-          </form>
-        )}
+            <div className="flex items-center">
+              <Button
+                onClick={
+                  isLastStep
+                    ? handleOnSubmit
+                    : () => {
+                        if (
+                          validateForm({
+                            from: formData.start_date,
+                            to: formData.end_date,
+                          })
+                        ) {
+                          nextStep();
+                        }
+                      }
+                }
+                variant="ghost"
+                color="secondary"
+              >
+                {isLastStep ? "Confirm reservation and Pay" : "Next Step"}
+              </Button>
+            </div>
+          </div>
+        </form>
       </main>
     </div>
   );

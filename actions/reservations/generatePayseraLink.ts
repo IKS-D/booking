@@ -31,5 +31,6 @@ export async function createPayment(
     callbackurl: callbackUrl,
   });
 
-  redirect(link);
+  // redirect(link);
+  return link;
 }
