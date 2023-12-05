@@ -1,21 +1,20 @@
-import { cookies } from "next/headers";
 import ProfileCard from "@/components/profile/ProfileCard";
 import OwnerProfileCard from "@/components/profile/OwnerProfileCard";
-import getCurrentUser from "@/actions/users/usersQueries";
+import getCurrentUser, { getUserProfileById } from "@/actions/users/usersQueries";
 import { EditIcon, DeleteIcon } from "@/components/Icons";
 import { Link } from "@nextui-org/react";
 
-export default async function Profile() {
-  const cookieStore = cookies();
-  const user = getCurrentUser();
+export default async function ProfilePage() {
+  const user = await getCurrentUser();
+  const { data: userProfile, error } = await getUserProfileById(user!.id);
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 text-foreground">
       <div className="text-2xl font-bold mb-2">
-        Welcome to your profile page, Adminas!
+        Welcome to your profile page, {userProfile?.first_name + " " + userProfile?.last_name}!
       </div>
 
-      <ProfileCard />
+      <ProfileCard user={user!} userProfile={userProfile!}/>
       <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
         <Link
           href="/profile/edit"

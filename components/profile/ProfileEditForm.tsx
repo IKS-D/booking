@@ -3,28 +3,30 @@
 import { User } from "@supabase/supabase-js";
 import React, { useState } from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { Avatar, Button, Input } from "@nextui-org/react";
+import { Avatar, Button, Input, Link } from "@nextui-org/react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ProfileRegistrationFormData, ProfileRegistrationSchema } from "@/lib/validations/registerProfile";
-import { insertProfile } from "@/actions/users/usersQueries";
+import { UserProfile, insertProfile, updateProfile } from "@/actions/users/usersQueries";
+import { EditIcon } from "../Icons";
 
-interface ProfileRegistrationFormProps {
+interface ProfileEditFormProps {
   user: User;
+  userProfile: UserProfile;
 }
 
-export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFormProps) {
+export default function ProfileEditForm({ user, userProfile, }: ProfileEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<ProfileRegistrationFormData>({
-    firstName: "",
-    lastName: "",
-    dateOfBirth: new Date(),
-    phoneNumber: "",
-    country: "",
-    city: "",
-    photo: ""
+    firstName: userProfile.first_name,
+    lastName: userProfile.last_name,
+    dateOfBirth: new Date(userProfile.birth_date),
+    phoneNumber: userProfile.phone,
+    country: userProfile.country,
+    city: userProfile.city,
+    photo: userProfile.photo
   });
 
   const [error, setError] = useState<{
@@ -63,7 +65,7 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
       return;
     }
 
-    const { profile, error } = await insertProfile({
+    const { profile, error } = await updateProfile({
       userId: user.id,
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -81,10 +83,10 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
     }
 
     setLoading(false);
-    toast.success("Profile registered successfully!");
+    toast.success("Profile updated successfully!");
 
-    // Navigate to home page
-    router.push("/");
+    // Navigate to profile page
+    router.push("/profile");
     router.refresh();
   };
 
@@ -93,7 +95,6 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
       <form
         onSubmit={handleOnSubmit}
         className="flex flex-col items-center w-full space-y-6">
-        <p className="text-md font-bold mb-4">Please complete your profile registration</p>
 
         <Input
           className="max-w-md h-[75px]"
@@ -186,7 +187,6 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
           errorMessage={error?.city}
         />
 
-        <p className="text-lg font-bold mb-4">Enter your profile picture</p>
         <Input
           className="max-w-md h-[75px]"
           label="Photo"
@@ -207,10 +207,22 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
           alt="Your profile photo"
         />
 
-        <Button type="submit" className="w-full flex gap-2">
-          Sign up
-          <AiOutlineLoading3Quarters className={cn("animate-spin", { "hidden": !loading })} />
-        </Button>
+        <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
+          <Button
+            type="submit"
+            className="bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
+          >
+            <div className="flex items-center justify-left gap-1">
+              <EditIcon /><p className="text-md">Save changes</p>
+            </div>
+          </Button>
+
+          <Link href="/profile" className="bg-danger hover:bg-danger-dark text-white font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out">
+            <div className="flex items-center justify-left gap-1">
+              <p className="text-md">Cancel</p>
+            </div>
+          </Link>
+        </div>
       </form>
     </div>
   );

@@ -70,13 +70,13 @@ export default function UserRegistrationForm() {
       setLoading(false);
       return;
     }
-
-    setLoading(false);
-    toast.success("User registered successfully");
     
-    // navigate to home page
-    //router.push("/");
-    //router.refresh();
+    toast.success("User registered successfully!");
+    setLoading(false);
+    
+    // Navigate to profile registration
+    router.push("/registration/profile");
+    router.refresh();
   };
 
   const toggleVisibility = () => {

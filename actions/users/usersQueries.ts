@@ -2,6 +2,7 @@
 
 import supabase from "@/supabase/supabase";
 import { createServerClient } from "@supabase/ssr";
+import { QueryData } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 export default async function getCurrentUser() {
@@ -56,7 +57,7 @@ export async function profileExists(userId: string) {
   return true;
 }
 
-export type UserProfile = ReturnType<typeof getUserProfileById>;
+export type UserProfile = QueryData<ReturnType<typeof getUserProfileById>>;
 
 export async function getUserProfileById(id: string) {
   const { data: profile, error } = await supabase
@@ -69,7 +70,7 @@ export async function getUserProfileById(id: string) {
     console.error(error);
   }
 
-  return profile;
+  return { data: profile, error: error };
 }
 
 export async function insertProfile({
@@ -105,6 +106,45 @@ export async function insertProfile({
     })
     .select()
     .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { profile, error };
+}
+
+export async function updateProfile({
+  userId,
+  firstName,
+  lastName,
+  dateOfBirth,
+  phoneNumber,
+  photo,
+  country,
+  city,
+}:{
+  userId: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  phoneNumber: string;
+  photo: string;
+  country: string;
+  city: string;
+}) {
+  let { data: profile, error } = await supabase
+    .from("profiles")
+    .update({
+      first_name: firstName,
+      last_name: lastName,
+      birth_date: dateOfBirth,
+      phone: phoneNumber,
+      photo: photo,
+      country: country,
+      city: city,
+    })
+    .eq("id", userId);
 
   if (error) {
     console.error(error);
