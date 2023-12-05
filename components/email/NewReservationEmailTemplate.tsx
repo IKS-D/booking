@@ -4,32 +4,31 @@ import {
   Body,
   Button,
   Container,
-  Column,
   Head,
   Heading,
   Hr,
   Html,
   Img,
-  Link,
   Preview,
-  Row,
   Section,
   Tailwind,
   Text,
 } from "@react-email/components";
+import { User } from "@supabase/supabase-js";
 
 interface NewReservationEmailTemplateProps {
   reservation: ReservationWithDetails;
+  host: User;
 }
 
 const baseUrl = "https://iksd.vercel.app";
 
 export const NewReservationEmailTemplate: React.FC<
   Readonly<NewReservationEmailTemplateProps>
-> = ({ reservation }) => (
+> = ({ reservation, host }) => (
   <Html>
     <Head />
-    <Preview>You have a new reservation</Preview>
+    <Preview>Your listing has been booked</Preview>
     <Tailwind>
       <Body className="bg-white my-auto mx-auto font-sans">
         <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
@@ -46,24 +45,25 @@ export const NewReservationEmailTemplate: React.FC<
             You have a new reservation on <strong>Booking</strong>
           </Heading>
           <Text className="text-black text-[14px] leading-[24px]">
-            Hello{" "}
-            {reservation.guest?.first_name + " " + reservation.guest?.last_name}
+            Hello {host.email}
+            {/* {reservation.guest?.first_name + " " + reservation.guest?.last_name} */}
             ,
           </Text>
           <Text className="text-black text-[14px] leading-[24px]">
-            Thank you for your reservation at{" "}
-            <strong>{reservation.listing?.title}</strong>. We are looking
-            forward to your stay! Your reservation is from{" "}
-            <strong>{reservation.start_date}</strong> to{" "}
-            <strong>{reservation.end_date}</strong>. Please contact us at our
-            website if you have any questions.
+            Your listing <strong>{reservation.listing?.title}</strong> has been
+            booked by{" "}
+            {reservation.guest?.first_name + " " + reservation.guest?.last_name}{" "}
+            . The reservation starts on{" "}
+            <strong>{reservation.start_date}</strong> and ends on{" "}
+            <strong>{reservation.end_date}</strong>. You can view the
+            reservation details in <strong>Pending reservations</strong> page.
           </Text>
           <Section className="text-center mt-[32px] mb-[32px]">
             <Button
               className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-[20px] py-[12px]"
-              href={`${baseUrl}/reservations`}
+              href={`${baseUrl}/reservations/pending`}
             >
-              View Reservations
+              View Pending Reservations
             </Button>
           </Section>
 
