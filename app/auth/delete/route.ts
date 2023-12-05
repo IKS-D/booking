@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -29,10 +29,9 @@ export async function POST(request: Request) {
   const { data: { user }, } = await supabase.auth.getUser();
 
   try {
-    const { error } = await supabase
-      .from('auth.users')
-      .delete()
-      .eq('id', user!.id);
+    await supabase.auth.signOut();
+
+    const { error } = await supabase.auth.admin.deleteUser(user!.id);
 
     if(error) {
       return new NextResponse(
@@ -43,8 +42,6 @@ export async function POST(request: Request) {
         }
       );
     }
-
-    await supabase.auth.signOut();
 
     return new NextResponse(
       JSON.stringify({ message: "User deleted successfully"}),
