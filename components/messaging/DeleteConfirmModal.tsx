@@ -7,18 +7,30 @@ import {
   ModalFooter,
   Button,
 } from "@nextui-org/react";
+import { deleteMessage } from "@/actions/messaging/messagesQueries";
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   onOpenChange: () => void;
   onConfirm: () => void;
+  messageId: number;
 }
 
 const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
   isOpen,
   onOpenChange,
   onConfirm,
+  messageId,
 }) => {
+
+  const handleDelete = async () => {
+    try {
+      await deleteMessage(messageId);
+      onConfirm(); 
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="md">
       <ModalContent>
@@ -30,6 +42,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
           <Button
             color="primary"
             onPress={() => {
+              handleDelete();
               onConfirm();
               onOpenChange();
             }}

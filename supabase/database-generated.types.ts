@@ -116,35 +116,26 @@ export interface Database {
       messages: {
         Row: {
           id: number;
-          read_time: string | null;
           received_id: string;
-          received_time: string | null;
           reservation_id: number;
           sender_id: string;
           sent_time: string;
-          status: number;
           text: string;
         };
         Insert: {
           id?: never;
-          read_time?: string | null;
           received_id: string;
-          received_time?: string | null;
           reservation_id: number;
           sender_id: string;
           sent_time: string;
-          status: number;
           text: string;
         };
         Update: {
           id?: never;
-          read_time?: string | null;
           received_id?: string;
-          received_time?: string | null;
           reservation_id?: number;
           sender_id?: string;
           sent_time?: string;
-          status?: number;
           text?: string;
         };
         Relationships: [
@@ -168,30 +159,8 @@ export interface Database {
             isOneToOne: false;
             referencedRelation: "users";
             referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "messages_status_fkey";
-            columns: ["status"];
-            isOneToOne: false;
-            referencedRelation: "messages_status";
-            referencedColumns: ["id"];
           }
         ];
-      };
-      messages_status: {
-        Row: {
-          id: number;
-          name: string;
-        };
-        Insert: {
-          id: number;
-          name: string;
-        };
-        Update: {
-          id?: number;
-          name?: string;
-        };
-        Relationships: [];
       };
       notifications: {
         Row: {

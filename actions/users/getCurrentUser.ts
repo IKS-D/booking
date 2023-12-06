@@ -1,3 +1,4 @@
+"use server";
 import { DbResultOk } from "@/supabase/database.types";
 import supabase from "@/supabase/supabase";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
