@@ -2,14 +2,19 @@
 
 import { NewMessageEmailTemplate } from "../../components/email/NewMessageEmailTemplate";
 import { Resend } from "resend";
-import { getMessageById } from "./messagesQueries";
 import { getUserProfileById } from "../users/getCurrentUser";
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseServiceRoleKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE || "";
+const supabaseServiceRoleKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY || "";
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set");
+}
+if (!process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY) {
+  throw new Error("NEXT_PUBLIC_SUPABASE_SERVICE_KEY is not set");
+}
 if (!process.env.NEXT_PUBLIC_RESEND_API_KEY) {
   throw new Error("NEXT_PUBLIC_RESEND_API_KEY is not set");
 }

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { format } from 'date-fns';
 import {
   Body,
   Button,
@@ -51,9 +52,9 @@ export const NewMessageEmailTemplate: React.FC<
             ,
           </Text>
           <Text className="text-black text-[14px] leading-[24px]">
-            Reservation: <strong>{reservation_id}{". "}
-            </strong>. {sender}: <strong>{text}</strong>{". "}
-            <strong>{sent_time}</strong> {". "}
+            Reservation: <strong>{reservation_id}</strong>.{" "}
+            From: {sender}. Message: {text}{" "}
+            {format(new Date(sent_time), 'yyyy-MM-dd HH:mm:ss')} {" "}
           </Text>
           <Section className="text-center mt-[32px] mb-[32px]">
             <Button
