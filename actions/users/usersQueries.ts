@@ -48,7 +48,7 @@ export async function getCurrentUserProfile() {
   return profile;
 }
 
-export async function profileExists(userId: string) {
+export async function userProfileExists(userId: string) {
   // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
   let { data: profile, error } = await supabase.from("profiles").select("*").eq("id", userId); 
   if(!error && (!profile || profile.length == 0)){
@@ -151,4 +151,96 @@ export async function updateProfile({
   }
 
   return { profile, error };
+}
+
+export async function hostProfileExists(userId: string) {
+  // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
+  let { data: host, error } = await supabase.from("hosts").select("*").eq("id", userId); 
+  if(!error && (!host || host.length == 0)){
+    return false;
+  }
+  return true;
+}
+
+export type HostProfile = QueryData<ReturnType<typeof getHostProfileById>>;
+
+export async function getHostProfileById(id: string) {
+  const { data: host, error } = await supabase
+    .from("hosts")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data: host, error: error };
+}
+
+export async function insertHost({
+  userId,
+  personalCode,
+  bankAccount,
+}: {
+  userId: string;
+  personalCode: string;
+  bankAccount: string;
+}) {
+  let { data: host, error } = await supabase
+    .from("hosts")
+    .insert({
+      id: userId,
+      personal_code: personalCode,
+      bank_account: bankAccount,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { host, error };
+}
+
+export async function updateHost({
+  userId,
+  personalCode,
+  bankAccount,
+}: {
+  userId: string;
+  personalCode: string;
+  bankAccount: string;
+}) {
+  let { data: host, error } = await supabase
+    .from("hosts")
+    .update({
+      personal_code: personalCode,
+      bank_account: bankAccount,
+    })
+    .eq("id", userId);
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { host, error };
+}
+
+export async function deleteHost({
+  userId,
+}: {
+  userId: string;
+}) {
+  let { error } = await supabase
+    .from("hosts")
+    .delete()
+    .eq("id", userId);
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { error };
 }

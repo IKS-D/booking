@@ -1,10 +1,8 @@
-import ProfileCard from "@/components/profile/ProfileCard";
-import OwnerProfileCard from "@/components/profile/OwnerProfileCard";
-import ProfileDeleteForm from "@/components/profile/delete/DeleteProfileForm"
+import UserProfileDeleteForm from "@/components/profile/user/delete/UserProfileDeleteForm"
 import getCurrentUser, { getUserProfileById } from "@/actions/users/usersQueries";
 import { getReservations } from "@/actions/reservations/reservationsQueries";
 
-export default async function ProfileDeletePage() {
+export default async function UserProfileDeletePage() {
   const user = await getCurrentUser();
   // const { data: userProfile, error } = await getUserProfileById(user!.id);
   const { data: reservations, error } = await getReservations(user!.id);
@@ -18,7 +16,7 @@ export default async function ProfileDeletePage() {
       <div className="text-2xl font-bold mb-2">
         Delete your profile
       </div>
-      <ProfileDeleteForm user={user!} reservationCount={reservationCount!} listingCount={listingCount!}/>
+      <UserProfileDeleteForm user={user!} reservationCount={reservationCount!} listingCount={listingCount!}/>
     </div>
   );
 }

@@ -1,9 +1,8 @@
 import { cookies } from "next/headers";
-import EditProfileForm from "@/components/profile/edit/EditProfileForm";
 import getCurrentUser, { getUserProfileById } from "@/actions/users/usersQueries";
-import ProfileEditForm from "@/components/profile/ProfileEditForm";
+import UserProfileEditForm from "@/components/profile/user/edit/UserProfileEditForm";
 
-export default async function ProfileEditPage() {
+export default async function UserProfileEditPage() {
   const user = await getCurrentUser();
   const { data: userProfile, error } = await getUserProfileById(user!.id);
 
@@ -13,7 +12,7 @@ export default async function ProfileEditPage() {
         Update your profile information
       </div>
 
-      <ProfileEditForm user={user!} userProfile={userProfile!}/>
+      <UserProfileEditForm user={user!} userProfile={userProfile!}/>
     </div>
   );
 }

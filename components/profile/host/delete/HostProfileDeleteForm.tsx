@@ -6,57 +6,44 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { DeleteIcon } from "@/components/Icons";
 import { User } from "@supabase/supabase-js";
+import { deleteHost } from "@/actions/users/usersQueries";
 
-interface ProfileDeleteFormProps {
+interface HostProfileDeleteFormProps {
   user: User;
-  reservationCount: number;
   listingCount: number;
 }
 
-export default function ProfileDeleteForm({ user, reservationCount, listingCount, }: ProfileDeleteFormProps) {
+export default function HostProfileDeleteForm({ user, listingCount, }: HostProfileDeleteFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const ableToDelete = (reservationCount == 0 && listingCount == 0);
+  const ableToDelete = (listingCount == 0);
 
   const handleOnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const response = await fetch("/auth/delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+
+    const { error } = await deleteHost({
+      userId: user.id,
     });
 
-    console.log(response);
-
-    const responseData = await response.json();
-
-    console.log(responseData);
-
-    if (!response.ok) {
-      toast.error(responseData.error);
-      setLoading(false);
+    if (error) {
+      console.error(error);
+      toast.error("Something went wrong");
       return;
     }
 
-    router.push("/");
-    toast.success("User profile successfully deleted");
+    router.push("/profile");
+    toast.success("Host profile deleted successfully.");
   };
 
   return (
     <div className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3">
       <form onSubmit={handleOnSubmit} className="w-full flex flex-col items-center justify-center m-4">
-        <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
-          <div>
-            <p className="text-lg">You have {reservationCount} reservations.</p>
-          </div>
           <div>
             <p className="text-lg">You have {listingCount} listings.</p>
           </div>
-        </div>
         <div className="flex items-center justify-center">
-              <p className="text-lg font-semibold">{ ableToDelete ? "Are you sure you want to delete your profile?" : "You cannot delete your profile."}</p>
+              <p className="text-lg font-semibold">{ ableToDelete ? "Are you sure you want to delete your host profile?" : "You cannot delete your host profile."}</p>
             </div>
         <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
           <Button type="submit"

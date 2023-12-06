@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { profileExists } from "./actions/users/usersQueries";
+import { userProfileExists } from "./actions/users/usersQueries";
 import { profile } from "console";
 import { toast } from "sonner";
 
@@ -67,7 +67,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // If user does not have a profile, redirect to profile registration
-  if(user && !(await profileExists(user.id)) && !publicRoutes.includes(path) && path !== "/registration/profile"){
+  if(user && !(await userProfileExists(user.id)) && !publicRoutes.includes(path) && path !== "/registration/profile"){
     return NextResponse.redirect(new URL("/registration/profile", request.url));
   }
 

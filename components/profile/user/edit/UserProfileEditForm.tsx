@@ -9,14 +9,14 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ProfileRegistrationFormData, ProfileRegistrationSchema } from "@/lib/validations/registerProfile";
 import { UserProfile, insertProfile, updateProfile } from "@/actions/users/usersQueries";
-import { EditIcon } from "../Icons";
+import { EditIcon } from "../../../Icons";
 
 interface ProfileEditFormProps {
   user: User;
   userProfile: UserProfile;
 }
 
-export default function ProfileEditForm({ user, userProfile, }: ProfileEditFormProps) {
+export default function UserProfileEditForm({ user, userProfile, }: ProfileEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<ProfileRegistrationFormData>({
