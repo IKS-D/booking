@@ -22,10 +22,11 @@ export async function getReservations(userId: string) {
   return { data: reservations, error: error };
 }
 
-export async function getHostPendingReservations(hostId: string) {
-  let { data: reservations, error } = await getReservationsBase()
-    .eq("status.name", "pending")
-    .eq("listing.host_id", hostId);
+export async function getHostReservations(hostId: string) {
+  let { data: reservations, error } = await getReservationsBase().eq(
+    "listing.host_id",
+    hostId
+  );
 
   if (error) {
     console.error(error);
@@ -92,7 +93,7 @@ export async function rejectReservation(reservationId: string) {
     console.error(error);
   }
 
-  revalidatePath("/reservations/pending");
+  revalidatePath("/reservations/host");
 
   return { error };
 }
@@ -107,7 +108,7 @@ export async function confirmReservation(reservationId: string) {
     console.error(error);
   }
 
-  revalidatePath("/reservations/pending");
+  revalidatePath("/reservations/host");
 
   return { error };
 }

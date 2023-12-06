@@ -1,6 +1,6 @@
 "use server";
 
-import { NewReservationEmailTemplate } from "../../components/email/NewReservationEmailTemplate";
+import { HostNewReservationEmailTemplate } from "../../components/email/HostNewReservationEmailTemplate";
 import { Resend } from "resend";
 import { getReservationById } from "./reservationsQueries";
 import { createClient } from "@supabase/supabase-js";
@@ -37,10 +37,6 @@ export const sendNewReservationEmailHost = async (reservation_id: number) => {
     return;
   }
 
-  // get user email from profile
-  //const host_profile = await getUserProfileById(reservation.listing?.host_id!);
-  // TODO replace with real email
-
   const { data, error: authError } = await supabase.auth.admin.getUserById(
     reservation.listing?.host_id!
   );
@@ -57,7 +53,7 @@ export const sendNewReservationEmailHost = async (reservation_id: number) => {
       from: "Booking <booking@namiokai.tech>",
       to: [host.email as string],
       subject: "Your listing has been booked",
-      react: NewReservationEmailTemplate({
+      react: HostNewReservationEmailTemplate({
         reservation: reservation,
         host: host,
       }) as React.ReactElement,

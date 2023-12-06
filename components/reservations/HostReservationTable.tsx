@@ -17,7 +17,6 @@ import { IoMdCheckmark as CheckmarkIcon } from "react-icons/io";
 import ReservationDetailsModal from "./ReservationDetailsModal";
 import { format } from "date-fns";
 import { ReservationWithDetails as Reservation } from "@/actions/reservations/reservationsQueries";
-import { title } from "../primitives";
 
 const columns = [
   { name: "ID", uid: "name" },
@@ -32,32 +31,33 @@ const columns = [
 
 const statusColorMap: Record<string, ChipProps["color"]> = {
   confirmed: "success",
-  canceled: "danger",
+  cancelled: "default",
+  rejected: "danger",
   pending: "warning",
 };
 
-interface PendingReservationTableProps {
-  pendingReservations: Reservation[];
+interface HostReservationTableProps {
+  hostReservations: Reservation[];
   onConfirm: (reservation: Reservation) => void;
-  onCancel: (reservation: Reservation) => void;
+  onReject: (reservation: Reservation) => void;
 }
 
-export default function PendingReservationTable({
-  pendingReservations,
+export default function HostReservationTable({
+  hostReservations,
   onConfirm,
-  onCancel,
-}: PendingReservationTableProps) {
+  onReject,
+}: HostReservationTableProps) {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 6;
 
-  const pages = Math.ceil(pendingReservations.length / rowsPerPage);
+  const pages = Math.ceil(hostReservations.length / rowsPerPage);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
-    return pendingReservations.slice(start, end);
-  }, [page, pendingReservations]);
+    return hostReservations.slice(start, end);
+  }, [page, hostReservations]);
 
   const detailsModal = useDisclosure();
   const [reservationModal, setReservation] = React.useState<Reservation | null>(
@@ -148,26 +148,30 @@ export default function PendingReservationTable({
                   </>
                 </span>
               </Tooltip>
-              <Tooltip content="Confirm reservation">
-                <span className="text-lg text-success cursor-pointer active:opacity-50">
-                  <CheckmarkIcon
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onConfirm(reservation);
-                    }}
-                  />
-                </span>
-              </Tooltip>
-              <Tooltip color="danger" content="Cancel reservation">
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                  <DeleteIcon
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onCancel(reservation);
-                    }}
-                  />
-                </span>
-              </Tooltip>
+              {reservation.status.name === "pending" && (
+                <>
+                  <Tooltip color="success" content="Confirm reservation">
+                    <span className="text-lg text-success cursor-pointer active:opacity-50">
+                      <CheckmarkIcon
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onConfirm(reservation);
+                        }}
+                      />
+                    </span>
+                  </Tooltip>
+                  <Tooltip color="danger" content="Reject reservation">
+                    <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                      <DeleteIcon
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onReject(reservation);
+                        }}
+                      />
+                    </span>
+                  </Tooltip>
+                </>
+              )}
             </div>
           );
         default:
@@ -221,7 +225,7 @@ export default function PendingReservationTable({
             <div className="flex flex-col items-center justify-center">
               <CheckmarkIcon className="text-6xl text-success" />
               <label className="font-bold text-lg text-white">
-                You have no pending reservations
+                You have no reservations
               </label>
             </div>
           }

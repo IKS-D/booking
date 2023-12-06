@@ -87,7 +87,7 @@ VALUES
 	(4, 'deleted');
 
 CREATE TABLE public.hosts (
-	id uuid not null references auth.users on delete cascade,
+	id uuid not null references auth.users on delete cascade primary key,
 	personal_code varchar (255) NOT NULL,
 	bank_account varchar (40) NOT NULL,
 	UNIQUE(id)
@@ -167,6 +167,7 @@ CREATE TABLE public.payments (
 	reservation_id int NOT NULL,
 	UNIQUE(reservation_id),
 	FOREIGN KEY(reservation_id) REFERENCES public.reservations (id)
+);
 );
 
 CREATE TABLE public.ordered_services (

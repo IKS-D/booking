@@ -1,7 +1,6 @@
 import getCurrentUser from "@/actions/users/usersQueries";
-import { getHostPendingReservations } from "@/actions/reservations/reservationsQueries";
-import PendingReservationsContent from "@/components/reservations/PendingReservationsContent";
-import { title } from "@/components/primitives";
+import { getHostReservations } from "@/actions/reservations/reservationsQueries";
+import HostReservationsContent from "@/components/reservations/HostReservationsContent";
 
 export const revalidate = 0;
 
@@ -16,7 +15,7 @@ const ReservationsPage = async () => {
     );
   }
 
-  const { data: pendingReservations } = await getHostPendingReservations(
+  const { data: hostReservations } = await getHostReservations(
     currentUser.id
   );
 
@@ -31,8 +30,8 @@ const ReservationsPage = async () => {
         justify-center
       "
     >
-      <PendingReservationsContent
-        reservations={pendingReservations!}
+      <HostReservationsContent
+        reservations={hostReservations!}
         currentUser={currentUser}
       />
     </div>

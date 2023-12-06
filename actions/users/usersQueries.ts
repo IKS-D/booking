@@ -28,8 +28,6 @@ export default async function getCurrentUser() {
 }
 
 export async function getCurrentUserProfile() {
-  // Maybe available to make one request instead of two?
-  // TODO: check if working
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -50,8 +48,11 @@ export async function getCurrentUserProfile() {
 
 export async function userProfileExists(userId: string) {
   // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
-  let { data: profile, error } = await supabase.from("profiles").select("*").eq("id", userId); 
-  if(!error && (!profile || profile.length == 0)){
+  let { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", userId);
+  if (!error && (!profile || profile.length == 0)) {
     return false;
   }
   return true;
@@ -123,7 +124,7 @@ export async function updateProfile({
   photo,
   country,
   city,
-}:{
+}: {
   userId: string;
   firstName: string;
   lastName: string;
@@ -155,8 +156,12 @@ export async function updateProfile({
 
 export async function hostProfileExists(userId: string) {
   // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
-  let { data: host, error } = await supabase.from("hosts").select("*").eq("id", userId); 
-  if(!error && (!host || host.length == 0)){
+  let { data: host, error } = await supabase
+    .from("hosts")
+    .select("*")
+    .eq("id", userId);
+  
+  if (!error && (!host || host.length == 0)) {
     return false;
   }
   return true;
@@ -228,15 +233,8 @@ export async function updateHost({
   return { host, error };
 }
 
-export async function deleteHost({
-  userId,
-}: {
-  userId: string;
-}) {
-  let { error } = await supabase
-    .from("hosts")
-    .delete()
-    .eq("id", userId);
+export async function deleteHost({ userId }: { userId: string }) {
+  let { error } = await supabase.from("hosts").delete().eq("id", userId);
 
   if (error) {
     console.error(error);

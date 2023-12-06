@@ -2,7 +2,7 @@
 
 import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
-import PendingReservationTable from "./PendingReservationTable";
+import HostReservationTable from "./HostReservationTable";
 import { toast } from "sonner";
 import {
   ReservationWithDetails,
@@ -10,29 +10,27 @@ import {
   confirmReservation,
 } from "@/actions/reservations/reservationsQueries";
 
-interface PendingReservationsContentProps {
+interface HostReservationsContentProps {
   reservations: ReservationWithDetails[];
   currentUser?: User | null;
 }
 
-const PendingReservationsContent: React.FC<PendingReservationsContentProps> = ({
+const HostReservationsContent: React.FC<HostReservationsContentProps> = ({
   reservations,
   currentUser,
 }) => {
   return (
     <div className="max-w-full items-center">
-      <label className={title({ size: "sm" })}>Pending Reservations</label>
-      <label className={subtitle({})}>
-        All your listings pending reservations
-      </label>
+      <label className={title({ size: "sm" })}>Listings reservations</label>
+      <label className={subtitle({})}>All your listings reservations</label>
 
-      <PendingReservationTable
-        pendingReservations={reservations}
+      <HostReservationTable
+        hostReservations={reservations}
         onConfirm={(res) => {
           toast.success(`Reservation ${res.id} confirmed!`);
           confirmReservation(res.id.toString());
         }}
-        onCancel={(res) => {
+        onReject={(res) => {
           toast.error(`Reservation ${res.id} canceled!`);
           rejectReservation(res.id.toString());
         }}
@@ -41,4 +39,4 @@ const PendingReservationsContent: React.FC<PendingReservationsContentProps> = ({
   );
 };
 
-export default PendingReservationsContent;
+export default HostReservationsContent;

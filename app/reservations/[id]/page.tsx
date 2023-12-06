@@ -1,7 +1,7 @@
 import { getListing, getListingById } from "@/actions/listings/getListings";
 import { getReservationById } from "@/actions/reservations/reservationsQueries";
 import getCurrentUser from "@/actions/users/usersQueries";
-import { NewReservationEmailTemplate } from "@/components/email/NewReservationEmailTemplate";
+import { HostNewReservationEmailTemplate } from "@/components/email/HostNewReservationEmailTemplate";
 import CreateReservationForm from "@/components/reservations/create/CreateReservationForm";
 import { notFound } from "next/navigation";
 import React from "react";

@@ -7,14 +7,29 @@ import BookingLogo from "./BookingLogo";
 import AvatarDropdownMenu from "./AvatarDropdownMenu";
 import { BiBell } from "react-icons/bi";
 import { User } from "@supabase/supabase-js";
+import {
+  UserProfile,
+  getUserProfileById,
+  hostProfileExists,
+} from "@/actions/users/usersQueries";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface TopNavbarProps {
   user: User | null;
 }
 
 export default async function TopNavbar({ user }: TopNavbarProps) {
+  let currentUserHost = false;
+  let userProfile: UserProfile | null = null;
+
+  if (user) {
+    currentUserHost = await hostProfileExists(user.id);
+    const { data, error } = await getUserProfileById(user.id);
+    userProfile = data;
+  }
+
   return (
     <Navbar
       maxWidth="full"
@@ -33,12 +48,16 @@ export default async function TopNavbar({ user }: TopNavbarProps) {
 
         {user && (
           <div className="items-center justify-center flex gap-6">
-            <NavbarItem className="hidden md:flex">
+            {/* <NavbarItem className="hidden md:flex">
               <NextLink href="/notifications">
                 <BiBell size={24} />
               </NextLink>
-            </NavbarItem>
-            <AvatarDropdownMenu user={user} />
+            </NavbarItem> */}
+            <AvatarDropdownMenu
+              user={user}
+              profile={userProfile}
+              hostProfileExists={currentUserHost}
+            />
           </div>
         )}
 

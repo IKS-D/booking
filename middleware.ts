@@ -1,8 +1,12 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { userProfileExists } from "./actions/users/usersQueries";
+import {
+  hostProfileExists,
+  userProfileExists,
+} from "./actions/users/usersQueries";
 import { profile } from "console";
 import { toast } from "sonner";
+import { notFound, redirect } from "next/navigation";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -67,8 +71,21 @@ export async function middleware(request: NextRequest) {
   }
 
   // If user does not have a profile, redirect to profile registration
-  if(user && !(await userProfileExists(user.id)) && !publicRoutes.includes(path) && path !== "/registration/profile"){
+  if (
+    user &&
+    !(await userProfileExists(user.id)) &&
+    !publicRoutes.includes(path) &&
+    path !== "/registration/profile"
+  ) {
     return NextResponse.redirect(new URL("/registration/profile", request.url));
+  }
+
+  if (
+    user &&
+    hostRoutes.includes(path) &&
+    !(await hostProfileExists(user.id))
+  ) {
+    return NextResponse.redirect(new URL("/not-found", request.url));
   }
 
   return response;
@@ -88,7 +105,9 @@ const publicRoutes = [
   "/listings/[id]",
   "/auth/sign-in",
   "/auth/sign-up",
-  "/auth/sign-out", // needed so a user without profile could logout
+  "/auth/sign-out",
   "/auth/callback",
   "/payment/callback",
 ];
+
+const hostRoutes = ["/reservations/host", "/listings/personal", "/reports"];

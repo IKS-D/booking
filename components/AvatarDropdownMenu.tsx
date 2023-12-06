@@ -11,12 +11,19 @@ import {
 import { User } from "@supabase/supabase-js";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
+import { UserProfile } from "@/actions/users/usersQueries";
 
 interface AvatarDropdownMenuProps {
   user: User;
+  profile: UserProfile | null;
+  hostProfileExists: boolean;
 }
 
-export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
+export default function AvatarDropdownMenu({
+  user,
+  profile,
+  hostProfileExists,
+}: AvatarDropdownMenuProps) {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
@@ -29,7 +36,6 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
       method: "POST",
     });
 
-    // TODO find better way to refresh page
     router.push("/");
     window.location.reload();
   };
@@ -52,7 +58,7 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
     }
 
     if (action === "host-reservations") {
-      router.push("/reservations/pending");
+      router.push("/reservations/host");
     }
 
     if (action === "listings") {
@@ -78,15 +84,8 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
             isBordered
             color="secondary"
             className="transition-transform"
-            // src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+            src={profile?.photo}
             showFallback
-            // fallback={
-            //   <CameraIcon
-            //     className="animate-pulse w-6 h-6 text-default-500"
-            //     fill="currentColor"
-            //     size={20}
-            //   />
-            // }
           />
         </DropdownTrigger>
         <DropdownMenu
@@ -105,16 +104,27 @@ export default function AvatarDropdownMenu({ user }: AvatarDropdownMenuProps) {
             <DropdownItem key="listings">Listings</DropdownItem>
           </DropdownSection>
 
-          <DropdownSection title="Host panel" showDivider>
-            <DropdownItem key="host-reservations">
-              Your listings reservations
-            </DropdownItem>
-
-            <DropdownItem key="personal-listings">
-              Your personal listings
-            </DropdownItem>
-            <DropdownItem key="reports">Your personal reports</DropdownItem>
-          </DropdownSection>
+          {hostProfileExists ? (
+            <DropdownSection title="Host panel" showDivider>
+              <DropdownItem key="host-reservations">
+                Your listings reservations
+              </DropdownItem>
+              <DropdownItem key="personal-listings">
+                Your personal listings
+              </DropdownItem>
+              <DropdownItem key="reports">Your personal reports</DropdownItem>
+            </DropdownSection>
+          ) : (
+            <DropdownSection
+              title="Host panel"
+              showDivider
+              classNames={{ base: "hidden" }}
+            >
+              <DropdownItem key="not-found">
+                If you see this message it means that my system is broken
+              </DropdownItem>
+            </DropdownSection>
+          )}
 
           <DropdownSection title="Actions">
             <DropdownItem key="theme">Toggle Theme</DropdownItem>
