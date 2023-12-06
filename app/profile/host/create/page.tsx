@@ -1,6 +1,8 @@
-import CreateOwnerForm from "@/components/profile/owner/CreateOwnerForm"
+import getCurrentUser from "@/actions/users/usersQueries";
+import HostProfileCreateForm from "@/components/profile/host/create/HostProfileCreateForm"
 
-export default async function CreateOwnerProfile() {
+export default async function HostProfileCreatePage() {
+  const user = await getCurrentUser();
   return (
     <div className="flex flex-col items-center justify-center gap-4 text-foreground">
         <div className="text-2xl font-bold mb-2">
@@ -8,7 +10,7 @@ export default async function CreateOwnerProfile() {
         </div>
 
         <div className="text-sm font-bold mb-4">Fill out this information to create an owner profile and start posting listings:</div>
-        <CreateOwnerForm />
+        <HostProfileCreateForm user={user!}/>
     </div>
   );
   

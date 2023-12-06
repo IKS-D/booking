@@ -1,4 +1,4 @@
-import getCurrentUser from "@/actions/users/getCurrentUser";
+import getCurrentUser from "@/actions/users/usersQueries";
 import { getHostPendingReservations } from "@/actions/reservations/reservationsQueries";
 import PendingReservationsContent from "@/components/reservations/PendingReservationsContent";
 import { title } from "@/components/primitives";

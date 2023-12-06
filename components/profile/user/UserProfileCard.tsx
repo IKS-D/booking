@@ -1,18 +1,26 @@
-import { EditIcon, DeleteIcon } from "../Icons";
+import { UserProfile } from "@/actions/users/usersQueries";
+import { EditIcon, DeleteIcon } from "../../Icons";
 import { Input, Avatar, Link, } from "@nextui-org/react";
-import { User } from "@/types";
+import { User } from "@supabase/supabase-js";
 
-export default async function ProfileCard() {
+interface UserProfileCardProps {
+  user: User;
+  userProfile: UserProfile;
+}
+
+export default async function UserProfileCard({ user, userProfile, }: UserProfileCardProps) {
   return (
     <div className="w-full flex flex-col items-center justify-center">
-      <Avatar alt="Your profile picture" className="mb-4 h-[100px] w-[100px]" />
+      <Avatar className="mb-4 h-[100px] w-[100px]" 
+      src={userProfile.photo}
+      alt="Your profile photo" />
 
-      <div className="text-lg font-bold mb-4">Your profile information</div>
+      <div className="text-lg font-bold mb-4">Your user profile</div>
       <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
         <div>
           <Input
             label="First name"
-            value="Adminas"
+            value={userProfile.first_name}
             readOnly
             disabled
             variant="bordered"
@@ -21,7 +29,7 @@ export default async function ProfileCard() {
         <div>
           <Input
             label="Last name"
-            value="Adminauskas"
+            value={userProfile.last_name}
             readOnly
             disabled
             variant="bordered"
@@ -32,7 +40,7 @@ export default async function ProfileCard() {
           <Input
             type="date"
             label="Date of birth"
-            value="2000-01-01"
+            value={userProfile.birth_date}
             readOnly
             disabled
             variant="bordered"
@@ -41,7 +49,7 @@ export default async function ProfileCard() {
         <div>
           <Input
             label="Phone number"
-            value="+37061111111"
+            value={userProfile.phone}
             readOnly
             disabled
             variant="bordered"
@@ -51,7 +59,7 @@ export default async function ProfileCard() {
         <div>
           <Input
             label="Country"
-            value="Lithuania"
+            value={userProfile.country}
             readOnly
             disabled
             variant="bordered"
@@ -60,7 +68,7 @@ export default async function ProfileCard() {
         <div>
           <Input
             label="City"
-            value="Kaunas"
+            value={userProfile.city}
             readOnly
             disabled
             variant="bordered"

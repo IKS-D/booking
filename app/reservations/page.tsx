@@ -1,4 +1,4 @@
-import getCurrentUser from "@/actions/users/getCurrentUser";
+import getCurrentUser from "@/actions/users/usersQueries";
 import { getReservations } from "@/actions/reservations/reservationsQueries";
 import ReservationsContent from "../../components/reservations/ReservationsContent";
 

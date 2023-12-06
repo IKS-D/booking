@@ -1,4 +1,4 @@
-import getCurrentUser from "@/actions/users/getCurrentUser";
+import getCurrentUser from "@/actions/users/usersQueries";
 import { getPersonalListings } from "@/actions/listings/getListings";
 import PersonalListingsContent from "../../../components/listings/PersonalListingsContent";
 import CreateNewListingButton from "../../../components/listings/CreateNewListingButton";

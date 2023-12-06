@@ -6,15 +6,11 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url);
-  const formData = await request.json();
-  const email = formData.email;
-  const password = formData.password;
-
   const cookieStore = cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -30,14 +26,12 @@ export async function POST(request: Request) {
     }
   );
 
+  const { data: { user }, } = await supabase.auth.getUser();
+
   try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      // options: {
-      //   emailRedirectTo: `${requestUrl.origin}/auth/callback`,
-      // },
-    });
+    await supabase.auth.signOut();
+
+    const { error } = await supabase.auth.admin.deleteUser(user!.id);
 
     if(error) {
       return new NextResponse(
@@ -50,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     return new NextResponse(
-      JSON.stringify({ message: "User registered successfully", data: data }),
+      JSON.stringify({ message: "User deleted successfully"}),
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -65,24 +59,4 @@ export async function POST(request: Request) {
       }
     );
   }
-
-  // if (error) {
-  //   return NextResponse.redirect(
-  //     `${requestUrl.origin}/registration/user?error=Could not authenticate user`,
-  //     {
-  //       // a 301 status is required to redirect from a POST to a GET route
-  //       status: 301,
-  //     }
-  //   );
-  //   // NextResponse.json({data, error})
-  // }
-
-  // return NextResponse.redirect(
-  //   `${requestUrl.origin}/?message=User registered successfully`,
-  //   {
-  //     // a 301 status is required to redirect from a POST to a GET route
-  //     status: 301,
-  //   }
-  // );
-  // NextResponse.json({data})
 }
