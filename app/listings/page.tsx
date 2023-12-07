@@ -2,11 +2,11 @@ import { getListings } from "@/actions/listings/getListings";
 import ListingsContent from "../../components/listings/ListingsContent";
 
 const ListingsPage = async () => {
-  const listings = await getListings({});
+  const { data: listings, error } = await getListings();
 
-  if (listings.length === 0) {
+  if (!listings || listings.length === 0) {
     return (
-      <label className="text-lg font-semibold">No reservations found.</label>
+      <label className="text-lg font-semibold">No listings found.</label>
     );
   }
 

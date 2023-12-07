@@ -1,6 +1,6 @@
-import { Listing } from "@/types";
 import Link from "next/link";
 import Image from "next/image";
+import { Listing } from "@/actions/listings/getListings";
 
 interface ListingCardProps {
   listing: Listing;
@@ -46,7 +46,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         group-hover:scale-110 
                         transition
                         "
-                        src={listing.images[0]}
+                        src={listing.photos}
                         alt="Listing"
                         />
 
@@ -64,8 +64,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
                     <div className="font-semibold text-lg">{listing.title}</div>
                     <div className="text-default-600 font-ligth">
-                        {listing.category.charAt(0).toUpperCase() +
-                        listing.category.slice(1)}
+                        {listing.category!.name.charAt(0).toUpperCase() +
+                        listing.category!.name.slice(1)}
                     </div>
                 </div>
         </Link>

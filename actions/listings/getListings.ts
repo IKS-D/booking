@@ -1,5 +1,4 @@
 import supabase from "@/supabase/supabase";
-import { Listing } from "@/types";
 import { QueryData, QueryResult } from "@supabase/supabase-js";
 
 interface Params {
@@ -18,7 +17,8 @@ export async function getListingById(listingId: number) {
       `
     *,
     category: listing_category (name),
-    services: services (*)
+    services: services (*),
+    images: photos (url)
   `
     )
     .eq("id", listingId)
@@ -31,26 +31,71 @@ export async function getListingById(listingId: number) {
   return { data, error };
 }
 
-export async function getListing(params: Params) {
-  const { listingId, userId, authorId } = params;
+export type Listings = QueryData<ReturnType<typeof getListingsBase>>;
+export type Listing = Listings[0];
 
-  const listings = Array(20).fill(mockListing);
+export async function getListings() {
 
-  const specificListing = listings.find((listing) => listing.id === listingId);
+  let { data: listings, error } = await getListingsBase();
 
-  if (!specificListing) {
-    return { error: "Listing not found" };
+  if (error) {
+    console.error(error);
   }
 
-  return specificListing;
+  return { data: listings, error: error };
 }
 
-export async function getListings(params: Params) {
-  const { listingId, userId, authorId } = params;
+export type AverageData = QueryData<ReturnType<typeof getChartInformation>>;
 
-  const listings = Array(20).fill(mockListing);
+export async function getChartInformation(listingId: number){
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("city")
+    .eq("id", listingId)
+    .single();
 
-  return listings;
+  if (listingError) {
+    console.error(listingError);
+    return { data: null, error: listingError };
+  }
+
+  const city = listing?.city;
+
+  if (!city) {
+    console.error("City not found for the listing");
+    return { data: null, error: "City not found for the listing" };
+  }
+
+  const { data: listings, error } = await supabase
+    .from("listings")
+    .select("number_of_places, day_price")
+    .eq("city", city);
+
+    if (error) {
+      console.error(error);
+      return { data: null, error };
+    }
+
+    const groupedListings: Record<number, number[]> = {};
+    listings?.forEach((listing) => {
+    const numberOfPlaces = listing.number_of_places;
+    const price = listing.day_price;
+
+    if (numberOfPlaces in groupedListings) {
+      groupedListings[numberOfPlaces].push(price);
+    } else {
+      groupedListings[numberOfPlaces] = [price];
+    }
+  });
+
+  const averages: Record<number, number> = {};
+  Object.entries(groupedListings).forEach(([numberOfPlaces, prices]) => {
+    const averagePrice =
+      prices.reduce((sum, price) => sum + price, 0) / prices.length;
+    averages[parseInt(numberOfPlaces, 10)] = averagePrice;
+  });
+
+  return { data: averages, error: null };
 }
 
 export async function getPersonalListings(params: Params) {
@@ -61,21 +106,6 @@ export async function getPersonalListings(params: Params) {
   return listings;
 }
 
-const mockListing: Listing = {
-  id: "1",
-  title: "Grand Apartment in Center of London",
-  description:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-  city: "London",
-  address: "Baker Street 221b",
-  created_at: new Date("2020-01-01"),
-  category: "apartment",
-  max_guests: 15,
-  day_price: 459.99,
-  images: [
-    "https://t4.ftcdn.net/jpg/01/57/39/19/360_F_157391956_UrG0WMZiXiG2UKktQeaKTVgaLNSa8hIT.jpg",
-    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/430666399.jpg?k=3ec09fe5fe134a2c1a20215861ab31f64f209ea9bfa1ba526fd0438abef3a17b&o=&hp=1",
-    "https://t4.ftcdn.net/jpg/01/57/39/19/360_F_157391956_UrG0WMZiXiG2UKktQeaKTVgaLNSa8hIT.jpg",
-    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/430666399.jpg?k=3ec09fe5fe134a2c1a20215861ab31f64f209ea9bfa1ba526fd0438abef3a17b&o=&hp=1",
-  ],
-};
+function getListingsBase() {
+  return supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)');
+}

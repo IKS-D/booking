@@ -1,9 +1,9 @@
+import { Listing, Listings } from "@/actions/listings/getListings";
 import ListingCard from "@/components/listings/ListingCard";
-import { Listing } from "@/types";
 import { subtitle, title } from "@/components/primitives";
 
 interface ListingsContentProps {
-  listings: Listing[];
+  listings: Listings;
 }
 
 const ListingsContent: React.FC<ListingsContentProps> = ({ listings }) => {

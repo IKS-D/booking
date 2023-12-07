@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Listing } from "@/types";
 import { Image, Button, Divider, Textarea, Input } from "@nextui-org/react";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import { useRouter } from "next/navigation";
+import { Listing } from "@/actions/listings/getListings";
 
 type ListingContentProps = {
   listing: Listing;
@@ -55,8 +55,8 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
             <Input
               label="Category"
               value={`${
-                listing.category.charAt(0).toUpperCase() +
-                listing.category.slice(1)
+                listing.category!.name.charAt(0).toUpperCase() +
+                listing.category!.name.slice(1)
               }`}
               readOnly
               disabled
@@ -66,7 +66,7 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
 
             <Input
               label="Max Guests"
-              value={`${listing.max_guests}`}
+              value={`${listing.number_of_places}`}
               readOnly
               disabled
               variant="bordered"
@@ -87,7 +87,7 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
           <div className="relative w-96 h-48">
             <div className="relative">
               <Image
-                src={listing.images[currentImageIndex]}
+                src={listing.images[currentImageIndex].url}
                 alt={`Image ${currentImageIndex + 1}`}
                 className="object-contain"
               />
@@ -127,17 +127,6 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
           </div>
         </div>
       </div>
-
-      <label className="text-lg font-semibold">
-        Average cost of a listing in the city of {listing.city}
-      </label>
-
-      <Image
-        src={
-          "https://images.squarespace-cdn.com/content/v1/55b6a6dce4b089e11621d3ed/1585087896250-R3GZ6OFWYQRZUJRCJU3D/produce_monthly.png"
-        }
-        className="relative w-96 h-48"
-      />
     </div>
   );
 };

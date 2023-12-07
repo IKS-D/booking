@@ -1,18 +1,23 @@
-import { getListing } from "@/actions/listings/getListings";
+import { getListingById, getChartInformation } from "@/actions/listings/getListings";
+import { Image } from "@nextui-org/react";
+import Head from 'next/head';
+import { useEffect, useMemo, useRef } from 'react';
 import ListingContent from "../../../components/listings/ListingContent";
+import ListingChart from "../../../components/listings/ListingChart";
 
 export default async function ListingPage({
   params,
 }: {
-  params: { id: string };
+  params: { id: number };
 }) {
+
+  const {data: average, error: chartError  } = await getChartInformation(params.id)
+
   const id = params.id; // Extract the 'id' from the URL
 
-  const listing = await getListing({
-    listingId: id as string,
-  });
+  const { data: listing, error } = await getListingById(params.id);
 
-  if (listing.error) {
+  if (!listing) {
     return (
       <label className="text-lg font-semibold">
         Such listing does not exist
@@ -31,7 +36,11 @@ export default async function ListingPage({
                 justify-center
             "
     >
+      <Head>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+      </Head>
       <ListingContent listing={listing} />
+      <ListingChart average={average ?? {}} />
     </div>
   );
 }
