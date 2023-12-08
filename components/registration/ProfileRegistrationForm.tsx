@@ -7,14 +7,19 @@ import { Avatar, Button, Input } from "@nextui-org/react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { ProfileRegistrationFormData, ProfileRegistrationSchema } from "@/lib/validations/registerProfile";
+import {
+  ProfileRegistrationFormData,
+  ProfileRegistrationSchema,
+} from "@/lib/validations/registerProfile";
 import { insertProfile } from "@/actions/users/usersQueries";
 
 interface ProfileRegistrationFormProps {
   user: User;
 }
 
-export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFormProps) {
+export default function ProfileRegistrationForm({
+  user,
+}: ProfileRegistrationFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<ProfileRegistrationFormData>({
@@ -24,7 +29,7 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
     phoneNumber: "",
     country: "",
     city: "",
-    photo: ""
+    photo: "",
   });
 
   const [error, setError] = useState<{
@@ -43,7 +48,7 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
     if (!result.success) {
       //console.log("False in validate form")
       setError(result.error.flatten().fieldErrors);
-      //console.log(result.error.flatten().fieldErrors);
+      console.log(result.error.flatten().fieldErrors);
       return false;
     }
 
@@ -58,10 +63,12 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
     const formValid = validateForm(formData);
 
     if (!formValid) {
-      //console.log("Form is not valid")
+      console.log("Form is not valid");
       setLoading(false);
       return;
     }
+
+    console.log("Form is valid");
 
     const { profile, error } = await insertProfile({
       userId: user.id,
@@ -92,8 +99,11 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
     <div className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3">
       <form
         onSubmit={handleOnSubmit}
-        className="flex flex-col items-center w-full space-y-6">
-        <p className="text-md font-bold mb-4">Please complete your profile registration</p>
+        className="flex flex-col items-center w-full space-y-6"
+      >
+        <p className="text-md font-bold mb-4">
+          Please complete your profile registration
+        </p>
 
         <Input
           className="max-w-md h-[75px]"
@@ -129,13 +139,30 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
           label="Date of birth"
           name="dateOfBirth"
           variant="bordered"
-          value={formData.dateOfBirth.toISOString().split('T')[0]}  // Format date to 'YYYY-MM-DD'
+          errorMessage={error?.dateOfBirth}
+          value={formData.dateOfBirth.toISOString().split("T")[0]} // Format date to 'YYYY-MM-DD'
           onChange={(event) => {
             const enteredDate = event.target.value;
             // Validate the entered date format
             if (/^\d{4}-\d{2}-\d{2}$/.test(enteredDate)) {
               const selectedDate = new Date(enteredDate);
               setFormData({ ...formData, dateOfBirth: selectedDate });
+
+              // Check if user is at least 18 years old
+              const today = new Date();
+              const age = today.getFullYear() - selectedDate.getFullYear();
+              const month = today.getMonth() - selectedDate.getMonth();
+
+              if (
+                month < 0 ||
+                (month === 0 && today.getDate() < selectedDate.getDate())
+              ) {
+                setError({
+                  dateOfBirth: ["You must be at least 18 years old"],
+                });
+                return;
+              }
+
               setError({ dateOfBirth: undefined });
             } else {
               // Display an error for invalid date format
@@ -203,13 +230,19 @@ export default function ProfileRegistrationForm({ user, }: ProfileRegistrationFo
 
         <Avatar
           className="w-[100px] h-[100px]"
-          src={formData.photo ? formData.photo : "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg"}
+          src={
+            formData.photo
+              ? formData.photo
+              : "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg"
+          }
           alt="Your profile photo"
         />
 
         <Button type="submit" className="w-full flex gap-2">
           Sign up
-          <AiOutlineLoading3Quarters className={cn("animate-spin", { "hidden": !loading })} />
+          <AiOutlineLoading3Quarters
+            className={cn("animate-spin", { hidden: !loading })}
+          />
         </Button>
       </form>
     </div>

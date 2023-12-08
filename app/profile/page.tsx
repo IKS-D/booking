@@ -1,25 +1,32 @@
 import UserProfileCard from "@/components/profile/user/UserProfileCard";
 import HostProfileCard from "@/components/profile/host/HostProfileCard";
-import getCurrentUser, { getHostProfileById, getUserProfileById, hostProfileExists } from "@/actions/users/usersQueries";
+import getCurrentUser, {
+  getHostProfileById,
+  getUserProfileById,
+  hostProfileExists,
+} from "@/actions/users/usersQueries";
 import { EditIcon, DeleteIcon } from "@/components/Icons";
 import { Link } from "@nextui-org/react";
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();
-  const { data: userProfile, error: profileError } = await getUserProfileById(user!.id);
+  const { data: userProfile, error: profileError } = await getUserProfileById(
+    user!.id
+  );
   var hostProfile;
   if (await hostProfileExists(user!.id)) {
-    const { data: recvHostProfile, error: hostError } = await getHostProfileById(user!.id);
+    const { data: recvHostProfile, error: hostError } =
+      await getHostProfileById(user!.id);
     hostProfile = recvHostProfile;
-  }
-  else {
+  } else {
     hostProfile = null;
   }
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 text-foreground">
       <div className="text-2xl font-bold mb-2">
-        Welcome to your profile page, {userProfile?.first_name + " " + userProfile?.last_name}!
+        Welcome to your profile page,{" "}
+        {userProfile?.first_name + " " + userProfile?.last_name}!
       </div>
 
       <UserProfileCard user={user!} userProfile={userProfile!} />

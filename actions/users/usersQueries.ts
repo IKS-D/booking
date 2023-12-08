@@ -65,6 +65,7 @@ export async function getUserProfileById(id: string) {
     .from("profiles")
     .select("*")
     .eq("id", id)
+    .limit(1)
     .single();
 
   if (error) {
@@ -160,7 +161,7 @@ export async function hostProfileExists(userId: string) {
     .from("hosts")
     .select("*")
     .eq("id", userId);
-  
+
   if (!error && (!host || host.length == 0)) {
     return false;
   }

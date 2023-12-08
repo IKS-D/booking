@@ -1,6 +1,8 @@
 import getCurrentUser from "@/actions/users/usersQueries";
 import { getReservations } from "@/actions/reservations/reservationsQueries";
 import ReservationsContent from "../../components/reservations/ReservationsContent";
+import { notFound } from "next/navigation";
+import NotFoundComponent from "@/components/NotFoundComponent";
 
 const ReservationsPage = async () => {
   const currentUser = await getCurrentUser();
@@ -17,7 +19,10 @@ const ReservationsPage = async () => {
 
   if (!reservations || reservations.length === 0) {
     return (
-      <label className="text-lg font-semibold">No reservations found.</label>
+      <NotFoundComponent
+        title="No reservations found"
+        subtitle="You have no reservations yet."
+      />
     );
   }
 

@@ -4,9 +4,6 @@ import {
   hostProfileExists,
   userProfileExists,
 } from "./actions/users/usersQueries";
-import { profile } from "console";
-import { toast } from "sonner";
-import { notFound, redirect } from "next/navigation";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
