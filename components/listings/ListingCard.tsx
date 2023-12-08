@@ -17,59 +17,45 @@ const ListingCard: React.FC<ListingCardProps> = ({
   actionLabel,
   actionId = "",
 }) => {
-//   const detailsModal = useDisclosure();
+  // const detailsModal = useDisclosure();
+  const defaultImageUrl = "https://helloartsy.com/wp-content/uploads/kids/places/how-to-draw-a-house/how-to-draw-a-house-step-6.jpg"; // Provide the path to your default image
 
   return (
-    <>
-      {/* <ReservationDetailsModal
-        listing={listing}
-        isOpen={detailsModal.isOpen}
-        onOpenChange={detailsModal.onOpenChange}
-      /> */}
-        <Link href={`/listings/[id]`} as={`/listings/${listing.id}`} className="cursor-pointer group" passHref>
-                <div className="flex flex-col gap-2 w-full">
-                    <div
-                        className="
-                        aspect-square 
-                        w-full 
-                        relative 
-                        overflow-hidden 
-                        rounded-xl
-                    "
-                    >
-                        <Image
-                        fill
-                        className="
-                        object-cover 
-                        h-full 
-                        w-full 
-                        group-hover:scale-110 
-                        transition
-                        "
-                        src={listing.photos}
-                        alt="Listing"
-                        />
+    <Link href={`/listings/[id]`} as={`/listings/${listing.id}`} passHref>
+      <div className="cursor-pointer group flex flex-col gap-2 w-full">
+        {listing.images && listing.images.length > 0 ? (
+          <div className="aspect-square relative overflow-hidden rounded-xl">
+            <Image
+              fill
+              className="object-cover h-full w-full group-hover:scale-110 transition"
+              src={listing.images[0].url}
+              alt="Listing"
+            />
 
-                        {/* Can be used to add icons on top of the image
-                        <div
-                        className="
-                        absolute
-                        top-3
-                        right-3
-                        "
-                        >
-                        <HeartButton listingId={listing.id} currentUser={currentUser} />
-                        </div> */}
-                    </div>
+            {/* Can be used to add icons on top of the image
+            <div className="absolute top-3 right-3">
+              <HeartButton listingId={listing.id} currentUser={currentUser} />
+            </div> */}
+          </div>
+        ) : (
+          // Display default image if there are no images
+          <div className="aspect-square relative overflow-hidden rounded-xl">
+            <Image
+              fill
+              className="object-cover h-full w-full group-hover:scale-110 transition"
+              src={defaultImageUrl}
+              alt="Default Listing"
+            />
+          </div>
+        )}
 
-                    <div className="font-semibold text-lg">{listing.title}</div>
-                    <div className="text-default-600 font-ligth">
-                        {listing.category!.name.charAt(0).toUpperCase() +
-                        listing.category!.name.slice(1)}
-                    </div>
-                </div>
-        </Link>
-    </>
+        <div className="font-semibold text-lg">{listing.title}</div>
+        <div className="text-default-600 font-light">
+          {listing.category?.name &&
+            `${listing.category.name.charAt(0).toUpperCase()}${listing.category.name.slice(1)}`}
+        </div>
+      </div>
+    </Link>
   );
 };
 

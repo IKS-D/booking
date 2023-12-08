@@ -87,7 +87,7 @@ const ListingChart: React.FC<ListingChartProps> = ({ average }) => {
   
     return (
       <section>
-        <div ref={pieEl}></div>
+        <div className="z-0" ref={pieEl}></div>
       </section>
     );
   };

@@ -1,13 +1,14 @@
 "use client"
 
 import React from "react";
-import { Button, Input, Textarea, Select, SelectItem } from "@nextui-org/react";
+import { Button, Input, Textarea, Select, SelectItem, select } from "@nextui-org/react";
 import { AnimatePresence } from "framer-motion";
 import { useMultiplestepForm } from "@/hooks/useMultiplestepForm";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import { Categories, Listing, getListingCategories, insertListing } from "@/actions/listings/getListings";
+import FileUpload from "./FileUpload";
 
 interface CreateListingFormProps {
   user: User;
@@ -18,6 +19,7 @@ export default function CreateListingForm({
 }: CreateListingFormProps){
 
     const [formData, setFormData] = React.useState<Partial<Listing>>({});
+    const [selectedFiles, setSelectedFiles] = React.useState<FileList | null>(null);
     const [categories, setCategories] = React.useState<Categories>([]);
     const [errors, setErrors] = React.useState<Partial<Listing>>({});
     const [titleError, setTitleError] = React.useState(false);
@@ -57,6 +59,7 @@ export default function CreateListingForm({
       const { error } = await insertListing({
         listing: formData,
         user_id: user.id,
+        files: selectedFiles!,
       });
 
       if (error) {
@@ -66,6 +69,16 @@ export default function CreateListingForm({
 
       router.push("/listings/personal/");
       toast.success("Listing created successfully");
+    };
+
+    const handleFileUpload = (files: FileList | null) => {
+      if (files) {
+        // Handle the files (either a single file or multiple files)
+        setSelectedFiles(files)
+      } else {
+        // Handle the case where no files are selected
+        console.log('No files selected');
+      }
     };
 
     const validateStep = () => {
@@ -102,7 +115,7 @@ export default function CreateListingForm({
       }
       if (currentStepIndex === 2) {
         let hasErrors = false;
-          if (!formData.category) {
+          if (!formData.category_id) {
               setCategoryError(true);
               hasErrors = true;
           }
@@ -272,12 +285,7 @@ export default function CreateListingForm({
 
               {currentStepIndex === 3 && (
                 <>
-                <Input className="mb-5"
-                label="Photos of the listing"
-                labelPlacement="outside-left"
-                type="file"
-                multiple
-                />
+                <FileUpload onFileChange={(files: FileList | null) => handleFileUpload(files)}></FileUpload>
                 </>
               )}
             </AnimatePresence>

@@ -16,14 +16,13 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
 
   const nextImage = () => {
     setCurrentImageIndex(
-      (prevIndex) => (prevIndex + 1) % listing.images.length
+      currentImageIndex + 1 % listing.images.length
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) =>
-        (prevIndex - 1 + listing.images.length) % listing.images.length
+      currentImageIndex - 1 % listing.images.length
     );
   };
 
@@ -85,33 +84,35 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
         </div>
         <div className="mt-10">
           <div className="relative w-96 h-48">
-            <div className="relative">
-              <Image
-                src={listing.images[currentImageIndex].url}
-                alt={`Image ${currentImageIndex + 1}`}
-                className="object-contain"
-              />
+          {listing.images && listing.images.length > 0 ? (
+            <div>
+              <div className="relative">
+                <Image
+                  src={listing.images[currentImageIndex].url}
+                  alt={`Image ${currentImageIndex + 1}`}
+                  className="object-contain"
+                />
+              </div>
+              {listing.images.length > 1 && (
+                <div className="flex justify-center gap-5 mt-2">
+                  <Button
+                    className="prev-button"
+                    onClick={prevImage}
+                    disabled={currentImageIndex === 0}
+                  >
+                    <BsArrowLeft />
+                  </Button>
+                  <Button
+                    className="next-button"
+                    onClick={nextImage}
+                    disabled={currentImageIndex === listing.images.length - 1}
+                  >
+                    <BsArrowRight />
+                  </Button>
+                </div>
+              )}
             </div>
-            <div className="flex justify-center gap-5 mt-2">
-              <Button
-                className="prev-button"
-                onClick={prevImage}
-                disabled={listing.images.length <= 1 || currentImageIndex === 0}
-              >
-                <BsArrowLeft />
-              </Button>
-              <Button
-                className="next-button"
-                onClick={nextImage}
-                disabled={
-                  listing.images.length <= 1 ||
-                  currentImageIndex === listing.images.length - 1
-                }
-              >
-                <BsArrowRight />
-              </Button>
-            </div>
-
+          ) : null}
             <div className="flex justify-center gap-5 mt-2">
               <Button
                 className="mt-6 items-center justify-center"

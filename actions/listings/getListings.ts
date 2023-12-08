@@ -98,8 +98,7 @@ export async function getChartInformation(listingId: number){
   return { data: averages, error: null };
 }
 
-export async function getPersonalListings(params: Params) {
-  const { userId } = params;
+export async function getPersonalListings(userId: string) {
 
   const { data, error } = await supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)').eq("host_id",userId!);
 
@@ -113,32 +112,57 @@ export async function getPersonalListings(params: Params) {
 export async function insertListing({
   listing,
   user_id,
-} : {
+  files,
+}: {
   listing: Partial<Listing>;
   user_id: string;
-}){
+  files: FileList;
+}) {
+  let { data: addedListing, error } = await supabase
+    .from("listings")
+    .insert({
+      address: listing.address!,
+      category_id: listing.category_id!,
+      city: listing.city!,
+      country: listing.country!,
+      creation_date: new Date().toISOString(),
+      day_price: listing.day_price!,
+      description: listing.description!,
+      host_id: user_id,
+      number_of_places: listing.number_of_places!,
+      photos: "asdasd",
+      suspension_status: false,
+      title: listing.title!,
+    })
+    .select()
+    .single();
 
-  let { data: addedListing, error } = await supabase.from("listings")
-                                               .insert({
-                                                address: listing.address!,
-                                                category_id: 1,
-                                                city: listing.city!,
-                                                country: listing.country!,
-                                                creation_date: new Date().toISOString(),
-                                                day_price: listing.day_price!,
-                                                description: listing.description!,
-                                                host_id: user_id,
-                                                number_of_places: listing.number_of_places!,
-                                                photos: "asdasd",
-                                                suspension_status: false,
-                                                title: listing.title!,
-                                              })
-                                              .select()
-                                              .single();
   if (error) {
     console.error(error);
-  }
+  } else {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
+      // Upload the file to Supabase Storage
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from('images') // Replace with your storage bucket name
+        .upload(file.name, file);
+
+      if (fileError) {
+        console.error('Error uploading file:', fileError);
+      } else {
+        // Get the public URL of the uploaded file
+        const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
+        console.log(fileURL);
+
+        
+        await supabase.from("photos").insert({
+          listing_id: addedListing!.id,
+          url: fileURL.data.publicUrl,
+        });
+      }
+    }
+  }
   return { error };
 }
 

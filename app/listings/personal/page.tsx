@@ -5,7 +5,6 @@ import CreateNewListingButton from "../../../components/listings/CreateNewListin
 
 const PersonalListingsPage = async () => {
   const currentUser = await getCurrentUser();
-
   if (!currentUser) {
     return (
       <label className="text-lg font-semibold">
@@ -14,7 +13,7 @@ const PersonalListingsPage = async () => {
     );
   }
 
-  const { data: personalListings, error } = await getPersonalListings({});
+  const { data: personalListings, error } = await getPersonalListings(currentUser.id);
 
   if (!personalListings || personalListings.length === 0) {
     return (
