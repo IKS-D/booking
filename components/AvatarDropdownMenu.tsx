@@ -12,6 +12,9 @@ import { User } from "@supabase/supabase-js";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { UserProfile } from "@/actions/users/usersQueries";
+import { signOut } from "@/actions/auth/authQueries";
+import { error } from "console";
+import { toast } from "sonner";
 
 interface AvatarDropdownMenuProps {
   user: User;
@@ -32,9 +35,13 @@ export default function AvatarDropdownMenu({
   };
 
   const onLogout = async () => {
-    await fetch("/auth/sign-out", {
-      method: "POST",
-    });
+    const { error } = await signOut();
+
+    if(error){
+      console.error(error);
+      toast.error("There was an error while signing out: " + error.message);
+      return;
+    }
 
     router.push("/");
     window.location.reload();

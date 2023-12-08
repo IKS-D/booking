@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { DeleteIcon } from "@/components/Icons";
 import { User } from "@supabase/supabase-js";
+import { deleteUser } from "@/actions/auth/authQueries";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface ProfileDeleteFormProps {
   user: User;
@@ -21,21 +23,12 @@ export default function UserProfileDeleteForm({ user, reservationCount, listingC
   const handleOnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const response = await fetch("/auth/delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
 
-    console.log(response);
+    const { error } = await deleteUser();
 
-    const responseData = await response.json();
-
-    console.log(responseData);
-
-    if (!response.ok) {
-      toast.error(responseData.error);
+    if (error) {
+      console.error(error);
+      toast.error(error.message);
       setLoading(false);
       return;
     }
@@ -45,36 +38,39 @@ export default function UserProfileDeleteForm({ user, reservationCount, listingC
   };
 
   return (
-    <div className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3">
-      <form onSubmit={handleOnSubmit} className="w-full flex flex-col items-center justify-center m-4">
-        <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
-          <div>
-            <p className="text-lg">You have {reservationCount} reservations.</p>
-          </div>
-          <div>
-            <p className="text-lg">You have {listingCount} listings.</p>
-          </div>
-        </div>
-        <div className="flex items-center justify-center">
-              <p className="text-lg font-semibold">{ ableToDelete ? "Are you sure you want to delete your profile?" : "You cannot delete your profile."}</p>
+    <>
+      {loading && <LoadingSpinner />}
+      <div className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3">
+        <form onSubmit={handleOnSubmit} className="w-full flex flex-col items-center justify-center m-4">
+          <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
+            <div>
+              <p className="text-lg">You have {reservationCount} reservations.</p>
             </div>
-        <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
-          <Button type="submit"
-            className="bg-danger text-white font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out hover:bg-danger-dark disabled:bg-black"
-            disabled={!ableToDelete}
-          >
-            <div className="flex items-center justify-left gap-1">
-              <DeleteIcon /><p className="text-md">Confirm</p>
+            <div>
+              <p className="text-lg">You have {listingCount} listings.</p>
             </div>
-          </Button>
+          </div>
+          <div className="flex items-center justify-center">
+            <p className="text-lg font-semibold">{ableToDelete ? "Are you sure you want to delete your profile?" : "You cannot delete your profile."}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
+            <Button type="submit"
+              className="bg-danger text-white font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out hover:bg-danger-dark disabled:bg-black"
+              disabled={!ableToDelete}
+            >
+              <div className="flex items-center justify-left gap-1">
+                <DeleteIcon /><p className="text-md">Confirm</p>
+              </div>
+            </Button>
 
-          <Link href="/profile" className="bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out">
-            <div className="flex items-center justify-left gap-1">
-              <p className="text-md">Cancel</p>
-            </div>
-          </Link>
-        </div>
-      </form>
-    </div>
+            <Link href="/profile" className="bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out">
+              <div className="flex items-center justify-left gap-1">
+                <p className="text-md">Cancel</p>
+              </div>
+            </Link>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

@@ -29,7 +29,8 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if(error){
-      console.error(error)
+      // There was an error creating a session
+      console.error(error);
     }
   }
 
