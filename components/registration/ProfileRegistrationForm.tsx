@@ -2,16 +2,21 @@
 
 import { User } from "@supabase/supabase-js";
 import React, { useState } from "react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import { Avatar, Button, Input } from "@nextui-org/react";
+import {
+  Avatar,
+  Button,
+  Input
+} from "@nextui-org/react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import {
   ProfileRegistrationFormData,
   ProfileRegistrationSchema,
 } from "@/lib/validations/registerProfile";
 import { insertProfile } from "@/actions/users/usersQueries";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import LoadingSpinner from "../LoadingSpinner";
 
 interface ProfileRegistrationFormProps {
   user: User;
@@ -21,69 +26,42 @@ export default function ProfileRegistrationForm({
   user,
 }: ProfileRegistrationFormProps) {
   const router = useRouter();
+
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<ProfileRegistrationFormData>({
-    firstName: "",
-    lastName: "",
-    dateOfBirth: new Date(),
-    phoneNumber: "",
-    country: "",
-    city: "",
-    photo: "",
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors, isSubmitting },
+    reset,
+    setError,
+  } = useForm<ProfileRegistrationFormData>({
+    resolver: zodResolver(ProfileRegistrationSchema),
   });
 
-  const [error, setError] = useState<{
-    firstName?: string[] | undefined;
-    lastName?: string[] | undefined;
-    dateOfBirth?: string[] | undefined;
-    phoneNumber?: string[] | undefined;
-    country?: string[] | undefined;
-    city?: string[] | undefined;
-    photo?: string[] | undefined;
-  }>();
-
-  const validateForm = (formData: ProfileRegistrationFormData) => {
-    const result = ProfileRegistrationSchema.safeParse(formData);
-
-    if (!result.success) {
-      //console.log("False in validate form")
-      setError(result.error.flatten().fieldErrors);
-      console.log(result.error.flatten().fieldErrors);
-      return false;
-    }
-
-    setError(undefined);
-    return true;
-  };
-
-  const handleOnSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: ProfileRegistrationFormData) => {
     setLoading(true);
-    console.log(formData);
-    const formValid = validateForm(formData);
-
-    if (!formValid) {
-      console.log("Form is not valid");
-      setLoading(false);
-      return;
-    }
-
-    console.log("Form is valid");
 
     const { profile, error } = await insertProfile({
       userId: user.id,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      dateOfBirth: formData.dateOfBirth!.toDateString(),
-      phoneNumber: formData.phoneNumber,
-      country: formData.country,
-      city: formData.city,
-      photo: formData.photo,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dateOfBirth: data.dateOfBirth!.toDateString(),
+      phoneNumber: data.phoneNumber,
+      country: data.country,
+      city: data.city,
+      photo: data.photo,
     });
 
     if (error) {
+      // Display the server error
+      toast.error("Something went wrong: " + error.message);
+
       console.error(error);
-      toast.error("Something went wrong");
+
+      setLoading(false);
       return;
     }
 
@@ -93,158 +71,126 @@ export default function ProfileRegistrationForm({
     // Navigate to home page
     router.push("/");
     router.refresh();
+
+    reset();
   };
 
   return (
-    <div className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3">
+    <>
+      {loading && <LoadingSpinner />}
       <form
-        onSubmit={handleOnSubmit}
-        className="flex flex-col items-center w-full space-y-6"
+        className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3 space-y-4"
+        onSubmit={handleSubmit((e) => onSubmit(e))}
       >
-        <p className="text-md font-bold mb-4">
+        <p className="text-lg font-bold mb-2 mt-2">
           Please complete your profile registration
         </p>
 
         <Input
           className="max-w-md h-[75px]"
+          {...register("firstName")}
+          errorMessage={errors.firstName && (errors.firstName.message as string)}
+          isInvalid={errors.firstName ? true : false}
+          disabled={isSubmitting}
           label="First name"
           name="firstName"
           placeholder="Enter your first name"
           variant="bordered"
-          value={formData.firstName}
-          onChange={(event) => {
-            setFormData({ ...formData, firstName: event.target.value });
-            setError({ firstName: undefined });
-          }}
-          errorMessage={error?.firstName}
         />
 
         <Input
           className="max-w-md h-[75px]"
+          {...register("lastName")}
+          errorMessage={errors.lastName && (errors.lastName.message as string)}
+          isInvalid={errors.lastName ? true : false}
+          disabled={isSubmitting}
           label="Last name"
           name="lastName"
           placeholder="Enter your last name"
           variant="bordered"
-          value={formData.lastName}
-          onChange={(event) => {
-            setFormData({ ...formData, lastName: event.target.value });
-            setError({ lastName: undefined });
-          }}
-          errorMessage={error?.lastName}
         />
 
         <Input
           className="max-w-md h-[75px]"
+          errorMessage={errors.dateOfBirth && (errors.dateOfBirth.message as string)}
+          isInvalid={errors.dateOfBirth ? true : false}
+          disabled={isSubmitting}
           type="date"
           label="Date of birth"
           name="dateOfBirth"
           variant="bordered"
-          errorMessage={error?.dateOfBirth}
-          value={formData.dateOfBirth.toISOString().split("T")[0]} // Format date to 'YYYY-MM-DD'
           onChange={(event) => {
-            const enteredDate = event.target.value;
-            // Validate the entered date format
-            if (/^\d{4}-\d{2}-\d{2}$/.test(enteredDate)) {
-              const selectedDate = new Date(enteredDate);
-              setFormData({ ...formData, dateOfBirth: selectedDate });
-
-              // Check if user is at least 18 years old
-              const today = new Date();
-              const age = today.getFullYear() - selectedDate.getFullYear();
-              const month = today.getMonth() - selectedDate.getMonth();
-
-              if (
-                month < 0 ||
-                (month === 0 && today.getDate() < selectedDate.getDate())
-              ) {
-                setError({
-                  dateOfBirth: ["You must be at least 18 years old"],
-                });
-                return;
-              }
-
-              setError({ dateOfBirth: undefined });
-            } else {
-              // Display an error for invalid date format
-              setError({ dateOfBirth: ["Invalid date format"] });
-            }
+            const formatedDate = new Date(event.target.value);
+            setValue("dateOfBirth", formatedDate);
           }}
         />
 
         <Input
           className="max-w-md h-[75px]"
+          {...register("phoneNumber")}
+          errorMessage={errors.phoneNumber && (errors.phoneNumber.message as string)}
+          isInvalid={errors.phoneNumber ? true : false}
+          disabled={isSubmitting}
           label="Phone number"
           name="phoneNumber"
           placeholder="Enter your phone number"
           variant="bordered"
-          value={formData.phoneNumber}
-          onChange={(event) => {
-            setFormData({ ...formData, phoneNumber: event.target.value });
-            setError({ phoneNumber: undefined });
-          }}
-          errorMessage={error?.phoneNumber}
         />
 
         <Input
           className="max-w-md h-[75px]"
+          {...register("country")}
+          errorMessage={errors.country && (errors.country.message as string)}
+          isInvalid={errors.country ? true : false}
+          disabled={isSubmitting}
           label="Country"
           name="country"
           placeholder="Enter the name of your country"
           variant="bordered"
-          value={formData.country}
-          onChange={(event) => {
-            setFormData({ ...formData, country: event.target.value });
-            setError({ country: undefined });
-          }}
-          errorMessage={error?.country}
         />
 
         <Input
           className="max-w-md h-[75px]"
+          {...register("city")}
+          errorMessage={errors.city && (errors.city.message as string)}
+          isInvalid={errors.city ? true : false}
+          disabled={isSubmitting}
           label="City"
           name="city"
           placeholder="Enter the name of your city"
           variant="bordered"
-          value={formData.city}
-          onChange={(event) => {
-            setFormData({ ...formData, city: event.target.value });
-            setError({ city: undefined });
-          }}
-          errorMessage={error?.city}
         />
 
-        <p className="text-lg font-bold mb-4">Enter your profile picture</p>
         <Input
           className="max-w-md h-[75px]"
+          {...register("photo")}
+          errorMessage={errors.photo && (errors.photo.message as string)}
+          isInvalid={errors.photo ? true : false}
+          disabled={isSubmitting}
           label="Photo"
           name="photo"
           placeholder="Enter a URL for your photo"
           variant="bordered"
-          value={formData.photo}
-          onChange={(event) => {
-            setFormData({ ...formData, photo: event.target.value });
-            setError({ photo: undefined });
-          }}
-          errorMessage={error?.photo}
         />
 
         <Avatar
           className="w-[100px] h-[100px]"
           src={
-            formData.photo
-              ? formData.photo
+            getValues("photo")
+              ? getValues("photo")
               : "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg"
           }
           alt="Your profile photo"
         />
 
-        <Button type="submit" className="w-full flex gap-2">
+        <Button
+          type="submit"
+          color="primary"
+          className="w-full max-w-md"
+        >
           Sign up
-          <AiOutlineLoading3Quarters
-            className={cn("animate-spin", { hidden: !loading })}
-          />
         </Button>
       </form>
-    </div>
+    </>
   );
 }

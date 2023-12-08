@@ -32,7 +32,7 @@ export default async function ProfilePage() {
       <UserProfileCard user={user!} userProfile={userProfile!} />
       <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
         <Link
-          href="/profile/edit"
+          href="/profile/user/edit"
           className="bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
         >
           <div className="flex items-center justify-left gap-1">
@@ -41,7 +41,7 @@ export default async function ProfilePage() {
           </div>
         </Link>
         <Link
-          href="/profile/delete"
+          href="/profile/user/delete"
           className="bg-danger hover:bg-danger-dark text-white font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
         >
           <div className="flex items-center justify-left gap-1">

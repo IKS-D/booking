@@ -1,18 +1,16 @@
 "use client";
 
-import React, { ReactEventHandler, useState } from "react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import React, { useState } from "react";
 import { Button, Input } from "@nextui-org/react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { UserRegistrationFormData, UserRegistrationSchema } from "@/lib/validations/registerUser";
 import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../Icons";
-import OAuthForm from "../OAuthForm";
 import LoadingSpinner from "../LoadingSpinner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { signUpUsingEmailAndPassword } from "@/actions/auth/authQueries";
 
 export default function UserRegistrationForm() {
   const router = useRouter();
@@ -36,62 +34,37 @@ export default function UserRegistrationForm() {
 
   const onSubmit = async (data: UserRegistrationFormData) => {
     setLoading(true);
-    console.log(data)
 
-    const response = await fetch("/auth/sign-up", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const { responseData, error } = await signUpUsingEmailAndPassword(data);
 
-    if (!response.ok) {
-      const error = await (response.json() as Promise<AuthError>);
+    if (error) {
       toast.error(error.message);
-
-      // Set the errors to display on the form
-      setError("email", {
-        type: "manual",
-        message: error.message,
-      });
-
-      setError("password", {
-        type: "manual",
-        message: error.message,
-      });
-
-      setError("confirmPassword", {
-        type: "manual",
-        message: error.message,
-      });
-
       setLoading(false);
       return;
     }
 
     setLoading(false);
-    toast.success("User registered successfully!");
+    toast.success("User " + responseData.user?.email + " registered successfully!");
 
     // Navigate to profile registration
-    // router.push("/registration/profile");
-    // router.refresh();
+    router.push("/registration/profile");
+    router.refresh();
 
-    //reset();
+    reset();
   };
 
   return (
     <>
       {loading && <LoadingSpinner />}
       <form
-        className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3"
+        className="flex flex-col items-center p-4 w-1/3 space-y-4"
         onSubmit={handleSubmit((e) => onSubmit(e))}
       >
 
-        <p className="text-md font-bold mb-4">Sign up using email and password</p>
+        <p className="text-lg font-bold mb-2 mt-2">Sign up using email and password</p>
 
         <Input
-          className="max-w-md h-[75px] mb-2"
+          className="max-w-md h-[75px]"
           {...register("email")}
           errorMessage={errors.email && (errors.email.message as string)}
           isInvalid={errors.email ? true : false}
@@ -103,7 +76,7 @@ export default function UserRegistrationForm() {
         />
 
         <Input
-          className="max-w-md h-[75px] mb-2"
+          className="max-w-md h-[75px]"
           endContent={
             <button
               className="focus:outline-none"
@@ -129,7 +102,7 @@ export default function UserRegistrationForm() {
         />
 
         <Input
-          className="max-w-md h-[75px] mb-2"
+          className="max-w-md h-[75px]"
           {...register("confirmPassword")}
           errorMessage={errors.confirmPassword && (errors.confirmPassword.message as string)}
           isInvalid={errors.confirmPassword ? true : false}
@@ -149,12 +122,6 @@ export default function UserRegistrationForm() {
         >
           Sign up with email
         </Button>
-
-        <div className="flex flex-col items-center">
-          <p className="text-md font-bold mb-4">Or</p>
-        </div>
-
-        <OAuthForm />
       </form>
     </>
   );

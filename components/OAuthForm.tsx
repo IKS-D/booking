@@ -2,27 +2,47 @@
 
 import { Button } from "@nextui-org/react";
 import { createBrowserClient } from "@supabase/ssr";
-import React from "react";
+import React, { useState } from "react";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function OAuthForm() {
-	const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+	const [loading, setLoading] = useState(false);
 
-	const SignInWithGoogle = () => {
+	const handleSignInUsingGoogle = async () => {
+		setLoading(true);
+
+		const supabase = createBrowserClient(
+			process.env.NEXT_PUBLIC_SUPABASE_URL!,
+			process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+		)
+
 		supabase.auth.signInWithOAuth({
-			provider:"google",
+			provider: "google",
 			options: {
-				redirectTo:`${location.origin}/auth/callback`,
+				redirectTo: `${origin}/auth/callback`,
 			},
 		});
+
+		setLoading(false);
 	}
-	
-	return <Button 
-  color="primary"
-  className="w-full mb-4" 
-  onClick={SignInWithGoogle}>
-    Sign in with Google
-    </Button>;
+
+	return (
+		<>
+			{loading && <LoadingSpinner />}
+			<div className="flex flex-col items-center p-4 w-1/3">
+				<Button
+					color="primary"
+					className="w-full max-w-md flex gap-1"
+					onClick={handleSignInUsingGoogle}
+				>
+					<img
+						src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
+						alt="Google Icon"
+						className="w-[30px]"
+					/>
+					Sign in with Google
+				</Button>
+			</div>
+		</>
+	);
 }

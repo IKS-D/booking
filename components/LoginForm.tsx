@@ -16,9 +16,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "./Icons";
 import { useRouter } from "next/navigation";
 import { AuthError } from "@supabase/supabase-js";
-import { Spinner } from "@nextui-org/react";
 import LoadingSpinner from "./LoadingSpinner";
-import OAuthForm from "./OAuthForm";
+import { signInUsingEmailAndPassword } from "@/actions/auth/authQueries";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -39,29 +38,12 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginUserFormData) => {
     setLoading(true);
 
-    const response = await fetch("/auth/sign-in", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const { error } = await signInUsingEmailAndPassword(data);
 
-    if (!response.ok) {
-      const error = await (response.json() as Promise<AuthError>);
+    if (error) {
+      console.error(error);
       toast.error(error.message);
-
-      // set errors to display on form
-      setError("email", {
-        type: "manual",
-        message: error.message,
-      });
-
-      setError("password", {
-        type: "manual",
-        message: error.message,
-      });
-
+      setLoading(false);
       return;
     }
 
@@ -84,12 +66,10 @@ export default function LoginForm() {
       {loading && <LoadingSpinner />}
       <form
         onSubmit={handleSubmit((e) => onSubmit(e))}
-        className="flex flex-col justify-center gap-2 text-foreground"
-        //   action="/auth/sign-in"
-        //   method="post"
+        className="flex flex-col w-full justify-center items-center gap-2 text-foreground"
       >
         <Input
-          className="max-w-xs h-[75px]"
+          className="max-w-sm h-[75px]"
           {...register("email")}
           errorMessage={errors.email && (errors.email.message as string)}
           isInvalid={errors.email ? true : false}
@@ -102,7 +82,7 @@ export default function LoginForm() {
         {/* <Spacer y={1} /> */}
 
         <Input
-          className="max-w-xs h-[75px]"
+          className="max-w-sm h-[75px]"
           endContent={
             <button
               className="focus:outline-none"
@@ -125,33 +105,28 @@ export default function LoginForm() {
           errorMessage={errors.password && (errors.password.message as string)}
         />
 
-        <Spacer y={3} />
+        {/* <Spacer y={3} />
         <div className="flex justify-between items-center gap-x-10">
           <Checkbox>Remember me</Checkbox>
           <label className="text-md">Forgot password?</label>
-        </div>
+        </div> */}
 
         <Button
           disabled={isSubmitting}
           type="submit"
           color="primary"
-          className="max-w-xs"
+          className="w-full max-w-sm"
         >
-          Sign in
+          Sign in with email and password
         </Button>
 
         {/* or sign up */}
         <Spacer y={1} />
         <div className="flex flex-col items-center">
           <label className="text-md">Don't have an account?</label>
-          <Link href="/registration">
+          <Link href="/registration/user">
             <p className="text-md text-primary">Sign up</p>
           </Link>
-        </div>
-
-        <div className="flex flex-col items-center">
-          <label className="text-md mb-2">Or</label>
-          <OAuthForm />
         </div>
       </form>
     </>
