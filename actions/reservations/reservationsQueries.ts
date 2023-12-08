@@ -1,11 +1,12 @@
 "use server";
 
 import supabase from "@/supabase/supabase";
-import { DbResultOk, TableInserts } from "@/supabase/database.types";
 import { revalidatePath } from "next/cache";
-import { sendNewReservationEmail } from "./email";
+import { sendNewReservationEmailHost } from "./email";
+import { QueryData, QueryError, QueryResult } from "@supabase/supabase-js";
+import { TablesInsert } from "@/supabase/database-generated.types";
 
-type ReservationsWithDetails = DbResultOk<ReturnType<typeof getReservations>>;
+type ReservationsWithDetails = QueryData<ReturnType<typeof getReservations>>;
 export type ReservationWithDetails = ReservationsWithDetails[0];
 
 export async function getReservations(userId: string) {
@@ -21,10 +22,11 @@ export async function getReservations(userId: string) {
   return { data: reservations, error: error };
 }
 
-export async function getHostPendingReservations(hostId: string) {
-  let { data: reservations, error } = await getReservationsBase()
-    .eq("status.name", "pending")
-    .eq("listing.host_id", hostId);
+export async function getHostReservations(hostId: string) {
+  let { data: reservations, error } = await getReservationsBase().eq(
+    "listing.host_id",
+    hostId
+  );
 
   if (error) {
     console.error(error);
@@ -91,7 +93,7 @@ export async function rejectReservation(reservationId: string) {
     console.error(error);
   }
 
-  revalidatePath("/reservations/pending");
+  revalidatePath("/reservations/host");
 
   return { error };
 }
@@ -106,7 +108,7 @@ export async function confirmReservation(reservationId: string) {
     console.error(error);
   }
 
-  revalidatePath("/reservations/pending");
+  revalidatePath("/reservations/host");
 
   return { error };
 }
@@ -165,7 +167,7 @@ export async function insertReservation({
   }
 
   if (reservation?.id) {
-    sendNewReservationEmail(reservation.id);
+    await sendNewReservationEmailHost(reservation.id);
   }
 
   return { reservation, error };
@@ -189,7 +191,7 @@ export async function insertOrderedServices(
   return { error };
 }
 
-export async function insertPayment(payment: TableInserts<"payments">) {
+export async function insertPayment(payment: TablesInsert<"payments">) {
   let { error } = await supabase.from("payments").insert(payment).select();
 
   if (error) {

@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import { cookies } from "next/headers";
 import ClientOnly from "@/components/ClientOnly";
 import { createServerClient } from "@supabase/ssr";
+import { getCurrentUserProfile } from "@/actions/users/usersQueries";
 
 export const metadata: Metadata = {
   title: {

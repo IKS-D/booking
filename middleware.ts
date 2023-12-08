@@ -1,5 +1,9 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  hostProfileExists,
+  userProfileExists,
+} from "./actions/users/usersQueries";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -63,6 +67,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  // If user does not have a profile, redirect to profile registration
+  if (
+    user &&
+    !(await userProfileExists(user.id)) &&
+    !publicRoutes.includes(path) &&
+    path !== "/registration/profile"
+  ) {
+    return NextResponse.redirect(new URL("/registration/profile", request.url));
+  }
+
+  if (
+    user &&
+    hostRoutes.includes(path) &&
+    !(await hostProfileExists(user.id))
+  ) {
+    return NextResponse.redirect(new URL("/not-found", request.url));
+  }
+
   return response;
 }
 
@@ -73,9 +95,16 @@ export const config = {
 const publicRoutes = [
   "/login",
   "/registration",
+  "/registration/user",
+  "/registration/profile",
   "/",
   "/listings",
   "/listings/[id]",
   "/auth/sign-in",
+  "/auth/sign-up",
+  "/auth/sign-out",
+  "/auth/callback",
   "/payment/callback",
 ];
+
+const hostRoutes = ["/reservations/host", "/listings/personal", "/reports"];

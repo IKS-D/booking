@@ -29,8 +29,6 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 }) => {
   const listing = reservation.listing!;
 
-  console.log(listing);
-
   const cancelModal = useDisclosure();
   const detailsModal = useDisclosure();
 

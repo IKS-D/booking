@@ -1,4 +1,4 @@
-import getCurrentUser from "@/actions/users/getCurrentUser";
+import getCurrentUser from "@/actions/users/usersQueries";
 import CreateListingForm from "../../../../components/listings/CreateListingForm";
 
 const PersonalListingsPage = async () => {

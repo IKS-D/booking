@@ -1,7 +1,9 @@
-import { title } from "@/components/primitives";
+import { subtitle, title } from "@/components/primitives";
+import { cn } from "@/lib/utils";
 import { Code } from "@nextui-org/code";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { twMerge } from "tailwind-merge";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +36,10 @@ export default async function Home() {
         <br />
         <h1 className={title({ size: "sm" })}>How are you holding up?</h1>
         <br />
-        <Code className="mt-3">Current page: ./app/page.tsx</Code>
+        <br />
+        <label className={cn(subtitle(), "text-primary font-bold")}>
+          Click your avatar to reveal menu
+        </label>
       </div>
     </section>
   );

@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { IoIosPaperPlane } from "react-icons/io";
 import EditMessageModal from "./EditMessageModal";
-import getCurrentUser from "@/actions/users/getCurrentUser";
 import { insertMessage, getMessagesForCurrentUser } from "@/actions/messaging/messagesQueries";
 import {
     Modal,
@@ -14,6 +13,7 @@ import {
     Button,
     Avatar,
   } from "@nextui-org/react";
+import getCurrentUser from "@/actions/users/usersQueries";
   
   interface MessageModalProps {
     isOpen: boolean;

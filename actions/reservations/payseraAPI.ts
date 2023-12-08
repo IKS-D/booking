@@ -1,4 +1,4 @@
-import { TableInserts, TableRows } from "@/supabase/database.types";
+import { TablesInsert } from "@/supabase/database-generated.types";
 import * as crypto from "crypto";
 import { TypeOnlyCompatibleAliasDeclaration } from "typescript";
 export const md5 = (contents: string) =>
@@ -80,7 +80,7 @@ export const decodePayseraData = (data: string, ss1: string, _ss2: string) => {
     params[key] = val;
   });
 
-  const payment: TableInserts<"payments"> = {
+  const payment: TablesInsert<"payments"> = {
     amount: parseInt(params.amount),
     date: new Date().toISOString(),
     first_name: params.p_firstname,
