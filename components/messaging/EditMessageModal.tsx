@@ -9,6 +9,7 @@ import {
   Button,
 } from "@nextui-org/react";
 import DeleteConfirmationModal from "./DeleteConfirmModal"; 
+import { updateMessageText } from "@/actions/messaging/messagesQueries";
 
 interface EditMessageModalProps {
     isOpen: boolean;
@@ -41,6 +42,14 @@ const EditMessageModal: React.FC<EditMessageModalProps> = ({
     }
   }, [message]);
 
+  const handleSave = async () => {
+    const newMessage = {
+      messageId: message?.id || 0,
+      newText: editedContent  || ""
+    };
+    await updateMessageText(newMessage);
+  };
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
       <ModalContent>
@@ -58,6 +67,7 @@ const EditMessageModal: React.FC<EditMessageModalProps> = ({
             onPress={() => {
               if (message) {
                 onSave({ ...message, content: editedContent });
+                handleSave();
                 onOpenChange();
               }
             }}
@@ -84,6 +94,7 @@ const EditMessageModal: React.FC<EditMessageModalProps> = ({
             onDelete(message.id);
             onOpenChange();
           }}
+          messageId={message.id}
         />
       )}
     </Modal>

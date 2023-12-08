@@ -144,6 +144,7 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
                 </Button>
                 <MessageModal
                   isOpen={isMessageModalOpen}
+                  reservationId={reservation.listing?.id || 0}
                   onOpenChange={() =>
                     setIsMessageModalOpen(!isMessageModalOpen)
                   }

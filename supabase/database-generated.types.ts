@@ -123,7 +123,7 @@ export interface Database {
           text: string;
         };
         Insert: {
-          id?: number;
+          id?: never;
           received_id: string;
           reservation_id: number;
           sender_id: string;
@@ -131,7 +131,7 @@ export interface Database {
           text: string;
         };
         Update: {
-          id?: number;
+          id?: never;
           received_id?: string;
           reservation_id?: number;
           sender_id?: string;

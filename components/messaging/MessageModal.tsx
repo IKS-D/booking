@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { IoIosPaperPlane } from "react-icons/io";
-import { getMessages } from "@/actions/messaging/getMessages";
 import EditMessageModal from "./EditMessageModal";
+import { insertMessage, getMessagesForCurrentUser } from "@/actions/messaging/messagesQueries";
 import {
     Modal,
     ModalContent,
@@ -13,9 +13,11 @@ import {
     Button,
     Avatar,
   } from "@nextui-org/react";
+import getCurrentUser from "@/actions/users/usersQueries";
   
   interface MessageModalProps {
     isOpen: boolean;
+    reservationId: number;
     onOpenChange: () => void;
   }
 
@@ -34,6 +36,7 @@ import {
   
   const MessageModal: React.FC<MessageModalProps> = ({
     isOpen,
+    reservationId,
     onOpenChange,
   }) => {
     const [message, setMessage] = React.useState("");
@@ -41,24 +44,59 @@ import {
     const [isEditingModalOpen, setIsEditingModalOpen] = useState(false);
     const [editingMessage, setEditingMessage] = useState<ChatMessage | null>(null);
 
-  
-    const handleSendMessage = () => {
-        const newMessage = {
-          id: Date.now(),
-          sender: "user",
-          content: message,
-          timestamp: formatTime(new Date()), 
-        };
-        setChatMessages([...chatMessages, newMessage]);
-        setMessage("");
-      };
 
-      useEffect(() => {
-        (async () => {
-            const fetchedMessages = await getMessages();
-            setChatMessages(fetchedMessages);
-        })();
-    }, []);
+    useEffect(() => {
+      const fetchMessages = async () => {
+        try {
+          const response = await getMessagesForCurrentUser(reservationId);
+          const currentUser = await getCurrentUser();
+          if (response && response.data) {
+            const transformedMessages = response.data.map(msg => ({
+              id: msg.id,
+              sender: msg.sender_id === currentUser?.id ? "user" : "owner",
+              content: msg.text,
+              timestamp: formatTime(new Date(msg.sent_time))
+            }));
+            setChatMessages(transformedMessages);
+          } else {
+            setChatMessages([]);
+          }
+        } catch (error) {
+          console.error('Error fetching messages:', error);
+        }
+      };
+  
+      if (isOpen) {
+        fetchMessages();
+      }
+    }, [isOpen, reservationId]); 
+
+  
+    const handleSendMessage = async () => {
+      const newMessage = {
+        text: message,
+        reservationId: reservationId
+      };
+      await insertMessage(newMessage);
+      try {
+        const response = await getMessagesForCurrentUser(reservationId);
+        const currentUser = await getCurrentUser();
+        if (response && response.data) {
+          const transformedMessages = response.data.map(msg => ({
+            id: msg.id,
+            sender: msg.sender_id === currentUser?.id ? "user" : "owner",
+            content: msg.text,
+            timestamp: formatTime(new Date(msg.sent_time))
+          }));
+          setChatMessages(transformedMessages);
+          setMessage("");
+        } else {
+          setChatMessages([]);
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    };
       
     return (
         <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
