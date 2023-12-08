@@ -13,7 +13,6 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { FaPen } from 'react-icons/fa';
-import { Listing } from "@/types";
 import ListingRemovalConfirmModal from "@/components/listings/ListingRemovalConfirmModal";
 import ListingEditModal from "@/components/listings/ListingEditModal";
 
@@ -22,6 +21,7 @@ import { Reservation } from "@/types";
 import { IoMdCheckmark as CheckmarkIcon } from "react-icons/io";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { Listing, Listings } from "@/actions/listings/getListings";
 
 const columns = [
   { name: "ID", uid: "name" },
@@ -42,7 +42,7 @@ const statusColorMap: Record<string, ChipProps["color"]> = {
 };
 
 interface PersonalListingsTableProps {
-  listings: Listing[];
+  listings: Listings;
 }
 
 export default function PersonalListingsTable({
@@ -54,6 +54,10 @@ export default function PersonalListingsTable({
   const pages = Math.ceil(listings.length / rowsPerPage);
 
   const items = React.useMemo(() => {
+    if (!Array.isArray(listings)) {
+      // Handle the case where listings is not an array (or is undefined)
+      return [];
+    }
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
@@ -125,7 +129,7 @@ export default function PersonalListingsTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-              {format(listing.created_at, "PP")}
+              {format(new Date(listing.creation_date), "PP")}
               </p>
             </div>
           );
@@ -133,7 +137,7 @@ export default function PersonalListingsTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {listing.category}
+                {listing.category!.name}
               </p>
             </div>
           );
@@ -141,7 +145,7 @@ export default function PersonalListingsTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {listing.max_guests}
+                {listing.number_of_places}
               </p>
             </div>
           );

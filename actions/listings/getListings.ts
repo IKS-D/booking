@@ -99,13 +99,61 @@ export async function getChartInformation(listingId: number){
 }
 
 export async function getPersonalListings(params: Params) {
-  const { listingId, userId, authorId } = params;
+  const { userId } = params;
 
-  const listings = Array(20).fill(mockListing);
+  const { data, error } = await supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)').eq("host_id",userId!);
 
-  return listings;
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function insertListing({
+  listing,
+  user_id,
+} : {
+  listing: Partial<Listing>;
+  user_id: string;
+}){
+
+  let { data: addedListing, error } = await supabase.from("listings")
+                                               .insert({
+                                                address: listing.address!,
+                                                category_id: 1,
+                                                city: listing.city!,
+                                                country: listing.country!,
+                                                creation_date: new Date().toISOString(),
+                                                day_price: listing.day_price!,
+                                                description: listing.description!,
+                                                host_id: user_id,
+                                                number_of_places: listing.number_of_places!,
+                                                photos: "asdasd",
+                                                suspension_status: false,
+                                                title: listing.title!,
+                                              })
+                                              .select()
+                                              .single();
+  if (error) {
+    console.error(error);
+  }
+
+  return { error };
 }
 
 function getListingsBase() {
   return supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)');
+}
+
+export type Categories = QueryData<ReturnType<typeof getListingCategories>>;
+
+export async function getListingCategories(){
+  let { data: categories, error } = await supabase.from("listing_category").select('*');
+                                              
+  if (error) {
+    console.error(error);
+  }
+
+  return { data: categories, error };
 }

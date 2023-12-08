@@ -2,18 +2,27 @@
 
 import React from "react";
 import { Button, Input, Textarea, Select, SelectItem } from "@nextui-org/react";
-import { Listing, ListingCategory } from "@/types";
 import { AnimatePresence } from "framer-motion";
 import { useMultiplestepForm } from "@/hooks/useMultiplestepForm";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
+import { Categories, Listing, getListingCategories, insertListing } from "@/actions/listings/getListings";
 
-const CreateListingForm: React.FC = () => {
+interface CreateListingFormProps {
+  user: User;
+}
+
+export default function CreateListingForm({
+  user,
+}: CreateListingFormProps){
 
     const [formData, setFormData] = React.useState<Partial<Listing>>({});
+    const [categories, setCategories] = React.useState<Categories>([]);
     const [errors, setErrors] = React.useState<Partial<Listing>>({});
     const [titleError, setTitleError] = React.useState(false);
     const [descriptionError, setDescriptionError] = React.useState(false);
+    const [countryError, setCountryError] = React.useState(false);
     const [cityError, setCityError] = React.useState(false);
     const [addressError, setAddressError] = React.useState(false);
     const [categoryError, setCategoryError] = React.useState(false);
@@ -22,7 +31,39 @@ const CreateListingForm: React.FC = () => {
   
     const router = useRouter();
 
-    const handleFormSubmit = () => {
+    React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: categories, error } = await getListingCategories();
+
+        if (error) {
+          toast.error("Error fetching categories");
+          return;
+        }
+
+        setCategories(categories || []);
+
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("Something went wrong");
+      }
+    };
+
+      fetchData();
+    }, []);
+
+    const handleFormSubmit = async () => {
+
+      const { error } = await insertListing({
+        listing: formData,
+        user_id: user.id,
+      });
+
+      if (error) {
+        toast.error("Something went wrong");
+        return;
+      }
+
       router.push("/listings/personal/");
       toast.success("Listing created successfully");
     };
@@ -44,6 +85,11 @@ const CreateListingForm: React.FC = () => {
       }
       if (currentStepIndex === 1) {
         let hasErrors = false;
+          if (!formData.country) {
+            setCountryError(true);
+            hasErrors = true;
+          }
+
           if (!formData.city) {
               setCityError(true);
               hasErrors = true;
@@ -60,7 +106,7 @@ const CreateListingForm: React.FC = () => {
               setCategoryError(true);
               hasErrors = true;
           }
-          if (!formData.max_guests) {
+          if (!formData.number_of_places) {
               setGuestError(true);
               hasErrors = true;
           }
@@ -72,26 +118,6 @@ const CreateListingForm: React.FC = () => {
       }
       return true;
     };
-
-    const cities = [
-      "New York",
-      "Los Angeles",
-      "Chicago",
-      "San Francisco",
-      "Miami",
-      "Boston",
-      "Seattle",
-      "Austin",
-      "Denver",
-      "Atlanta",
-    ];
-
-    const categories = [
-      "apartment",
-      "house",
-      "room",
-      "flat",
-    ]
 
 
 
@@ -153,26 +179,31 @@ const CreateListingForm: React.FC = () => {
 
               {currentStepIndex === 1 && (
                 <>
-                  <Select
+                  <Input className="mb-5 w-48"
                     isRequired
-                    isInvalid={cityError}
-                    label="City"
+                    label="Country"
+                    isInvalid={countryError}
+                    value={formData.country}
                     labelPlacement="outside"
-                    placeholder="Select the city"
-                    className="max-w-xs mb-5"
-                    value={formData.city || ""} // Ensure formData.city is a string or an empty string
+                    placeholder="The country of location"
                     onChange={(event) => {
-                        setFormData({ ...formData, city: event.target.value })
-                        setCityError(false)
+                      setFormData({ ...formData, country: event.target.value })
+                      setDescriptionError(false)
                     }}
-                  >
-                    {cities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                  <Input className="mb-5"
+                  />
+                  <Input className="mb-5 w-48"
+                    isRequired
+                    label="City"
+                    isInvalid={cityError}
+                    value={formData.city}
+                    labelPlacement="outside"
+                    placeholder="The city of location"
+                    onChange={(event) => {
+                      setFormData({ ...formData, city: event.target.value })
+                      setDescriptionError(false)
+                    }}
+                  />
+                  <Input className="mb-5 w-96"
                     isRequired
                     isInvalid={addressError}
                     label="Address"
@@ -195,11 +226,11 @@ const CreateListingForm: React.FC = () => {
                   isInvalid={guestError}
                   labelPlacement="outside"
                   type="number"
-                  value={formData.max_guests ? formData.max_guests.toString() : ''}
+                  value={formData.number_of_places ? formData.number_of_places.toString() : ''}
                   placeholder="Maximum number of guests"
                   onChange={(event) => {
                     const value = parseInt(event.target.value, 10); // Parse input as an integer
-                    setFormData({ ...formData, max_guests: value });
+                    setFormData({ ...formData, number_of_places: value });
                     setGuestError(false)
                   }}
                 />
@@ -225,13 +256,14 @@ const CreateListingForm: React.FC = () => {
                     placeholder="Select the category"
                     className="max-w-xs mb-5"
                     onChange={(event) =>{
-                      setFormData({ ...formData, category: event.target.value as ListingCategory})
+                      const categoryId = parseInt(event.target.value, 10);
+                      setFormData({ ...formData, category_id: categoryId})
                       setCategoryError(false)
                     }}
                   >
                     {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
                       </SelectItem>
                     ))}
                 </Select>
@@ -287,5 +319,3 @@ const CreateListingForm: React.FC = () => {
     </div>
     );
   };
-  
-  export default CreateListingForm;

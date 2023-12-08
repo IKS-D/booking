@@ -2,9 +2,9 @@ import getCurrentUser from "@/actions/users/usersQueries";
 import CreateListingForm from "../../../../components/listings/CreateListingForm";
 
 const PersonalListingsPage = async () => {
-  const currentUser = await getCurrentUser();
+  const user = await getCurrentUser();
 
-  if (!currentUser) {
+  if (!user) {
     return (
       <label className="text-lg font-semibold">
         Please sign in to continue
@@ -23,7 +23,7 @@ const PersonalListingsPage = async () => {
           justify-center
         "
     >
-      <CreateListingForm />
+      <CreateListingForm user={user!} />
     </div>
   );
 };

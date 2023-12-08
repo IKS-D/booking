@@ -14,18 +14,18 @@ const PersonalListingsPage = async () => {
     );
   }
 
-  const personalListings = await getPersonalListings({});
+  const { data: personalListings, error } = await getPersonalListings({});
 
-  if (personalListings.length === 0) {
+  if (!personalListings || personalListings.length === 0) {
     return (
       <div>
-        <label className="text-lg font-semibold">
+        <label className="flex justify-center text-xl font-semibold">
           No personal listings found
         </label>
         <div className="flex justify-center mt-10">
           <CreateNewListingButton />
         </div>
-      </div>
+      </div> 
     );
   }
 
