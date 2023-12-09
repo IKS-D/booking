@@ -1,5 +1,8 @@
+import { revalidate } from "@/components/TopNavbar";
 import supabase from "@/supabase/supabase";
 import { QueryData, QueryResult } from "@supabase/supabase-js";
+import { nanoid } from "nanoid";
+import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 
 interface Params {
   listingId?: string;
@@ -35,7 +38,7 @@ export type Listings = QueryData<ReturnType<typeof getListingsBase>>;
 export type Listing = Listings[0];
 
 export async function getListings() {
-
+  noStore();
   let { data: listings, error } = await getListingsBase();
 
   if (error) {
@@ -98,8 +101,13 @@ export async function getChartInformation(listingId: number){
   return { data: averages, error: null };
 }
 
-export async function getPersonalListings(userId: string) {
+function getFilenameFromUrl(url: string) {
+  const urlParts = url.split('/');
+  return (urlParts[urlParts.length - 2] + "/" + urlParts[urlParts.length - 1]);
+}
 
+export async function getPersonalListings(userId: string) {
+  noStore();
   const { data, error } = await supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)').eq("host_id",userId!);
 
   if (error) {
@@ -107,6 +115,125 @@ export async function getPersonalListings(userId: string) {
   }
 
   return { data, error };
+}
+
+export async function deleteListing({
+  listing_id,
+}: {
+  listing_id: number;
+}) {
+  const { data: reservations, error: reservationsError } = await supabase
+    .from('reservations')
+    .select('id')
+    .eq('listing_id', listing_id)
+    .eq('status', 2);
+
+  if (reservationsError) {
+    console.error(reservationsError);
+    return { error: reservationsError };
+  }
+
+  if (reservations && reservations.length > 0) {
+    // Active reservations found, throw an error
+    const errorMessage = 'Cannot delete listing with active reservations';
+    console.error(errorMessage);
+    return { error: errorMessage };
+  }
+
+  // Retrieve the list of photo URLs associated with the listing
+  const { data: photos, error: photosError } = await supabase
+    .from('photos')
+    .select('url')
+    .eq('listing_id', listing_id);
+
+  if (photosError) {
+    console.error(photosError);
+    return { error: photosError };
+  }
+
+  // Delete the listing
+  const { error: listingDeleteError } = await supabase
+    .from('listings')
+    .delete()
+    .eq('id', listing_id);
+
+  if (listingDeleteError) {
+    console.error(listingDeleteError);
+    return { error: listingDeleteError };
+  }
+
+  // Delete photos from Supabase storage
+  if (photos && photos.length > 0) {
+    for (const photo of photos) {
+      console.log(getFilenameFromUrl(photo.url));
+      const filename = getFilenameFromUrl(photo.url);
+      const { data: removed, error: photoDeleteError } = await supabase.storage
+        .from('images')
+        .remove([filename]);
+
+      if (photoDeleteError) {
+        console.error('Error deleting photo from storage:', photoDeleteError);
+        return { error: photoDeleteError };
+      }
+    }
+  }
+  return { error: null };
+}
+
+export type PartialListingUpdate = Partial<{
+  title: string;
+  description: string;
+  number_of_places: number;
+  day_price: number;
+}>;
+
+export async function updateListing({
+  editedListing,
+  files,
+  listing_id,
+}: {
+  editedListing: PartialListingUpdate;
+  files: FileList;
+  listing_id: number;
+}) {
+
+  console.log(editedListing);
+
+  const { error: updateError } = await supabase
+    .from('listings')
+    .update(editedListing)
+    .eq('id', listing_id);
+
+  if (updateError) {
+    console.error(updateError);
+  }
+
+  const folderName = `listing_${listing_id}`;
+  if(!files || files.length === 0){
+    return { updateError };
+  }
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
+    
+    const { data: fileData, error: fileError } = await supabase.storage
+      .from('images')
+      .upload(`${folderName}/${uniqueFileName}`, file);
+
+    if (fileError) {
+      console.error('Error uploading file:', fileError);
+    } else {
+      // Get the public URL of the uploaded file
+      const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
+   
+      await supabase.from("photos").insert({
+        listing_id: listing_id,
+        url: fileURL.data.publicUrl,
+      });
+    }
+  }
+  return { updateError };
 }
 
 export async function insertListing({
@@ -140,22 +267,25 @@ export async function insertListing({
   if (error) {
     console.error(error);
   } else {
+    const folderName = `listing_${addedListing!.id}`;
+    if(!files || files.length === 0){
+       return { error };
+     }
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-
-      // Upload the file to Supabase Storage
+  
+      const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
+      
       const { data: fileData, error: fileError } = await supabase.storage
-        .from('images') // Replace with your storage bucket name
-        .upload(file.name, file);
-
+        .from('images')
+        .upload(`${folderName}/${uniqueFileName}`, file);
+  
       if (fileError) {
         console.error('Error uploading file:', fileError);
       } else {
         // Get the public URL of the uploaded file
         const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
-        console.log(fileURL);
-
-        
+     
         await supabase.from("photos").insert({
           listing_id: addedListing!.id,
           url: fileURL.data.publicUrl,

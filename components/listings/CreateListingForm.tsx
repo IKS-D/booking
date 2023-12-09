@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React from "react";
 import { Button, Input, Textarea, Select, SelectItem, select } from "@nextui-org/react";
@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 import { Categories, Listing, getListingCategories, insertListing } from "@/actions/listings/getListings";
 import FileUpload from "./FileUpload";
+import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate-path";
 
 interface CreateListingFormProps {
   user: User;
@@ -66,8 +67,8 @@ export default function CreateListingForm({
         toast.error("Something went wrong");
         return;
       }
-
       router.push("/listings/personal/");
+      router.refresh();
       toast.success("Listing created successfully");
     };
 

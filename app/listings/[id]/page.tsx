@@ -39,8 +39,10 @@ export default async function ListingPage({
       <Head>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       </Head>
-      <ListingContent listing={listing} />
-      <ListingChart average={average ?? {}} />
+      <div>
+        <ListingContent listing={listing} />
+        <ListingChart average={average ?? {}} />
+      </div>
     </div>
   );
 }

@@ -76,15 +76,6 @@ export default function PersonalListingsTable({
     editModal.onOpenChange();
   };
 
-  const remList = async () => {
-    toast.error(`Listing ${selectedListing?.id} removed successfully!`);
-  };
-
-  const edList = async (listing : Listing) => {
-    setSelectedListing(listing);
-    toast.success(`Listing ${listing.id} edited successfully!`);
-  };
-
 
 
   const editModal = useDisclosure();
@@ -195,7 +186,6 @@ export default function PersonalListingsTable({
       <ListingRemovalConfirmModal  
         isOpen={removeModal.isOpen}
         onOpenChange={removeModal.onOpenChange}
-        onConfirm={remList}
         listing={selectedListing}
       />
       
@@ -209,7 +199,6 @@ export default function PersonalListingsTable({
       <ListingEditModal  
         isOpen={editModal.isOpen}
         onOpenChange={editModal.onOpenChange}
-        onConfirm={edList}
         listing={selectedListing}
       />
 

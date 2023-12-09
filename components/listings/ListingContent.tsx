@@ -27,8 +27,8 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
   };
 
   return (
-    <div>
-      <div className="flex flex-row gap-40 mt-3 mb-3">
+    <div className="relative z-50">
+      <div className="flex flex-row gap-40 mt-3 mb-3 z-50">
         <div className="">
           <h2 className="text-xl font-bold mb-4">{listing.title}</h2>
           <Divider className="my-4" />
@@ -94,7 +94,7 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
                 />
               </div>
               {listing.images.length > 1 && (
-                <div className="flex justify-center gap-5 mt-2">
+                <div className="flex justify-center gap-5 mt-2 z-10">
                   <Button
                     className="prev-button"
                     onClick={prevImage}
@@ -103,7 +103,7 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
                     <BsArrowLeft />
                   </Button>
                   <Button
-                    className="next-button"
+                    className="next-button z-10"
                     onClick={nextImage}
                     disabled={currentImageIndex === listing.images.length - 1}
                   >
@@ -113,7 +113,7 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
               )}
             </div>
           ) : null}
-            <div className="flex justify-center gap-5 mt-2">
+            <div className="flex justify-center gap-5 mt-2 z-10">
               <Button
                 className="mt-6 items-center justify-center"
                 color="primary"

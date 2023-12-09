@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Image, Button, Divider, Textarea, Input } from "@nextui-org/react";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
-import { useRouter } from "next/navigation";
 import { AverageData, Listing } from "@/actions/listings/getListings";
 
 type ListingChartProps = {
@@ -19,7 +18,7 @@ const ListingChart: React.FC<ListingChartProps> = ({ average }) => {
       const options = {
         title: 'The average price of rent for the amount of people in this city',
         width: 600,
-        height: 300,
+        height: 400,
         legend: { position: 'bottom' as const, textStyle: { color: '#FFFFFF' } }, 
         backgroundColor: '#1E1E1E',
         colors: ['#FFA500'],
@@ -86,8 +85,8 @@ const ListingChart: React.FC<ListingChartProps> = ({ average }) => {
       }, []);
   
     return (
-      <section>
-        <div className="z-0" ref={pieEl}></div>
+      <section className="relative z-0">
+        <div ref={pieEl}></div>
       </section>
     );
   };
