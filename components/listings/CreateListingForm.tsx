@@ -7,9 +7,12 @@ import { useMultiplestepForm } from "@/hooks/useMultiplestepForm";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
-import { Categories, Listing, getListingCategories, insertListing } from "@/actions/listings/getListings";
+import { Categories, Listing, ServiceInput, getListingCategories, insertListing } from "@/actions/listings/getListings";
 import FileUpload from "./FileUpload";
 import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate-path";
+import DynamicForm from "./DynamicForm";
+import { Database, Tables, Enums } from "../../supabase/database-generated.types";
+import { Label } from "@radix-ui/react-label";
 
 interface CreateListingFormProps {
   user: User;
@@ -21,6 +24,9 @@ export default function CreateListingForm({
 
     const [formData, setFormData] = React.useState<Partial<Listing>>({});
     const [selectedFiles, setSelectedFiles] = React.useState<FileList | null>(null);
+    const [services, setServices] = React.useState<ServiceInput[]>([
+      { title: '', description: '', price: 0 },
+    ]);
     const [categories, setCategories] = React.useState<Categories>([]);
     const [errors, setErrors] = React.useState<Partial<Listing>>({});
     const [titleError, setTitleError] = React.useState(false);
@@ -61,6 +67,7 @@ export default function CreateListingForm({
         listing: formData,
         user_id: user.id,
         files: selectedFiles!,
+        services: services!,
       });
 
       if (error) {
@@ -80,6 +87,22 @@ export default function CreateListingForm({
         // Handle the case where no files are selected
         console.log('No files selected');
       }
+    };
+
+    const handleInputChange = (index: number, field: keyof ServiceInput, value: string | number) => {
+      const updatedServices = [...services];
+      updatedServices[index] = { ...updatedServices[index], [field]: value };
+      setServices(updatedServices);
+    };
+  
+    const addService = () => {
+      setServices([...services, { title: '', description: '', price: 0 }]);
+    };
+  
+    const removeService = (index: number) => {
+      const updatedServices = [...services];
+      updatedServices.splice(index, 1);
+      setServices(updatedServices);
     };
 
     const validateStep = () => {
@@ -133,8 +156,6 @@ export default function CreateListingForm({
       return true;
     };
 
-
-
     const {
       previousStep,
       currentStepIndex,
@@ -144,7 +165,7 @@ export default function CreateListingForm({
       steps,
       goTo,
       showSuccessMsg,
-    } = useMultiplestepForm(4);
+    } = useMultiplestepForm(5);
   
     return (
       <div
@@ -289,6 +310,60 @@ export default function CreateListingForm({
                 <FileUpload onFileChange={(files: FileList | null) => handleFileUpload(files)}></FileUpload>
                 </>
               )}
+
+              {currentStepIndex === 4 && (
+                <>
+                <Label className="text-lg font-semibold mb-2">Add Additional Services:</Label>
+                    {services.map((service, index) => (
+                      <div key={index} className="flex space-x-4 items-center">
+                        <label className="flex-grow">
+                          <Input
+                            type="text"
+                            placeholder="Name of additional service"
+                            value={service.title !== '' ? service.title : ''}
+                            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+                            height={20} // Set the height to be three times lower
+                          />
+                        </label>
+
+                        <label className="flex-grow">
+                          <Input
+                            type="text"
+                            placeholder="Short description"
+                            value={service.description !== '' ? service.description : ''}
+                            onChange={(e) => handleInputChange(index, 'description', e.target.value)}
+                            height={20} // Set the height to be three times lower
+                          />
+                        </label>
+
+                        <label className="flex-grow">
+                          <Input
+                              type="number"
+                              placeholder="Price for one night"
+                              value={service.price !== 0 ? service.price.toString() : ''}
+                              onChange={(e) => handleInputChange(index, 'price', parseFloat(e.target.value))}
+                              className="placeholder-gray-500" // Apply the placeholder styling class here
+                          />
+                        </label>
+
+                        {index === services.length - 1 && (
+                          <div>
+                            <Button type="button" variant="ghost" onClick={addService}>
+                              Add
+                            </Button>
+                          </div>
+                        )}
+
+                        {index > 0 && (
+                          <Button type="button"  variant="ghost" onClick={() => removeService(index)}>
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                </>
+              )}
+
             </AnimatePresence>
             <div className="w-full items-center flex justify-between">
               <div className="">

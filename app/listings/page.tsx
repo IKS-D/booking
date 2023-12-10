@@ -3,11 +3,10 @@ import ListingsContent from "../../components/listings/ListingsContent";
 import { useRouter } from "next/navigation";
 
 export const revalidate = 0;
+export const dynamic = 'force-dynamic'
 
 const ListingsPage = async () => {
   const { data: listings, error } = await getListings();
-  const router = useRouter();
-  router.refresh();
   if (!listings || listings.length === 0) {
     return (
       <label className="text-lg font-semibold">No listings found.</label>

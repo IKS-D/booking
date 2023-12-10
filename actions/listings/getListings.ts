@@ -240,10 +240,12 @@ export async function insertListing({
   listing,
   user_id,
   files,
+  services,
 }: {
   listing: Partial<Listing>;
   user_id: string;
   files: FileList;
+  services: ServiceInput[];
 }) {
   let { data: addedListing, error } = await supabase
     .from("listings")
@@ -292,6 +294,25 @@ export async function insertListing({
         });
       }
     }
+
+    if(!services || services.length === 0){
+      return { error };
+    }
+
+    for (let i = 0; i < services.length; i++){
+      const service = services[i];
+
+       const { error: serviceError } = await supabase.from("services").insert({
+          title: service!.title,
+          description: service!.description,
+          price: service!.price,
+          listing_id: addedListing!.id,
+      });
+
+      if (serviceError) {
+        console.error('Error uploading file:', serviceError);
+      }
+    }
   }
   return { error };
 }
@@ -311,3 +332,9 @@ export async function getListingCategories(){
 
   return { data: categories, error };
 }
+
+export type ServiceInput = {
+  title: string;
+  description: string;
+  price: number;
+};
