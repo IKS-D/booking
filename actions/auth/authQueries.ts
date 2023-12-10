@@ -5,7 +5,7 @@ import { createServerClient, CookieOptions } from "@supabase/ssr";
 import { QueryData } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getReservations } from "../reservations/reservationsQueries";
-import { getPersonalListings } from "../listings/getListings";
+import { getPersonalListings } from "../listings/listingsQueries";
 
 async function getSupabaseServerClient() {
   const cookieStore = cookies();
