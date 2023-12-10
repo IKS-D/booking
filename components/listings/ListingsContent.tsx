@@ -1,4 +1,4 @@
-import { Listing, Listings } from "@/actions/listings/getListings";
+import { Listing, Listings } from "@/actions/listings/listingsQueries";
 import ListingCard from "@/components/listings/ListingCard";
 import { subtitle, title } from "@/components/primitives";
 

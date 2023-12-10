@@ -13,7 +13,7 @@ import { CreateReservationSchema } from "@/lib/validations/schema";
 import { DateRange } from "react-day-picker";
 import { createPayment } from "@/actions/reservations/generatePayseraLink";
 import { insertReservation } from "@/actions/reservations/reservationsQueries";
-import { ListingWithDetails } from "@/actions/listings/getListings";
+import { ListingWithDetails } from "@/actions/listings/listingsQueries";
 import { User } from "@supabase/supabase-js";
 import { differenceInDays } from "date-fns";
 import LoadingSpinner from "@/components/LoadingSpinner";

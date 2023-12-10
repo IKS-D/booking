@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import MessageModal from "..//messaging//MessageModal";
 import { ReservationWithDetails } from "@/actions/reservations/reservationsQueries";
 import { format } from "date-fns";
+import { defaultListingImage } from "@/config/constants";
 
 interface ReservationDetailsProps {
   reservation: ReservationWithDetails;
@@ -46,7 +47,9 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
               </ModalHeader>
               <ModalBody className="mb-6">
                 <Image
-                  src={reservation.listing?.photos}
+                  src={
+                    reservation.listing?.images[0]?.url || defaultListingImage
+                  }
                   alt={reservation.listing?.title}
                   radius="lg"
                   width={300}
@@ -92,12 +95,20 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
 
                 <div className="flex flex-row gap-2">
                   <Input
-                    label="Adress"
+                    label="Address"
                     value={`${reservation.listing?.address}, ${reservation.listing?.city}`}
                     readOnly
                     disabled
                     variant="bordered"
                     className="w-2/3"
+                  />
+                  <Input
+                    label="Total price"
+                    value={reservation.total_price / 100 + " €"}
+                    readOnly
+                    disabled
+                    variant="bordered"
+                    className="w-1/3"
                   />
                 </div>
 
@@ -144,7 +155,7 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
                 </Button>
                 <MessageModal
                   isOpen={isMessageModalOpen}
-                  reservationId={reservation.listing?.id || 0}
+                  reservationId={reservation?.id || 0}
                   onOpenChange={() =>
                     setIsMessageModalOpen(!isMessageModalOpen)
                   }

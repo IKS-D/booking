@@ -37,7 +37,7 @@ export default function AvatarDropdownMenu({
   const onLogout = async () => {
     const { error } = await signOut();
 
-    if(error){
+    if (error) {
       console.error(error);
       toast.error("There was an error while signing out: " + error.message);
       return;
@@ -75,10 +75,6 @@ export default function AvatarDropdownMenu({
     if (action === "personal-listings") {
       router.push("/listings/personal");
     }
-
-    if (action === "reports") {
-      router.push("/reports");
-    }
   };
 
   return (
@@ -113,13 +109,8 @@ export default function AvatarDropdownMenu({
 
           {hostProfileExists ? (
             <DropdownSection title="Host panel" showDivider>
-              <DropdownItem key="host-reservations">
-                Your listings reservations
-              </DropdownItem>
-              <DropdownItem key="personal-listings">
-                Your personal listings
-              </DropdownItem>
-              <DropdownItem key="reports">Your personal reports</DropdownItem>
+              <DropdownItem key="host-reservations">Reservations</DropdownItem>
+              <DropdownItem key="personal-listings">Properties</DropdownItem>
             </DropdownSection>
           ) : (
             <DropdownSection

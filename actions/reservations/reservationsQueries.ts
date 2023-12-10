@@ -53,7 +53,8 @@ function getReservationsBase() {
     *,
     listing: listings!inner (
       *,
-      category: listing_category (name)
+      category: listing_category (name),
+      images: photos (url)
     ),
     ordered_services (
       id,

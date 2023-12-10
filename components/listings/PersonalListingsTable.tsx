@@ -12,7 +12,7 @@ import {
   Pagination,
   useDisclosure,
 } from "@nextui-org/react";
-import { FaPen } from 'react-icons/fa';
+import { FaPen } from "react-icons/fa";
 import ListingRemovalConfirmModal from "@/components/listings/ListingRemovalConfirmModal";
 import ListingEditModal from "@/components/listings/ListingEditModal";
 
@@ -21,14 +21,14 @@ import { Reservation } from "@/types";
 import { IoMdCheckmark as CheckmarkIcon } from "react-icons/io";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Listing, Listings } from "@/actions/listings/getListings";
+import { Listing, Listings } from "@/actions/listings/listingsQueries";
 
 const columns = [
   { name: "ID", uid: "name" },
   { name: "LISTING TITLE", uid: "listing" },
   { name: "CITY", uid: "city" },
   { name: "ADDRESS", uid: "address" },
-  { name: "CATEGORY", uid: "category"},
+  { name: "CATEGORY", uid: "category" },
   { name: "MAXIMUM GUEST NUMBER", uid: "max_guests" },
   { name: "PRICE FOR A DAY", uid: "day_price" },
   { name: "CREATION DATE", uid: "created_at" },
@@ -64,19 +64,19 @@ export default function PersonalListingsTable({
     return listings.slice(start, end);
   }, [page, listings]);
 
-  const [selectedListing, setSelectedListing] = React.useState<Listing | null>(null);
+  const [selectedListing, setSelectedListing] = React.useState<Listing | null>(
+    null
+  );
 
-  const removeListing = (listing : Listing) => {
+  const removeListing = (listing: Listing) => {
     setSelectedListing(listing);
     removeModal.onOpenChange();
   };
 
-  const editListing = (listing : Listing) => {
+  const editListing = (listing: Listing) => {
     setSelectedListing(listing);
     editModal.onOpenChange();
   };
-
-
 
   const editModal = useDisclosure();
   const removeModal = useDisclosure();
@@ -87,40 +87,32 @@ export default function PersonalListingsTable({
         case "name":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize w-8">
-                {listing.id}
-              </p>
+              <p className="text-bold text-sm capitalize w-8">{listing.id}</p>
             </div>
           );
         case "listing":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {listing.title}
-              </p>
+              <p className="text-bold text-sm capitalize">{listing.title}</p>
             </div>
           );
         case "city":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {listing.city}
-              </p>
+              <p className="text-bold text-sm capitalize">{listing.city}</p>
             </div>
           );
         case "address":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {listing.address}
-              </p>
+              <p className="text-bold text-sm capitalize">{listing.address}</p>
             </div>
           );
         case "created_at":
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-              {format(new Date(listing.creation_date), "PP")}
+                {format(new Date(listing.creation_date), "PP")}
               </p>
             </div>
           );
@@ -153,21 +145,21 @@ export default function PersonalListingsTable({
             <div className="relative flex items-center gap-2">
               <Tooltip color="danger" content="Remove listing">
                 <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon
+                  <DeleteIcon
                     onClick={(e) => {
-                        e.stopPropagation();
-                        removeListing(listing);
-                      }}
-                    />
+                      e.stopPropagation();
+                      removeListing(listing);
+                    }}
+                  />
                 </span>
               </Tooltip>
               <Tooltip color="success" content="Edit listing information">
                 <span className="text-lg text-success cursor-pointer active:opacity-50">
-                  < FaPen
+                  <FaPen
                     onClick={(e) => {
-                        e.stopPropagation();
-                        editListing(listing);
-                      }}
+                      e.stopPropagation();
+                      editListing(listing);
+                    }}
                   />
                 </span>
               </Tooltip>
@@ -183,12 +175,12 @@ export default function PersonalListingsTable({
 
   return (
     <>
-      <ListingRemovalConfirmModal  
+      <ListingRemovalConfirmModal
         isOpen={removeModal.isOpen}
         onOpenChange={removeModal.onOpenChange}
         listing={selectedListing}
       />
-      
+
       {/* <ListingRemovalConfirmModal  
         isOpen={editModal.isOpen}
         onOpenChange={editModal.onOpenChange}
@@ -196,7 +188,7 @@ export default function PersonalListingsTable({
         listing={selectedListing}
       /> */}
 
-      <ListingEditModal  
+      <ListingEditModal
         isOpen={editModal.isOpen}
         onOpenChange={editModal.onOpenChange}
         listing={selectedListing}

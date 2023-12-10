@@ -1,6 +1,6 @@
 "use client";
 
-import { Listing, deleteListing } from "@/actions/listings/getListings";
+import { Listing, deleteListing } from "@/actions/listings/listingsQueries";
 import {
   Modal,
   ModalContent,
@@ -24,17 +24,16 @@ const ListingRemovalConfirmModal: React.FC<ListingRemovalConfirmModalProps> = ({
   isOpen,
   onOpenChange,
 }) => {
-
   const router = useRouter();
 
   const onConfirm = async () => {
     const { error } = await deleteListing({ listing_id: +listing!.id });
 
     if (error) {
-      toast.error('Failed to delete listing');
+      toast.error("Failed to delete listing");
     } else {
       router.refresh();
-      toast.success('Listing deleted successfully');
+      toast.success("Listing deleted successfully");
     }
   };
 
@@ -50,9 +49,7 @@ const ListingRemovalConfirmModal: React.FC<ListingRemovalConfirmModalProps> = ({
               <ModalBody>
                 <p>
                   You are about to delete listing{" "}
-                  <label className="text-primary">
-                    {listing?.title}
-                  </label>
+                  <label className="text-primary">{listing?.title}</label>
                 </p>
               </ModalBody>
               <ModalFooter>

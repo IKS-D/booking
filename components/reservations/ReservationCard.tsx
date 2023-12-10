@@ -11,6 +11,7 @@ import {
   ReservationWithDetails,
   cancelReservation,
 } from "@/actions/reservations/reservationsQueries";
+import { defaultListingImage } from "@/config/constants";
 
 interface ReservationCardProps {
   reservation: ReservationWithDetails;
@@ -84,7 +85,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
               group-hover:scale-110 
               transition
             "
-              src={listing?.photos || ""}
+              src={listing?.images[0]?.url || defaultListingImage}
               alt="Listing"
             />
           </div>

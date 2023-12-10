@@ -107,4 +107,4 @@ const publicRoutes = [
   "/payment/callback",
 ];
 
-const hostRoutes = ["/reservations/host", "/listings/personal", "/reports"];
+const hostRoutes = ["/reservations/host", "/listings/personal"];

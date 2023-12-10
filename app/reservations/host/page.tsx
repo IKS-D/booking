@@ -1,10 +1,10 @@
 import getCurrentUser from "@/actions/users/usersQueries";
 import { getHostReservations } from "@/actions/reservations/reservationsQueries";
 import HostReservationsContent from "@/components/reservations/HostReservationsContent";
-
-export const revalidate = 0;
+import { unstable_noStore as noStore } from "next/cache";
 
 const ReservationsPage = async () => {
+  noStore();
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -15,9 +15,7 @@ const ReservationsPage = async () => {
     );
   }
 
-  const { data: hostReservations } = await getHostReservations(
-    currentUser.id
-  );
+  const { data: hostReservations } = await getHostReservations(currentUser.id);
 
   return (
     <div

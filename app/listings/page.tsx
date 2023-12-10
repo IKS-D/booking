@@ -1,16 +1,14 @@
-import { getListings } from "@/actions/listings/getListings";
+import { getListings } from "@/actions/listings/listingsQueries";
 import ListingsContent from "../../components/listings/ListingsContent";
 import { useRouter } from "next/navigation";
 
 export const revalidate = 0;
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 const ListingsPage = async () => {
   const { data: listings, error } = await getListings();
   if (!listings || listings.length === 0) {
-    return (
-      <label className="text-lg font-semibold">No listings found.</label>
-    );
+    return <label className="text-lg font-semibold">No listings found.</label>;
   }
 
   return (

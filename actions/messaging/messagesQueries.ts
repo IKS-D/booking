@@ -2,7 +2,9 @@
 
 import supabase from "@/supabase/supabase";
 import { sendNewMessageEmail } from "./email";
-import getCurrentUser from "../users/usersQueries";
+import getCurrentUser, {
+  getHostIdByReservationId,
+} from "../users/usersQueries";
 
 export async function getMessagesForCurrentUser(reservationId: number) {
   const currentUser = await getCurrentUser();
@@ -36,29 +38,39 @@ export async function insertMessage({
   text: string;
   reservationId: number;
 }) {
-  const reservation = await getUserIdFromReservation(reservationId);
-  if (!reservation) {
+  const { user_id: guestId } = await getUserIdFromReservation(reservationId);
+
+  if (!guestId) {
     console.error("Reservation not found or error fetching reservation");
     return null;
   }
-  const currentUser = await getCurrentUser();
-  const receiverId = reservation.user_id;
-  let { data, error } = await supabase.from("messages").insert([
+
+  const sender = await getCurrentUser();
+  const { data: hostId } = await getHostIdByReservationId(reservationId);
+
+  const receiverId = sender?.id === hostId ? guestId : hostId;
+
+  if (!receiverId) {
+    console.error("Receiver not found or error fetching receiver");
+    return null;
+  }
+
+  let { error } = await supabase.from("messages").insert([
     {
       sent_time: new Date().toISOString(),
       text: text,
-      sender_id: currentUser?.id ?? "",
+      sender_id: sender?.id ?? "",
       received_id: receiverId ?? "",
       reservation_id: reservationId,
     },
   ]);
 
-  if (receiverId != null && currentUser != null)
+  if (receiverId != null && sender != null)
     sendNewMessageEmail(
       receiverId,
       new Date().toISOString(),
       text,
-      currentUser?.id,
+      sender?.id,
       receiverId,
       reservationId
     );
@@ -74,6 +86,7 @@ export async function getUserIdFromReservation(reservationId: number) {
     .from("reservations")
     .select("user_id")
     .eq("id", reservationId)
+    .limit(1)
     .single();
 
   if (error) {

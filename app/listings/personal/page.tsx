@@ -1,7 +1,9 @@
 import getCurrentUser from "@/actions/users/usersQueries";
-import { getPersonalListings } from "@/actions/listings/getListings";
+import { getPersonalListings } from "@/actions/listings/listingsQueries";
 import PersonalListingsContent from "../../../components/listings/PersonalListingsContent";
-import CreateNewListingButton from "../../../components/listings/CreateNewListingButton";
+import NotFoundComponent from "@/components/NotFoundComponent";
+import { Button } from "@nextui-org/react";
+import Link from "next/link";
 
 const PersonalListingsPage = async () => {
   const currentUser = await getCurrentUser();
@@ -13,18 +15,21 @@ const PersonalListingsPage = async () => {
     );
   }
 
-  const { data: personalListings, error } = await getPersonalListings(currentUser.id);
+  const { data: personalListings } = await getPersonalListings(currentUser.id);
 
   if (!personalListings || personalListings.length === 0) {
     return (
-      <div>
-        <label className="flex justify-center text-xl font-semibold">
-          No personal listings found
-        </label>
-        <div className="flex justify-center mt-10">
-          <CreateNewListingButton />
+      <div className="h-full flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-center">
+          <NotFoundComponent
+            title="No personal listings found"
+            subtitle="Create a new listing to get started"
+          />
+          <Button variant="flat">
+            <Link href="/listings/personal/create">Create new listing</Link>
+          </Button>
         </div>
-      </div> 
+      </div>
     );
   }
 

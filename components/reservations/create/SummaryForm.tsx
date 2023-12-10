@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@nextui-org/react";
 import { Listing, Reservation } from "@/types";
-import { ListingWithDetails } from "@/actions/listings/getListings";
+import { ListingWithDetails } from "@/actions/listings/listingsQueries";
 
 interface SummaryFormProps {
   reservation: Partial<Reservation>;

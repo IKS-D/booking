@@ -3,8 +3,11 @@ import { getReservations } from "@/actions/reservations/reservationsQueries";
 import ReservationsContent from "../../components/reservations/ReservationsContent";
 import { notFound } from "next/navigation";
 import NotFoundComponent from "@/components/NotFoundComponent";
+import { unstable_SuspenseList } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 
 const ReservationsPage = async () => {
+  noStore();
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {

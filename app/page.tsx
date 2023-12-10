@@ -38,7 +38,7 @@ export default async function Home() {
         <br />
         <br />
         <label className={cn(subtitle(), "text-primary font-bold")}>
-          Click your avatar to reveal menu
+          Click your avatar in the top right corner to get started
         </label>
       </div>
     </section>

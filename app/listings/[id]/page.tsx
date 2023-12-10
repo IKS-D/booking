@@ -1,7 +1,10 @@
-import { getListingById, getChartInformation } from "@/actions/listings/getListings";
+import {
+  getListingById,
+  getChartInformation,
+} from "@/actions/listings/listingsQueries";
 import { Image } from "@nextui-org/react";
-import Head from 'next/head';
-import { useEffect, useMemo, useRef } from 'react';
+import Head from "next/head";
+import { useEffect, useMemo, useRef } from "react";
 import ListingContent from "../../../components/listings/ListingContent";
 import ListingChart from "../../../components/listings/ListingChart";
 
@@ -10,8 +13,9 @@ export default async function ListingPage({
 }: {
   params: { id: number };
 }) {
-
-  const {data: average, error: chartError  } = await getChartInformation(params.id)
+  const { data: average, error: chartError } = await getChartInformation(
+    params.id
+  );
 
   const id = params.id; // Extract the 'id' from the URL
 
@@ -37,7 +41,10 @@ export default async function ListingPage({
             "
     >
       <Head>
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script
+          type="text/javascript"
+          src="https://www.gstatic.com/charts/loader.js"
+        ></script>
       </Head>
       <div>
         <ListingContent listing={listing} />

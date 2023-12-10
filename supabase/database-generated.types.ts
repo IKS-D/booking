@@ -62,7 +62,6 @@ export interface Database {
           host_id: string;
           id: number;
           number_of_places: number;
-          photos: string;
           suspension_status: boolean;
           title: string;
         };
@@ -77,7 +76,6 @@ export interface Database {
           host_id: string;
           id?: never;
           number_of_places: number;
-          photos: string;
           suspension_status: boolean;
           title: string;
         };
@@ -92,7 +90,6 @@ export interface Database {
           host_id?: string;
           id?: never;
           number_of_places?: number;
-          photos?: string;
           suspension_status?: boolean;
           title?: string;
         };
@@ -123,7 +120,7 @@ export interface Database {
           text: string;
         };
         Insert: {
-          id?: never;
+          id?: number;
           received_id: string;
           reservation_id: number;
           sender_id: string;
@@ -131,7 +128,7 @@ export interface Database {
           text: string;
         };
         Update: {
-          id?: never;
+          id?: number;
           received_id?: string;
           reservation_id?: number;
           sender_id?: string;
@@ -496,7 +493,14 @@ export interface Database {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      get_user_email: {
+        Args: {
+          user_id: string;
+        };
+        Returns: {
+          email: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;

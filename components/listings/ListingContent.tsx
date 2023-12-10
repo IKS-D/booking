@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Image, Button, Divider, Textarea, Input } from "@nextui-org/react";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import { useRouter } from "next/navigation";
-import { Listing } from "@/actions/listings/getListings";
+import { Listing } from "@/actions/listings/listingsQueries";
 
 type ListingContentProps = {
   listing: Listing;
@@ -15,15 +15,11 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
   const router = useRouter();
 
   const nextImage = () => {
-    setCurrentImageIndex(
-      currentImageIndex + 1 % listing.images.length
-    );
+    setCurrentImageIndex(currentImageIndex + (1 % listing.images.length));
   };
 
   const prevImage = () => {
-    setCurrentImageIndex(
-      currentImageIndex - 1 % listing.images.length
-    );
+    setCurrentImageIndex(currentImageIndex - (1 % listing.images.length));
   };
 
   return (
@@ -84,35 +80,35 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
         </div>
         <div className="mt-10">
           <div className="relative w-96 h-48">
-          {listing.images && listing.images.length > 0 ? (
-            <div>
-              <div className="relative">
-                <Image
-                  src={listing.images[currentImageIndex].url}
-                  alt={`Image ${currentImageIndex + 1}`}
-                  className="object-contain"
-                />
-              </div>
-              {listing.images.length > 1 && (
-                <div className="flex justify-center gap-5 mt-2 z-10">
-                  <Button
-                    className="prev-button"
-                    onClick={prevImage}
-                    disabled={currentImageIndex === 0}
-                  >
-                    <BsArrowLeft />
-                  </Button>
-                  <Button
-                    className="next-button z-10"
-                    onClick={nextImage}
-                    disabled={currentImageIndex === listing.images.length - 1}
-                  >
-                    <BsArrowRight />
-                  </Button>
+            {listing.images && listing.images.length > 0 ? (
+              <div>
+                <div className="relative">
+                  <Image
+                    src={listing.images[currentImageIndex].url}
+                    alt={`Image ${currentImageIndex + 1}`}
+                    className="object-contain"
+                  />
                 </div>
-              )}
-            </div>
-          ) : null}
+                {listing.images.length > 1 && (
+                  <div className="flex justify-center gap-5 mt-2 z-10">
+                    <Button
+                      className="prev-button"
+                      onClick={prevImage}
+                      disabled={currentImageIndex === 0}
+                    >
+                      <BsArrowLeft />
+                    </Button>
+                    <Button
+                      className="next-button z-10"
+                      onClick={nextImage}
+                      disabled={currentImageIndex === listing.images.length - 1}
+                    >
+                      <BsArrowRight />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : null}
             <div className="flex justify-center gap-5 mt-2 z-10">
               <Button
                 className="mt-6 items-center justify-center"

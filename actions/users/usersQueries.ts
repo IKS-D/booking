@@ -243,3 +243,25 @@ export async function deleteHost({ userId }: { userId: string }) {
 
   return { error };
 }
+
+export async function getHostIdByReservationId(reservationId: number) {
+  const { data: host, error } = await supabase
+    .from("reservations")
+    .select(
+      `
+      id,
+      listing: listings!inner (
+        host_id
+    )
+    ` 
+    )
+    .eq("id", reservationId)
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data: host?.listing?.host_id, error: error };
+}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Listing } from "@/actions/listings/getListings";
+import { Listing } from "@/actions/listings/listingsQueries";
+import { defaultListingImage } from "@/config/constants";
 
 interface ListingCardProps {
   listing: Listing;
@@ -17,9 +18,6 @@ const ListingCard: React.FC<ListingCardProps> = ({
   actionLabel,
   actionId = "",
 }) => {
-  // const detailsModal = useDisclosure();
-  const defaultImageUrl = "https://helloartsy.com/wp-content/uploads/kids/places/how-to-draw-a-house/how-to-draw-a-house-step-6.jpg"; // Provide the path to your default image
-
   return (
     <Link href={`/listings/[id]`} as={`/listings/${listing.id}`} passHref>
       <div className="cursor-pointer group flex flex-col gap-2 w-full">
@@ -43,7 +41,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
             <Image
               fill
               className="object-cover h-full w-full group-hover:scale-110 transition"
-              src={defaultImageUrl}
+              src={defaultListingImage}
               alt="Default Listing"
             />
           </div>
@@ -52,7 +50,9 @@ const ListingCard: React.FC<ListingCardProps> = ({
         <div className="font-semibold text-lg">{listing.title}</div>
         <div className="text-default-600 font-light">
           {listing.category?.name &&
-            `${listing.category.name.charAt(0).toUpperCase()}${listing.category.name.slice(1)}`}
+            `${listing.category.name
+              .charAt(0)
+              .toUpperCase()}${listing.category.name.slice(1)}`}
         </div>
       </div>
     </Link>

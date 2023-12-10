@@ -1,29 +1,45 @@
 "use client";
 
 import React from "react";
-import { Button, Input, Textarea, Select, SelectItem, select } from "@nextui-org/react";
+import {
+  Button,
+  Input,
+  Textarea,
+  Select,
+  SelectItem,
+  select,
+} from "@nextui-org/react";
 import { AnimatePresence } from "framer-motion";
 import { useMultiplestepForm } from "@/hooks/useMultiplestepForm";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
-import { Categories, Listing, ServiceInput, getListingCategories, insertListing } from "@/actions/listings/getListings";
+import {
+  Categories,
+  Listing,
+  ServiceInput,
+  getListingCategories,
+  insertListing,
+} from "@/actions/listings/listingsQueries";
 import FileUpload from "./FileUpload";
 import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate-path";
 import DynamicForm from "./DynamicForm";
-import { Database, Tables, Enums } from "../../supabase/database-generated.types";
+import {
+  Database,
+  Tables,
+  Enums,
+} from "../../supabase/database-generated.types";
 import { Label } from "@radix-ui/react-label";
 
 interface CreateListingFormProps {
   user: User;
 }
 
-export default function CreateListingForm({
-  user,
-}: CreateListingFormProps) {
-
+export default function CreateListingForm({ user }: CreateListingFormProps) {
   const [formData, setFormData] = React.useState<Partial<Listing>>({});
-  const [selectedFiles, setSelectedFiles] = React.useState<FileList | null>(null);
+  const [selectedFiles, setSelectedFiles] = React.useState<FileList | null>(
+    null
+  );
   const [services, setServices] = React.useState<ServiceInput[]>([]);
   const [categories, setCategories] = React.useState<Categories>([]);
   const [titleError, setTitleError] = React.useState(false);
@@ -35,7 +51,6 @@ export default function CreateListingForm({
   const [guestError, setGuestError] = React.useState(false);
   const [priceError, setPriceError] = React.useState(false);
   const [serviceErrors, setServiceErrors] = React.useState<boolean[][]>([]);
-
 
   const router = useRouter();
 
@@ -50,7 +65,6 @@ export default function CreateListingForm({
         }
 
         setCategories(categories || []);
-
       } catch (error) {
         console.error("Error fetching categories:", error);
         toast.error("Something went wrong");
@@ -61,7 +75,6 @@ export default function CreateListingForm({
   }, []);
 
   const handleFormSubmit = async () => {
-
     const { error } = await insertListing({
       listing: formData,
       user_id: user.id,
@@ -81,25 +94,28 @@ export default function CreateListingForm({
   const handleFileUpload = (files: FileList | null) => {
     if (files) {
       // Handle the files (either a single file or multiple files)
-      setSelectedFiles(files)
+      setSelectedFiles(files);
     } else {
       // Handle the case where no files are selected
-      console.log('No files selected');
+      console.log("No files selected");
     }
   };
 
-  const handleInputChange = (index: number, field: keyof ServiceInput, value: string | number | undefined) => {
+  const handleInputChange = (
+    index: number,
+    field: keyof ServiceInput,
+    value: string | number | undefined
+  ) => {
     const updatedServices = [...services];
-    updatedServices[index] = { ...updatedServices[index], [field]: value};
-  
+    updatedServices[index] = { ...updatedServices[index], [field]: value };
+
     setServices(updatedServices);
   };
-  
 
   const addService = () => {
-    setServices([...services, { title: '', description: '', price: -1 }]);
+    setServices([...services, { title: "", description: "", price: -1 }]);
 
-    setServiceErrors([...serviceErrors, [false, false, false]])
+    setServiceErrors([...serviceErrors, [false, false, false]]);
   };
 
   const removeService = (index: number) => {
@@ -171,12 +187,12 @@ export default function CreateListingForm({
 
         console.log(index);
 
-        if (service.title === '') {
+        if (service.title === "") {
           console.log("gerai");
           newErrors[index][0] = true;
           hasErrors = true;
         }
-        if (service.description === '') {
+        if (service.description === "") {
           console.log("gerai");
           newErrors[index][1] = true;
           hasErrors = true;
@@ -214,13 +230,12 @@ export default function CreateListingForm({
       className={`flex justify-between rounded-lg border border-neutral-700 p-4`}
     >
       <main className="w-full">
-        <form
-          className="w-full flex flex-col h-full p-10"
-        >
+        <form className="w-full flex flex-col h-full p-10">
           <AnimatePresence mode="wait">
             {currentStepIndex === 0 && (
               <>
-                <Input className="mb-5"
+                <Input
+                  className="mb-5"
                   isRequired
                   label="Title"
                   isInvalid={titleError}
@@ -228,12 +243,13 @@ export default function CreateListingForm({
                   labelPlacement="outside"
                   placeholder="The title of the listing"
                   onChange={(event) => {
-                    setFormData({ ...formData, title: event.target.value })
-                    setTitleError(false)
+                    setFormData({ ...formData, title: event.target.value });
+                    setTitleError(false);
                   }}
                 />
 
-                <Textarea className="mb-5"
+                <Textarea
+                  className="mb-5"
                   isRequired
                   label="Description"
                   isInvalid={descriptionError}
@@ -241,17 +257,20 @@ export default function CreateListingForm({
                   labelPlacement="outside"
                   placeholder="Description of the listing"
                   onChange={(event) => {
-                    setFormData({ ...formData, description: event.target.value })
-                    setDescriptionError(false)
+                    setFormData({
+                      ...formData,
+                      description: event.target.value,
+                    });
+                    setDescriptionError(false);
                   }}
                 />
               </>
-
             )}
 
             {currentStepIndex === 1 && (
               <>
-                <Input className="mb-5 w-48"
+                <Input
+                  className="mb-5 w-48"
                   isRequired
                   label="Country"
                   isInvalid={countryError}
@@ -259,11 +278,12 @@ export default function CreateListingForm({
                   labelPlacement="outside"
                   placeholder="The country of location"
                   onChange={(event) => {
-                    setFormData({ ...formData, country: event.target.value })
-                    setDescriptionError(false)
+                    setFormData({ ...formData, country: event.target.value });
+                    setDescriptionError(false);
                   }}
                 />
-                <Input className="mb-5 w-48"
+                <Input
+                  className="mb-5 w-48"
                   isRequired
                   label="City"
                   isInvalid={cityError}
@@ -271,11 +291,12 @@ export default function CreateListingForm({
                   labelPlacement="outside"
                   placeholder="The city of location"
                   onChange={(event) => {
-                    setFormData({ ...formData, city: event.target.value })
-                    setDescriptionError(false)
+                    setFormData({ ...formData, city: event.target.value });
+                    setDescriptionError(false);
                   }}
                 />
-                <Input className="mb-5 w-96"
+                <Input
+                  className="mb-5 w-96"
                   isRequired
                   isInvalid={addressError}
                   label="Address"
@@ -283,8 +304,8 @@ export default function CreateListingForm({
                   labelPlacement="outside"
                   placeholder="The address of the listing"
                   onChange={(event) => {
-                    setAddressError(false)
-                    setFormData({ ...formData, address: event.target.value })
+                    setAddressError(false);
+                    setFormData({ ...formData, address: event.target.value });
                   }}
                 />
               </>
@@ -292,19 +313,24 @@ export default function CreateListingForm({
 
             {currentStepIndex === 2 && (
               <>
-                <Input className="mb-5"
+                <Input
+                  className="mb-5"
                   isRequired
                   label="Max guests"
                   isInvalid={guestError}
                   labelPlacement="outside"
                   type="number"
                   min="1"
-                  value={formData.number_of_places ? formData.number_of_places.toString() : ''}
+                  value={
+                    formData.number_of_places
+                      ? formData.number_of_places.toString()
+                      : ""
+                  }
                   placeholder="Maximum number of guests"
                   onChange={(event) => {
                     const value = parseInt(event.target.value, 10); // Parse input as an integer
                     setFormData({ ...formData, number_of_places: value });
-                    setGuestError(false)
+                    setGuestError(false);
                   }}
                 />
                 <Input
@@ -317,12 +343,15 @@ export default function CreateListingForm({
                   type="number"
                   step="0.01"
                   placeholder="Price for one night"
-                  value={formData.day_price ? formData.day_price.toString() : ''}
+                  value={
+                    formData.day_price ? formData.day_price.toString() : ""
+                  }
                   onChange={(event) => {
                     const rawValue = event.target.value;
-                    const regex = /^\d+(\.\d{0,2})?$/;  // Allow up to two decimal places
-                    if (rawValue === '' || regex.test(rawValue)) {
-                      const value = rawValue === '' ? undefined : parseFloat(rawValue);
+                    const regex = /^\d+(\.\d{0,2})?$/; // Allow up to two decimal places
+                    if (rawValue === "" || regex.test(rawValue)) {
+                      const value =
+                        rawValue === "" ? undefined : parseFloat(rawValue);
                       setFormData({ ...formData, day_price: value });
                       setPriceError(false);
                     }
@@ -338,8 +367,8 @@ export default function CreateListingForm({
                   className="max-w-xs mb-5"
                   onChange={(event) => {
                     const categoryId = parseInt(event.target.value, 10);
-                    setFormData({ ...formData, category_id: categoryId })
-                    setCategoryError(false)
+                    setFormData({ ...formData, category_id: categoryId });
+                    setCategoryError(false);
                   }}
                 >
                   {categories.map((category) => (
@@ -353,28 +382,39 @@ export default function CreateListingForm({
 
             {currentStepIndex === 3 && (
               <>
-                <FileUpload onFileChange={(files: FileList | null) => handleFileUpload(files)}></FileUpload>
+                <FileUpload
+                  onFileChange={(files: FileList | null) =>
+                    handleFileUpload(files)
+                  }
+                ></FileUpload>
               </>
             )}
 
             {currentStepIndex === 4 && (
               <>
                 <div className="mb-10">
-                  <Label className="text-lg font-semibold mb-4">Add Additional Services:</Label>
+                  <Label className="text-lg font-semibold mb-4">
+                    Add Additional Services:
+                  </Label>
                   {services.map((service, index) => (
-                    <div key={index} className="flex space-x-4 items-center mb-4">
+                    <div
+                      key={index}
+                      className="flex space-x-4 items-center mb-4"
+                    >
                       <label className="flex-grow">
                         <Input
                           isRequired
-                          isInvalid={serviceErrors[index] && serviceErrors[index][0]}
+                          isInvalid={
+                            serviceErrors[index] && serviceErrors[index][0]
+                          }
                           type="text"
                           placeholder="Name of additional service"
-                          value={service.title !== '' ? service.title : ''}
+                          value={service.title !== "" ? service.title : ""}
                           onChange={(e) => {
                             const newErrors = [...serviceErrors];
                             newErrors[index][0] = false;
                             setServiceErrors(newErrors);
-                            handleInputChange(index, 'title', e.target.value);
+                            handleInputChange(index, "title", e.target.value);
                           }}
                         />
                       </label>
@@ -382,12 +422,22 @@ export default function CreateListingForm({
                       <label className="flex-grow">
                         <Input
                           isRequired
-                          isInvalid={serviceErrors[index] && serviceErrors[index][1]}
+                          isInvalid={
+                            serviceErrors[index] && serviceErrors[index][1]
+                          }
                           type="text"
                           placeholder="Short description"
-                          value={service.description !== '' ? service.description : ''}
+                          value={
+                            service.description !== ""
+                              ? service.description
+                              : ""
+                          }
                           onChange={(e) => {
-                            handleInputChange(index, 'description', e.target.value);
+                            handleInputChange(
+                              index,
+                              "description",
+                              e.target.value
+                            );
                             const newErrors = [...serviceErrors];
                             newErrors[index][1] = false;
                             setServiceErrors(newErrors);
@@ -398,38 +448,44 @@ export default function CreateListingForm({
                       <label className="flex-grow">
                         <Input
                           isRequired
-                          isInvalid={serviceErrors[index] && serviceErrors[index][2]}
+                          isInvalid={
+                            serviceErrors[index] && serviceErrors[index][2]
+                          }
                           type="number"
                           min="1"
                           step="0.01"
                           placeholder="Price for one night"
-                          value={service.price !== -1 ? service.price.toString() : ''}
+                          value={
+                            service.price !== -1 ? service.price.toString() : ""
+                          }
                           onChange={(e) => {
                             const rawValue = e.target.value;
-                            const regex = /^\d+(\.\d{0,2})?$/;  // Allow up to two decimal places
-                            
+                            const regex = /^\d+(\.\d{0,2})?$/; // Allow up to two decimal places
 
-                            if (rawValue === '' || regex.test(rawValue)) {
-                              const value = rawValue === '' ? undefined : parseFloat(rawValue);
+                            if (rawValue === "" || regex.test(rawValue)) {
+                              const value =
+                                rawValue === ""
+                                  ? undefined
+                                  : parseFloat(rawValue);
 
                               const newErrors = [...serviceErrors];
                               newErrors[index][2] = false;
                               setServiceErrors(newErrors);
-                              handleInputChange(index, 'price', value);  // Use the parsed value here
+                              handleInputChange(index, "price", value); // Use the parsed value here
                             }
-
-                                
-                              }}
-
+                          }}
                         />
                       </label>
-
-
                     </div>
                   ))}
 
                   {services.length > 0 && (
-                    <Button type="button" className="mb-2" variant="ghost" onClick={() => removeService(services.length - 1)}>
+                    <Button
+                      type="button"
+                      className="mb-2"
+                      variant="ghost"
+                      onClick={() => removeService(services.length - 1)}
+                    >
                       Remove
                     </Button>
                   )}
@@ -442,7 +498,6 @@ export default function CreateListingForm({
                 </div>
               </>
             )}
-
           </AnimatePresence>
           <div className="w-full items-center flex justify-between">
             <div className="">
@@ -450,10 +505,11 @@ export default function CreateListingForm({
                 onClick={previousStep}
                 type="button"
                 variant="ghost"
-                className={`${isFirstStep
-                  ? "invisible"
-                  : "visible p-0 text-neutral-200 hover:text-white"
-                  }`}
+                className={`${
+                  isFirstStep
+                    ? "invisible"
+                    : "visible p-0 text-neutral-200 hover:text-white"
+                }`}
               >
                 Go Back
               </Button>
@@ -480,4 +536,4 @@ export default function CreateListingForm({
       </main>
     </div>
   );
-};
+}
