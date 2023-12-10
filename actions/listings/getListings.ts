@@ -270,38 +270,38 @@ export async function insertListing({
     console.error(error);
   } else {
     const folderName = `listing_${addedListing!.id}`;
-    if(!files || files.length === 0){
-       return { error };
-     }
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-  
-      const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
-      
-      const { data: fileData, error: fileError } = await supabase.storage
-        .from('images')
-        .upload(`${folderName}/${uniqueFileName}`, file);
-  
-      if (fileError) {
-        console.error('Error uploading file:', fileError);
-      } else {
-        // Get the public URL of the uploaded file
-        const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
-     
-        await supabase.from("photos").insert({
-          listing_id: addedListing!.id,
-          url: fileURL.data.publicUrl,
-        });
+    if(files && files.length !== 0){
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+    
+        const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
+        
+        const { data: fileData, error: fileError } = await supabase.storage
+          .from('images')
+          .upload(`${folderName}/${uniqueFileName}`, file);
+    
+        if (fileError) {
+          console.error('Error uploading file:', fileError);
+        } else {
+          // Get the public URL of the uploaded file
+          const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
+       
+          await supabase.from("photos").insert({
+            listing_id: addedListing!.id,
+            url: fileURL.data.publicUrl,
+          });
+        }
       }
     }
 
     if(!services || services.length === 0){
+      console.log("No services came");
       return { error };
     }
 
     for (let i = 0; i < services.length; i++){
       const service = services[i];
-
+      console.log("Service came");
        const { error: serviceError } = await supabase.from("services").insert({
           title: service!.title,
           description: service!.description,
