@@ -33,6 +33,7 @@ export default function UserProfileDeleteForm({ user, reservationCount, listingC
       return;
     }
 
+    setLoading(false);
     router.push("/");
     toast.success("User profile successfully deleted");
   };
@@ -43,15 +44,20 @@ export default function UserProfileDeleteForm({ user, reservationCount, listingC
       <div className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3">
         <form onSubmit={handleOnSubmit} className="w-full flex flex-col items-center justify-center m-4">
           <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
-            <div>
-              <p className="text-lg">You have {reservationCount} reservations.</p>
+            <div className="flex items-center justify-center text-lg font-semibold">
+              You have {reservationCount} reservations.
             </div>
-            <div>
-              <p className="text-lg">You have {listingCount} listings.</p>
+            <div className="flex items-center justify-center text-lg font-semibold">
+              You have {listingCount} listings.
             </div>
           </div>
           <div className="flex items-center justify-center">
-            <p className="text-lg font-semibold">{ableToDelete ? "Are you sure you want to delete your profile?" : "You cannot delete your profile."}</p>
+            <p className="text-lg font-bold">
+              {ableToDelete ?
+                "Are you sure you want to delete your profile?"
+                :
+                "You cannot delete your profile."}
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
             <Button type="submit"

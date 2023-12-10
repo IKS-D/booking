@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const origin = requestUrl.searchParams.get("origin");
 
   if (code) {
     const cookieStore = cookies();
@@ -33,7 +34,9 @@ export async function GET(request: Request) {
       console.error(error);
     }
   }
+  // Determine the destination based on the origin
+  const destination = origin === "/login" ? "/" : "/registration/profile";
 
   // URL to redirect to after sign in process completes
-  return NextResponse.redirect(requestUrl.origin);
+  return NextResponse.redirect(requestUrl.origin + destination);
 }
