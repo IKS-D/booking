@@ -4,6 +4,8 @@ import supabase from "@/supabase/supabase";
 import { createServerClient, CookieOptions } from "@supabase/ssr";
 import { QueryData } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { getReservations } from "../reservations/reservationsQueries";
+import { getPersonalListings } from "../listings/getListings";
 
 async function getSupabaseServerClient() {
   const cookieStore = cookies();
@@ -87,18 +89,37 @@ export async function deleteUser() {
     }
   );
 
+  // Get the user
   const { data: { user }, error: getUserError } = await supabase.auth.getUser();
 
   if (getUserError) {
     return { error: getUserError };
   }
 
+  // Double check the listings and reservations
+  const { data: reservations, error: reservationsError } = await getReservations(user!.id);
+  if(reservationsError){
+    return { error: reservationsError };
+  }
+  if( reservations && reservations?.length > 0){
+    return { error: { message: "User has reservations" } };
+  }
+  const { data: listings, error: listingsError } = await getPersonalListings(user!.id);
+  if(listingsError){
+    return { error: listingsError };
+  }
+  if( listings && listings?.length > 0){
+    return { error: { message: "User has listings" } }
+  }
+
+  // Attempt to sign the user out
   const { error: signOutError } = await supabase.auth.signOut();
 
   if (signOutError) {
     return { error: signOutError };
   }
 
+  // Attempt to delete the user
   const { error: deleteError } = await supabase.auth.admin.deleteUser(user!.id);
 
   if (deleteError) {

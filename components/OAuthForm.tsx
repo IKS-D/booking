@@ -16,10 +16,17 @@ export default function OAuthForm() {
 			process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 		)
 
+		const pathname = window.location.pathname; // Gets the current route, e.g., "/login"
+		const redirectTo = `${origin}/auth/callback?origin=${pathname}`;
+
+		// console.log(pathname);
+		// console.log(redirectTo);
+		// console.log(origin + pathname);
+
 		supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				redirectTo: `${origin}/auth/callback`,
+				redirectTo: redirectTo,
 			},
 		});
 
