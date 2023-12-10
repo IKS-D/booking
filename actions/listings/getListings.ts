@@ -197,7 +197,8 @@ export async function updateListing({
   listing_id: number;
 }) {
 
-  console.log(editedListing);
+  const priceInCents = Math.round(editedListing.day_price! * 100);
+  editedListing.day_price = priceInCents;
 
   const { error: updateError } = await supabase
     .from('listings')
@@ -247,6 +248,8 @@ export async function insertListing({
   files: FileList;
   services: ServiceInput[];
 }) {
+  const priceInCents = Math.round(listing.day_price! * 100);
+  listing.day_price = priceInCents;
   let { data: addedListing, error } = await supabase
     .from("listings")
     .insert({
@@ -301,6 +304,8 @@ export async function insertListing({
 
     for (let i = 0; i < services.length; i++){
       const service = services[i];
+      const priceInCents = Math.round(service.price! * 100);
+      service.price = priceInCents;
       console.log("Service came");
        const { error: serviceError } = await supabase.from("services").insert({
           title: service!.title,

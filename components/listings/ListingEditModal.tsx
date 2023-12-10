@@ -108,7 +108,14 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
               labelPlacement="outside"
               type="number"
               value={(editedListing?.day_price || 0).toString()}
-              onChange={(event) => handleInputChange("day_price", event.target.value)}
+              
+              onChange={(event) => {
+                const rawValue = event.target.value;
+                const regex = /^\d+(\.\d{0,2})?$/;  // Allow up to two decimal places
+                if (rawValue === '' || regex.test(rawValue)) {
+                    const value = rawValue === '' ? undefined : parseFloat(rawValue);
+                    handleInputChange("day_price", event.target.value)}}
+                }
             />
             <FileUpload onFileChange={(files: FileList | null) => handleFileUpload(files)}></FileUpload>
             {/* Add similar Input components for other properties */}

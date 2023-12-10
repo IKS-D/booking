@@ -144,7 +144,7 @@ export default function PersonalListingsTable({
           return (
             <div className="flex flex-col">
               <p className="text-bold text-sm capitalize">
-                {listing.day_price}
+                {listing.day_price / 100} $
               </p>
             </div>
           );
