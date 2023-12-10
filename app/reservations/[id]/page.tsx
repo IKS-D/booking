@@ -1,4 +1,4 @@
-import { getListing, getListingById } from "@/actions/listings/getListings";
+import { getListingById } from "@/actions/listings/getListings";
 import { getReservationById } from "@/actions/reservations/reservationsQueries";
 import getCurrentUser from "@/actions/users/usersQueries";
 import { HostNewReservationEmailTemplate } from "@/components/email/HostNewReservationEmailTemplate";

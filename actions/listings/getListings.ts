@@ -1,6 +1,8 @@
+import { revalidate } from "@/components/TopNavbar";
 import supabase from "@/supabase/supabase";
-import { Listing } from "@/types";
 import { QueryData, QueryResult } from "@supabase/supabase-js";
+import { nanoid } from "nanoid";
+import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 
 interface Params {
   listingId?: string;
@@ -18,7 +20,8 @@ export async function getListingById(listingId: number) {
       `
     *,
     category: listing_category (name),
-    services: services (*)
+    services: services (*),
+    images: photos (url)
   `
     )
     .eq("id", listingId)
@@ -31,51 +34,312 @@ export async function getListingById(listingId: number) {
   return { data, error };
 }
 
-export async function getListing(params: Params) {
-  const { listingId, userId, authorId } = params;
+export type Listings = QueryData<ReturnType<typeof getListingsBase>>;
+export type Listing = Listings[0];
 
-  const listings = Array(20).fill(mockListing);
+export async function getListings() {
+  noStore();
+  let { data: listings, error } = await getListingsBase();
 
-  const specificListing = listings.find((listing) => listing.id === listingId);
-
-  if (!specificListing) {
-    return { error: "Listing not found" };
+  if (error) {
+    console.error(error);
   }
 
-  return specificListing;
+  return { data: listings, error: error };
 }
 
-export async function getListings(params: Params) {
-  const { listingId, userId, authorId } = params;
+export type AverageData = QueryData<ReturnType<typeof getChartInformation>>;
 
-  const listings = Array(20).fill(mockListing);
+export async function getChartInformation(listingId: number){
+  const { data: listing, error: listingError } = await supabase
+    .from("listings")
+    .select("city")
+    .eq("id", listingId)
+    .single();
 
-  return listings;
+  if (listingError) {
+    console.error(listingError);
+    return { data: null, error: listingError };
+  }
+
+  const city = listing?.city;
+
+  if (!city) {
+    console.error("City not found for the listing");
+    return { data: null, error: "City not found for the listing" };
+  }
+
+  const { data: listings, error } = await supabase
+    .from("listings")
+    .select("number_of_places, day_price")
+    .eq("city", city);
+
+    if (error) {
+      console.error(error);
+      return { data: null, error };
+    }
+
+    const groupedListings: Record<number, number[]> = {};
+    listings?.forEach((listing) => {
+    const numberOfPlaces = listing.number_of_places;
+    const price = listing.day_price;
+
+    if (numberOfPlaces in groupedListings) {
+      groupedListings[numberOfPlaces].push(price);
+    } else {
+      groupedListings[numberOfPlaces] = [price];
+    }
+  });
+
+  const averages: Record<number, number> = {};
+  Object.entries(groupedListings).forEach(([numberOfPlaces, prices]) => {
+    const averagePrice =
+      prices.reduce((sum, price) => sum + price, 0) / prices.length;
+    averages[parseInt(numberOfPlaces, 10)] = averagePrice;
+  });
+
+  return { data: averages, error: null };
 }
 
-export async function getPersonalListings(params: Params) {
-  const { listingId, userId, authorId } = params;
-
-  const listings = Array(20).fill(mockListing);
-
-  return listings;
+function getFilenameFromUrl(url: string) {
+  const urlParts = url.split('/');
+  return (urlParts[urlParts.length - 2] + "/" + urlParts[urlParts.length - 1]);
 }
 
-const mockListing: Listing = {
-  id: "1",
-  title: "Grand Apartment in Center of London",
-  description:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-  city: "London",
-  address: "Baker Street 221b",
-  created_at: new Date("2020-01-01"),
-  category: "apartment",
-  max_guests: 15,
-  day_price: 459.99,
-  images: [
-    "https://t4.ftcdn.net/jpg/01/57/39/19/360_F_157391956_UrG0WMZiXiG2UKktQeaKTVgaLNSa8hIT.jpg",
-    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/430666399.jpg?k=3ec09fe5fe134a2c1a20215861ab31f64f209ea9bfa1ba526fd0438abef3a17b&o=&hp=1",
-    "https://t4.ftcdn.net/jpg/01/57/39/19/360_F_157391956_UrG0WMZiXiG2UKktQeaKTVgaLNSa8hIT.jpg",
-    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/430666399.jpg?k=3ec09fe5fe134a2c1a20215861ab31f64f209ea9bfa1ba526fd0438abef3a17b&o=&hp=1",
-  ],
+export async function getPersonalListings(userId: string) {
+  noStore();
+  const { data, error } = await supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)').eq("host_id",userId!);
+
+  if (error) {
+    console.error(error);
+  }
+
+  return { data, error };
+}
+
+export async function deleteListing({
+  listing_id,
+}: {
+  listing_id: number;
+}) {
+  const { data: reservations, error: reservationsError } = await supabase
+    .from('reservations')
+    .select('id')
+    .eq('listing_id', listing_id)
+    .eq('status', 2);
+
+  if (reservationsError) {
+    console.error(reservationsError);
+    return { error: reservationsError };
+  }
+
+  if (reservations && reservations.length > 0) {
+    // Active reservations found, throw an error
+    const errorMessage = 'Cannot delete listing with active reservations';
+    console.error(errorMessage);
+    return { error: errorMessage };
+  }
+
+  // Retrieve the list of photo URLs associated with the listing
+  const { data: photos, error: photosError } = await supabase
+    .from('photos')
+    .select('url')
+    .eq('listing_id', listing_id);
+
+  if (photosError) {
+    console.error(photosError);
+    return { error: photosError };
+  }
+
+  // Delete the listing
+  const { error: listingDeleteError } = await supabase
+    .from('listings')
+    .delete()
+    .eq('id', listing_id);
+
+  if (listingDeleteError) {
+    console.error(listingDeleteError);
+    return { error: listingDeleteError };
+  }
+
+  // Delete photos from Supabase storage
+  if (photos && photos.length > 0) {
+    for (const photo of photos) {
+      console.log(getFilenameFromUrl(photo.url));
+      const filename = getFilenameFromUrl(photo.url);
+      const { data: removed, error: photoDeleteError } = await supabase.storage
+        .from('images')
+        .remove([filename]);
+
+      if (photoDeleteError) {
+        console.error('Error deleting photo from storage:', photoDeleteError);
+        return { error: photoDeleteError };
+      }
+    }
+  }
+  return { error: null };
+}
+
+export type PartialListingUpdate = Partial<{
+  title: string;
+  description: string;
+  number_of_places: number;
+  day_price: number;
+}>;
+
+export async function updateListing({
+  editedListing,
+  files,
+  listing_id,
+}: {
+  editedListing: PartialListingUpdate;
+  files: FileList;
+  listing_id: number;
+}) {
+
+  const priceInCents = Math.round(editedListing.day_price! * 100);
+  editedListing.day_price = priceInCents;
+
+  const { error: updateError } = await supabase
+    .from('listings')
+    .update(editedListing)
+    .eq('id', listing_id);
+
+  if (updateError) {
+    console.error(updateError);
+  }
+
+  const folderName = `listing_${listing_id}`;
+  if(!files || files.length === 0){
+    return { updateError };
+  }
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
+    
+    const { data: fileData, error: fileError } = await supabase.storage
+      .from('images')
+      .upload(`${folderName}/${uniqueFileName}`, file);
+
+    if (fileError) {
+      console.error('Error uploading file:', fileError);
+    } else {
+      // Get the public URL of the uploaded file
+      const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
+   
+      await supabase.from("photos").insert({
+        listing_id: listing_id,
+        url: fileURL.data.publicUrl,
+      });
+    }
+  }
+  return { updateError };
+}
+
+export async function insertListing({
+  listing,
+  user_id,
+  files,
+  services,
+}: {
+  listing: Partial<Listing>;
+  user_id: string;
+  files: FileList;
+  services: ServiceInput[];
+}) {
+  const priceInCents = Math.round(listing.day_price! * 100);
+  listing.day_price = priceInCents;
+  let { data: addedListing, error } = await supabase
+    .from("listings")
+    .insert({
+      address: listing.address!,
+      category_id: listing.category_id!,
+      city: listing.city!,
+      country: listing.country!,
+      creation_date: new Date().toISOString(),
+      day_price: listing.day_price!,
+      description: listing.description!,
+      host_id: user_id,
+      number_of_places: listing.number_of_places!,
+      photos: "asdasd",
+      suspension_status: false,
+      title: listing.title!,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+  } else {
+    const folderName = `listing_${addedListing!.id}`;
+    if(files && files.length !== 0){
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+    
+        const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
+        
+        const { data: fileData, error: fileError } = await supabase.storage
+          .from('images')
+          .upload(`${folderName}/${uniqueFileName}`, file);
+    
+        if (fileError) {
+          console.error('Error uploading file:', fileError);
+        } else {
+          // Get the public URL of the uploaded file
+          const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
+       
+          await supabase.from("photos").insert({
+            listing_id: addedListing!.id,
+            url: fileURL.data.publicUrl,
+          });
+        }
+      }
+    }
+
+    if(!services || services.length === 0){
+      console.log("No services came");
+      return { error };
+    }
+
+    for (let i = 0; i < services.length; i++){
+      const service = services[i];
+      const priceInCents = Math.round(service.price! * 100);
+      service.price = priceInCents;
+      console.log("Service came");
+       const { error: serviceError } = await supabase.from("services").insert({
+          title: service!.title,
+          description: service!.description,
+          price: service!.price,
+          listing_id: addedListing!.id,
+      });
+
+      if (serviceError) {
+        console.error('Error uploading file:', serviceError);
+      }
+    }
+  }
+  return { error };
+}
+
+function getListingsBase() {
+  return supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)');
+}
+
+export type Categories = QueryData<ReturnType<typeof getListingCategories>>;
+
+export async function getListingCategories(){
+  let { data: categories, error } = await supabase.from("listing_category").select('*');
+                                              
+  if (error) {
+    console.error(error);
+  }
+
+  return { data: categories, error };
+}
+
+export type ServiceInput = {
+  title: string;
+  description: string;
+  price: number;
 };

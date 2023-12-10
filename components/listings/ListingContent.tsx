@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Listing } from "@/types";
 import { Image, Button, Divider, Textarea, Input } from "@nextui-org/react";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import { useRouter } from "next/navigation";
+import { Listing } from "@/actions/listings/getListings";
 
 type ListingContentProps = {
   listing: Listing;
@@ -16,20 +16,19 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
 
   const nextImage = () => {
     setCurrentImageIndex(
-      (prevIndex) => (prevIndex + 1) % listing.images.length
+      currentImageIndex + 1 % listing.images.length
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) =>
-        (prevIndex - 1 + listing.images.length) % listing.images.length
+      currentImageIndex - 1 % listing.images.length
     );
   };
 
   return (
-    <div>
-      <div className="flex flex-row gap-40 mt-3 mb-3">
+    <div className="relative z-50">
+      <div className="flex flex-row gap-40 mt-3 mb-3 z-50">
         <div className="">
           <h2 className="text-xl font-bold mb-4">{listing.title}</h2>
           <Divider className="my-4" />
@@ -55,8 +54,8 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
             <Input
               label="Category"
               value={`${
-                listing.category.charAt(0).toUpperCase() +
-                listing.category.slice(1)
+                listing.category!.name.charAt(0).toUpperCase() +
+                listing.category!.name.slice(1)
               }`}
               readOnly
               disabled
@@ -66,7 +65,7 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
 
             <Input
               label="Max Guests"
-              value={`${listing.max_guests}`}
+              value={`${listing.number_of_places}`}
               readOnly
               disabled
               variant="bordered"
@@ -85,34 +84,36 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
         </div>
         <div className="mt-10">
           <div className="relative w-96 h-48">
-            <div className="relative">
-              <Image
-                src={listing.images[currentImageIndex]}
-                alt={`Image ${currentImageIndex + 1}`}
-                className="object-contain"
-              />
+          {listing.images && listing.images.length > 0 ? (
+            <div>
+              <div className="relative">
+                <Image
+                  src={listing.images[currentImageIndex].url}
+                  alt={`Image ${currentImageIndex + 1}`}
+                  className="object-contain"
+                />
+              </div>
+              {listing.images.length > 1 && (
+                <div className="flex justify-center gap-5 mt-2 z-10">
+                  <Button
+                    className="prev-button"
+                    onClick={prevImage}
+                    disabled={currentImageIndex === 0}
+                  >
+                    <BsArrowLeft />
+                  </Button>
+                  <Button
+                    className="next-button z-10"
+                    onClick={nextImage}
+                    disabled={currentImageIndex === listing.images.length - 1}
+                  >
+                    <BsArrowRight />
+                  </Button>
+                </div>
+              )}
             </div>
-            <div className="flex justify-center gap-5 mt-2">
-              <Button
-                className="prev-button"
-                onClick={prevImage}
-                disabled={listing.images.length <= 1 || currentImageIndex === 0}
-              >
-                <BsArrowLeft />
-              </Button>
-              <Button
-                className="next-button"
-                onClick={nextImage}
-                disabled={
-                  listing.images.length <= 1 ||
-                  currentImageIndex === listing.images.length - 1
-                }
-              >
-                <BsArrowRight />
-              </Button>
-            </div>
-
-            <div className="flex justify-center gap-5 mt-2">
+          ) : null}
+            <div className="flex justify-center gap-5 mt-2 z-10">
               <Button
                 className="mt-6 items-center justify-center"
                 color="primary"
@@ -127,17 +128,6 @@ const ListingContent: React.FC<ListingContentProps> = ({ listing }) => {
           </div>
         </div>
       </div>
-
-      <label className="text-lg font-semibold">
-        Average cost of a listing in the city of {listing.city}
-      </label>
-
-      <Image
-        src={
-          "https://images.squarespace-cdn.com/content/v1/55b6a6dce4b089e11621d3ed/1585087896250-R3GZ6OFWYQRZUJRCJU3D/produce_monthly.png"
-        }
-        className="relative w-96 h-48"
-      />
     </div>
   );
 };

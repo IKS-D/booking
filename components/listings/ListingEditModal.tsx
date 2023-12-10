@@ -3,28 +3,34 @@
 import React, { useState, useEffect } from "react";
 import { Modal, ModalContent, ModalHeader, ModalFooter } from "@nextui-org/modal";
 import { Button, Input, Textarea } from "@nextui-org/react";
-import { Listing } from "@/types";
+import { Listing, PartialListingUpdate, updateListing } from "@/actions/listings/getListings";
+import FileUpload from "./FileUpload";
+import { List } from "postcss/lib/list";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ListingEditModalProps {
   listing: Listing | null;
   isOpen: boolean;
   onOpenChange: () => void;
-  onConfirm: (updatedListing: Listing) => void;
 }
 
 const ListingEditModal: React.FC<ListingEditModalProps> = ({
   listing,
   isOpen,
   onOpenChange,
-  onConfirm,
 }) => {
     
-  const [editedListing, setEditedListing] = useState<Listing | null>(null);
+  const [editedListing, setEditedListing] = useState<PartialListingUpdate>({});
+  const [selectedFiles, setSelectedFiles] = React.useState<FileList | null>(null);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+
+  const router = useRouter();
 
   useEffect(() => {
     if (isOpen && listing) {
-      setEditedListing(listing);
+      const { title, description, number_of_places, day_price } = listing;
+    setEditedListing({ title, description, number_of_places, day_price });
     }
   }, [isOpen, listing]);
 
@@ -37,19 +43,35 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
     }
   };
 
-  const handleUploadFiles = (files: File[]) =>{
-    const newPhotos = files.map((file) => URL.createObjectURL(file));
-    if(editedListing){
-      setEditedListing({
-        ...editedListing,
-        images: [...editedListing.images, ...newPhotos],
-      });
+  const handleFileUpload = (files: FileList | null) => {
+    if (files) {
+      // Handle the files (either a single file or multiple files)
+      setSelectedFiles(files)
+    } else {
+      // Handle the case where no files are selected
+      console.log('No files selected');
     }
+  };
+
+  const onConfirm = async () => {
+    const { updateError } = await updateListing({
+      editedListing: editedListing!,
+      files: selectedFiles!,
+      listing_id: +listing!.id,
+    });
+
+    if (updateError) {
+      toast.error("Something went wrong");
+      return;
+    }
+
+    toast.success("Listing edited successfully");
+    router.refresh();
   }
 
   const handleConfirm = () => {
     if (editedListing) {
-      onConfirm(editedListing);
+      onConfirm();
 
       onOpenChange();
     }
@@ -73,31 +95,29 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
               value={editedListing?.description || ""}
               onChange={(event) => handleInputChange("description", event.target.value)}
             />
-            <Input className="mb-10"
+            <Input
+              className="mb-10"
               label="Max guests"
               labelPlacement="outside"
               type="number"
-              value={editedListing?.max_guests.toString() || ""}
-              onChange={(event) => handleInputChange("max_guests", event.target.value)}
+              value={(editedListing?.number_of_places || 0).toString()}
+              onChange={(event) => handleInputChange("number_of_places", event.target.value)}
             />
             <Input className="mb-10"
               label="Price for a day"
               labelPlacement="outside"
               type="number"
-              value={editedListing?.day_price.toString() || ""}
-              onChange={(event) => handleInputChange("day_price", event.target.value)}
+              value={(editedListing?.day_price || 0).toString()}
+              
+              onChange={(event) => {
+                const rawValue = event.target.value;
+                const regex = /^\d+(\.\d{0,2})?$/;  // Allow up to two decimal places
+                if (rawValue === '' || regex.test(rawValue)) {
+                    const value = rawValue === '' ? undefined : parseFloat(rawValue);
+                    handleInputChange("day_price", event.target.value)}}
+                }
             />
-            <Input className="mb-10"
-                label="New photos"
-                labelPlacement="outside-left"
-                type="file"
-                multiple
-                onChange={(e) => {
-                  const chosenFiles = Array.prototype.slice.call(e.target.files)
-
-                  handleUploadFiles(chosenFiles);
-                }}
-            />
+            <FileUpload onFileChange={(files: FileList | null) => handleFileUpload(files)}></FileUpload>
             {/* Add similar Input components for other properties */}
           </div>)
         }

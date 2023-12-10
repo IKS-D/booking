@@ -1,15 +1,15 @@
 "use client";
 
-import { Listing } from "@/types";
 import { User } from "@supabase/supabase-js";
 import { subtitle, title } from "@/components/primitives";
 import PersonalListingsTable from "./PersonalListingsTable";
 import CreateNewListingButton from "./CreateNewListingButton";
 import { toast } from "sonner";
 import { list } from "postcss";
+import { Listings } from "@/actions/listings/getListings";
 
 interface PersonalListingsContentProps {
-  listings: Listing[];
+  listings: Listings;
   currentUser?: User | null;
 }
 

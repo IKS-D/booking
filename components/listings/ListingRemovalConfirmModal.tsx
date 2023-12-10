@@ -1,6 +1,6 @@
 "use client";
 
-import { Listing } from "@/types";
+import { Listing, deleteListing } from "@/actions/listings/getListings";
 import {
   Modal,
   ModalContent,
@@ -9,20 +9,35 @@ import {
   ModalFooter,
 } from "@nextui-org/modal";
 import { Button } from "@nextui-org/react";
+import { BsWindowSidebar } from "react-icons/bs";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ListingRemovalConfirmModalProps {
   listing: Listing | null;
   isOpen: boolean;
   onOpenChange: () => void;
-  onConfirm: () => void;
 }
 
 const ListingRemovalConfirmModal: React.FC<ListingRemovalConfirmModalProps> = ({
   listing,
   isOpen,
   onOpenChange,
-  onConfirm,
 }) => {
+
+  const router = useRouter();
+
+  const onConfirm = async () => {
+    const { error } = await deleteListing({ listing_id: +listing!.id });
+
+    if (error) {
+      toast.error('Failed to delete listing');
+    } else {
+      router.refresh();
+      toast.success('Listing deleted successfully');
+    }
+  };
+
   return (
     <>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
