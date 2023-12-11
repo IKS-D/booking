@@ -40,7 +40,12 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
   useEffect(() => {
     if (isOpen && listing) {
       const { title, description, number_of_places, day_price } = listing;
-      setEditedListing({ title, description, number_of_places, day_price });
+      setEditedListing({
+        title,
+        description,
+        number_of_places,
+        day_price: day_price / 100,
+      });
     }
   }, [isOpen, listing]);
 
