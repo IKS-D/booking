@@ -270,6 +270,7 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
             {currentStepIndex === 1 && (
               <>
                 <Input
+                  key={3}
                   className="mb-5 w-48"
                   isRequired
                   label="Country"
@@ -279,7 +280,7 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
                   placeholder="The country of location"
                   onChange={(event) => {
                     setFormData({ ...formData, country: event.target.value });
-                    setDescriptionError(false);
+                    setCountryError(false);
                   }}
                 />
                 <Input
@@ -292,7 +293,7 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
                   placeholder="The city of location"
                   onChange={(event) => {
                     setFormData({ ...formData, city: event.target.value });
-                    setDescriptionError(false);
+                    setCityError(false);
                   }}
                 />
                 <Input
@@ -342,7 +343,7 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
                   labelPlacement="outside"
                   type="number"
                   step="0.01"
-                  placeholder="Price for one night"
+                  placeholder="Price for one day"
                   value={
                     formData.day_price ? formData.day_price.toString() : ""
                   }
@@ -456,7 +457,7 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
                           step="0.01"
                           placeholder="Price for one night"
                           value={
-                            service.price !== -1 ? service.price.toString() : ""
+                            (service.price !== undefined && service.price !== -1) ? service.price.toString() : ""
                           }
                           onChange={(e) => {
                             const rawValue = e.target.value;

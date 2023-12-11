@@ -262,7 +262,6 @@ export async function insertListing({
       description: listing.description!,
       host_id: user_id,
       number_of_places: listing.number_of_places!,
-      photos: "asdasd",
       suspension_status: false,
       title: listing.title!,
     })
