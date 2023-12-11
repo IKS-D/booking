@@ -92,6 +92,7 @@ export default function ProfileRegistrationForm({
           errorMessage={errors.firstName && (errors.firstName.message as string)}
           isInvalid={errors.firstName ? true : false}
           disabled={isSubmitting}
+          isRequired
           label="First name"
           name="firstName"
           placeholder="Enter your first name"
@@ -104,6 +105,7 @@ export default function ProfileRegistrationForm({
           errorMessage={errors.lastName && (errors.lastName.message as string)}
           isInvalid={errors.lastName ? true : false}
           disabled={isSubmitting}
+          isRequired
           label="Last name"
           name="lastName"
           placeholder="Enter your last name"
@@ -115,10 +117,13 @@ export default function ProfileRegistrationForm({
           errorMessage={errors.dateOfBirth && (errors.dateOfBirth.message as string)}
           isInvalid={errors.dateOfBirth ? true : false}
           disabled={isSubmitting}
+          isRequired
           type="date"
           label="Date of birth"
+          labelPlacement="inside"
           name="dateOfBirth"
           variant="bordered"
+          placeholder="Enter the date of your birth"
           onChange={(event) => {
             const formatedDate = new Date(event.target.value);
             setValue("dateOfBirth", formatedDate);
@@ -131,6 +136,7 @@ export default function ProfileRegistrationForm({
           errorMessage={errors.phoneNumber && (errors.phoneNumber.message as string)}
           isInvalid={errors.phoneNumber ? true : false}
           disabled={isSubmitting}
+          isRequired
           label="Phone number"
           name="phoneNumber"
           placeholder="Enter your phone number"
@@ -143,6 +149,7 @@ export default function ProfileRegistrationForm({
           errorMessage={errors.country && (errors.country.message as string)}
           isInvalid={errors.country ? true : false}
           disabled={isSubmitting}
+          isRequired
           label="Country"
           name="country"
           placeholder="Enter the name of your country"
@@ -155,6 +162,7 @@ export default function ProfileRegistrationForm({
           errorMessage={errors.city && (errors.city.message as string)}
           isInvalid={errors.city ? true : false}
           disabled={isSubmitting}
+          isRequired
           label="City"
           name="city"
           placeholder="Enter the name of your city"
@@ -167,6 +175,7 @@ export default function ProfileRegistrationForm({
           errorMessage={errors.photo && (errors.photo.message as string)}
           isInvalid={errors.photo ? true : false}
           disabled={isSubmitting}
+          isRequired
           label="Photo"
           name="photo"
           placeholder="Enter a URL for your photo"

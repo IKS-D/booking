@@ -130,6 +130,7 @@ export default function UserProfileEditForm({ user, userProfile, }: ProfileEditF
           label="Date of birth"
           name="dateOfBirth"
           variant="bordered"
+          placeholder="Enter the date of your birth"
           value={formData.dateOfBirth.toISOString().split('T')[0]}  // Format date to 'YYYY-MM-DD'
           onChange={(event) => {
             const enteredDate = event.target.value;

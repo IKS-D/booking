@@ -14,7 +14,8 @@ export const ProfileRegistrationSchema = z
         message: "You must be at least 18 years old to register",
        }),
     phoneNumber: z.string().min(1, { message: "Phone number is required" })
-    .max(20, { message: "Phone number cannot be longer than 20 characters" }),
+    .max(20, { message: "Phone number cannot be longer than 20 characters" })
+    .refine((phoneNumber) => validatePhone(phoneNumber), { message: "Invalid phone number" }),
     country: z.string().min(1, { message: "Country is required" }),
     city: z.string().min(1, { message: "City is required" }),
     photo: z.string().min(1, { message: "Photo is required" })
@@ -65,6 +66,12 @@ export const ProfileRegistrationSchema = z
         return false;
       }
     }
+  };
+
+  const validatePhone = (phoneNumber: string) => {
+    // Regular expression for a valid phone number
+    const phoneRegex = /^\+?[0-9]{10,}$/;
+    return phoneRegex.test(phoneNumber);
   };
 
 export type ProfileRegistrationFormData = z.infer<typeof ProfileRegistrationSchema>;
