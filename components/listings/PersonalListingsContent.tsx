@@ -24,8 +24,8 @@ const PersonalListingsContent: React.FC<PersonalListingsContentProps> = ({
       <PersonalListingsTable listings={listings} />
 
       <div className="flex justify-center mt-10">
-        <Button variant="flat">
-          <Link href="/listings/personal/create">Create new listing</Link>
+        <Button href="/listings/personal/create" variant="flat" as={Link}>
+          Create new listing
         </Button>
       </div>
     </div>
