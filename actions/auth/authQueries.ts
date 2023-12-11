@@ -1,8 +1,6 @@
 "use server";
 
-import supabase from "@/supabase/supabase";
 import { createServerClient, CookieOptions } from "@supabase/ssr";
-import { QueryData } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { getReservations } from "../reservations/reservationsQueries";
 import { getPersonalListings } from "../listings/listingsQueries";
@@ -101,7 +99,21 @@ export async function deleteUser() {
   if(reservationsError){
     return { error: reservationsError };
   }
-  if( reservations && reservations?.length > 0){
+  let reservationCount = 0;
+  if(reservations && reservations?.length > 0){
+    // Check for active reservations
+    const today = new Date();
+    for(const reservation of reservations){
+      if(reservation.status === 1 || reservation.status === 2){
+        const startDate = new Date(reservation.start_date);
+        const endDate = new Date(reservation.end_date);
+        if(startDate > today || endDate > today){
+          reservationCount++;
+        }
+      }
+    }
+  }
+  if( reservationCount > 0){
     return { error: { message: "User has reservations" } };
   }
   const { data: listings, error: listingsError } = await getPersonalListings(user!.id);

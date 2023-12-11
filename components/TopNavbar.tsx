@@ -11,6 +11,7 @@ import {
   UserProfile,
   getUserProfileById,
   hostProfileExists,
+  userProfileExists,
 } from "@/actions/users/usersQueries";
 
 // export const dynamic = "force-dynamic";
@@ -26,8 +27,14 @@ export default async function TopNavbar({ user }: TopNavbarProps) {
 
   if (user) {
     currentUserHost = await hostProfileExists(user.id);
-    const { data, error } = await getUserProfileById(user.id);
-    userProfile = data;
+    // Without the check getUserProfileById throws error to console if profile doesn't exist
+    if(await userProfileExists(user.id)){
+      const { data, error } = await getUserProfileById(user.id);
+      if(error){
+        console.error(error);
+      }
+      userProfile = data;
+    }
   }
 
   return (
