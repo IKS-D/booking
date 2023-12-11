@@ -25,8 +25,8 @@ const PersonalListingsPage = async () => {
             title="No personal listings found"
             subtitle="Create a new listing to get started"
           />
-          <Button variant="flat">
-            <Link href="/listings/personal/create">Create new listing</Link>
+          <Button href="/listings/personal/create" variant="flat" as={Link}>
+            Create new listing
           </Button>
         </div>
       </div>

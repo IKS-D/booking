@@ -5,7 +5,7 @@ import { decodePayseraData } from "@/actions/reservations/payseraAPI";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Input } from "@nextui-org/input";
-import { Button } from "@nextui-org/button";
+import { Button } from "@nextui-org/react";
 
 const SuccessPayment = () => {
   const searchParams = useSearchParams();
@@ -65,8 +65,14 @@ const SuccessPayment = () => {
         />
       </div>
 
-      <Button variant="flat" className="mt-12" color="primary">
-        <Link href="/reservations">Go to reservations page</Link>
+      <Button
+        href="/reservations"
+        as={Link}
+        variant="flat"
+        className="mt-12"
+        color="primary"
+      >
+        Go to reservations page
       </Button>
     </div>
   );

@@ -1,7 +1,8 @@
 import React from "react";
 import { BiError } from "react-icons/bi";
 import { title } from "./primitives";
-import { Button, Link } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
+import Link from "next/link";
 
 interface NotFoundProps {
   title?: string;
@@ -14,8 +15,8 @@ const NotFoundComponent = ({ title: header, subtitle }: NotFoundProps) => {
       <BiError size={90} color="primary" />
       <h2 className={title({ size: "sm" })}>{header || "Not Found"}</h2>
       <p>{subtitle || "Could not find requested resource"}</p>
-      <Button variant="flat" color="primary">
-        <Link href="/">Back to Home</Link>
+      <Button href="/" as={Link} variant="flat" color="primary">
+        Back to Home
       </Button>
     </div>
   );
