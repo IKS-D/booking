@@ -1,5 +1,5 @@
 import { User } from "@supabase/supabase-js";
-import { EditIcon } from "../../Icons";
+import { DeleteIcon, EditIcon } from "../../Icons";
 import { Input, Link, } from "@nextui-org/react";
 import { HostProfile } from "@/actions/users/usersQueries";
 
@@ -34,13 +34,22 @@ export default async function HostProfileCard({ user, hostProfile, }: HostProfil
           </div>
           <Link
             href="/profile/host/edit"
-            className="w-full col-span-2 bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
+            className="w-full bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
           >
             <div className="flex items-center justify-center gap-1">
               <EditIcon />
               <p className="text-md">Edit host profile</p>
             </div>
           </Link>
+          <Link
+          href="/profile/host/delete"
+          className="bg-danger hover:bg-danger-dark text-white font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
+        >
+          <div className="flex items-center justify-center gap-1">
+            <DeleteIcon />
+            <p className="text-md">Delete host profile</p>
+          </div>
+        </Link>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 w-full max-w-lg">

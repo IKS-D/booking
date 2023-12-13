@@ -3,7 +3,7 @@
 import { Button } from "@nextui-org/react";
 import { createBrowserClient } from "@supabase/ssr";
 import React, { useState } from "react";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function OAuthForm() {
 	const [loading, setLoading] = useState(false);
@@ -18,10 +18,6 @@ export default function OAuthForm() {
 
 		const pathname = window.location.pathname; // Gets the current route, e.g., "/login"
 		const redirectTo = `${origin}/auth/callback?origin=${pathname}`;
-
-		// console.log(pathname);
-		// console.log(redirectTo);
-		// console.log(origin + pathname);
 
 		supabase.auth.signInWithOAuth({
 			provider: "google",

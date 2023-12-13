@@ -1,5 +1,5 @@
-import LoginForm from "@/components/LoginForm";
-import OAuthForm from "@/components/OAuthForm";
+import LoginForm from "@/components/auth/LoginForm";
+import OAuthForm from "@/components/auth/OAuthForm";
 
 export default function Login() {
   return (

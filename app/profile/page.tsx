@@ -35,18 +35,18 @@ export default async function ProfilePage() {
           href="/profile/user/edit"
           className="bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
         >
-          <div className="flex items-center justify-left gap-1">
+          <div className="flex items-center justify-center gap-1">
             <EditIcon />
-            <p className="text-md">Edit profile</p>
+            <p className="text-md">Edit user profile</p>
           </div>
         </Link>
         <Link
           href="/profile/user/delete"
           className="bg-danger hover:bg-danger-dark text-white font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
         >
-          <div className="flex items-center justify-left gap-1">
+          <div className="flex items-center justify-center gap-1">
             <DeleteIcon />
-            <p className="text-md">Delete profile</p>
+            <p className="text-md">Delete user profile</p>
           </div>
         </Link>
       </div>
