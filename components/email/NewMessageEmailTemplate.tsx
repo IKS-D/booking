@@ -1,8 +1,6 @@
-import * as React from "react";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import {
   Body,
-  Button,
   Container,
   Head,
   Heading,
@@ -46,26 +44,36 @@ export const NewMessageEmailTemplate: React.FC<
           <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
             You have a new message on <strong>Booking</strong>
           </Heading>
+
           <Text className="text-black text-[14px] leading-[24px]">
-            Hello{" "}
-            {receiver}
-            ,
+            Hello <strong>{receiver}</strong>,
           </Text>
+
           <Text className="text-black text-[14px] leading-[24px]">
-            Reservation: <strong>{reservation_id}</strong>.{" "}
-            From: {sender}. Message: {text}{" "}
-            {format(new Date(sent_time), 'yyyy-MM-dd HH:mm:ss')} {" "}
+            You have a new message from <strong>{sender}</strong> on Booking.
           </Text>
-          <Section className="text-center mt-[32px] mb-[32px]">
-            <Button
-              className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-[20px] py-[12px]"
-              href={`${baseUrl}/reservations`}
-            >
-              View Reservations
-            </Button>
-          </Section>
 
           <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
+
+          <Text className="text-lg text-black">Message details</Text>
+
+          <Text className="text-black text-[14px] leading-[24px]">
+            <strong>Reservation: </strong>
+            {reservation_id}
+          </Text>
+
+          <Text className="text-black text-[14px] leading-[24px]">
+            <strong>Message: </strong>
+            {text}
+          </Text>
+
+          <Text className="text-black text-[14px] leading-[24px]">
+            <strong>Sent at: </strong>
+            {format(new Date(sent_time), "yyyy-MM-dd HH:mm:ss")}
+          </Text>
+
+          <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
+
           <Text className="text-[#666666] text-[12px] leading-[24px]">
             Thank you for choosing us! We hope you have a great stay.
           </Text>

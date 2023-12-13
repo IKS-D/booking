@@ -6,6 +6,7 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const origin = requestUrl.searchParams.get("origin");
+  const header = request.headers;
 
   if (code) {
     const cookieStore = cookies();
@@ -29,14 +30,19 @@ export async function GET(request: Request) {
     );
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if(error){
+    if (error) {
       // There was an error creating a session
       console.error(error);
     }
   }
   // Determine the destination based on the origin
   const destination = origin === "/login" ? "/" : "/registration/profile";
+  const protocol = header.get("x-forwarded-proto") || "http";
+  const host = header.get("host");
+
+  const redirectUrl = `${protocol}://${host}${destination}`;
+  // console.log("redirectUrl", redirectUrl);
 
   // URL to redirect to after sign in process completes
-  return NextResponse.redirect(requestUrl.origin + destination);
+  return NextResponse.redirect(redirectUrl);
 }

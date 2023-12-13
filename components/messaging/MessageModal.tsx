@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoIosPaperPlane } from "react-icons/io";
 import EditMessageModal from "./EditMessageModal";
 import {
@@ -50,6 +50,15 @@ const MessageModal: React.FC<MessageModalProps> = ({
   const [editingMessage, setEditingMessage] = useState<ChatMessage | null>(
     null
   );
+  const messagesBottomRef = useRef<HTMLDivElement>(null);
+  const [pending, setPending] = useState(true);
+
+  useEffect(() => {
+    messagesBottomRef?.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  }, [chatMessages]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -75,17 +84,37 @@ const MessageModal: React.FC<MessageModalProps> = ({
     if (isOpen) {
       fetchMessages();
     }
+
+    setPending(false);
   }, [isOpen, reservationId]);
 
   const handleSendMessage = async () => {
+    setPending(true);
+    setMessage("Sending...");
+
     const newMessage = {
       text: message,
       reservationId: reservationId,
     };
+
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        sender: "user",
+        content: message,
+        timestamp: formatTime(
+          new Date(new Date().getTime() - 2 * 60 * 60 * 1000)
+        ),
+      },
+    ]);
+
     await insertMessage(newMessage);
+
     try {
       const response = await getMessagesForCurrentUser(reservationId);
       const currentUser = await getCurrentUser();
+
       if (response && response.data) {
         const transformedMessages = response.data.map((msg) => ({
           id: msg.id,
@@ -93,6 +122,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
           content: msg.text,
           timestamp: formatTime(new Date(msg.sent_time)),
         }));
+
         setChatMessages(transformedMessages);
         setMessage("");
       } else {
@@ -101,6 +131,8 @@ const MessageModal: React.FC<MessageModalProps> = ({
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
+
+    setPending(false);
   };
 
   return (
@@ -108,54 +140,60 @@ const MessageModal: React.FC<MessageModalProps> = ({
       <ModalContent>
         <ModalHeader>Chat Conversation</ModalHeader>
         <ModalBody>
-          <div className="overflow-y-auto h-96 p-4">
-            {chatMessages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex mb-4 ${
-                  msg.sender === "user" ? "justify-end" : ""
-                }`}
-              >
-                {msg.sender === "owner" && (
-                  <div className="rounded-full bg-gray-300 w-8 h-8 flex items-center justify-center mr-2">
-                    <Avatar
-                      as="button"
-                      size="sm"
-                      isBordered
-                      color="secondary"
-                      className="transition-transform"
-                      showFallback
-                    />
-                  </div>
-                )}
+          <div className="scrollbox h-96 p-4 pb-0">
+            <div>
+              {chatMessages.map((msg) => (
                 <div
-                  className={`p-3 rounded-lg ${
-                    msg.sender === "user"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-black"
+                  key={msg.id}
+                  className={`flex mb-4 ${
+                    msg.sender === "user" ? "justify-end" : ""
                   }`}
                 >
-                  {msg.content}
-                  <span className="ml-2 text-xs text-gray-600">
-                    {msg.timestamp}
-                  </span>
-                  <button
-                    className="ml-2"
-                    onClick={() => {
-                      setEditingMessage(msg);
-                      setIsEditingModalOpen(true);
-                    }}
+                  {msg.sender === "owner" && (
+                    <div className="rounded-full bg-gray-300 w-8 h-8 flex items-center justify-center mr-2">
+                      <Avatar
+                        as="button"
+                        size="sm"
+                        isBordered
+                        color="secondary"
+                        className="transition-transform"
+                        showFallback
+                      />
+                    </div>
+                  )}
+                  <div
+                    className={`p-3 rounded-lg ${
+                      msg.sender === "user"
+                        ? "bg-cyan-500 text-white"
+                        : "bg-gray-200 text-black"
+                    }`}
                   >
-                    ...
-                  </button>
+                    {msg.content}
+                    <span className="ml-2 text-xs text-gray-600">
+                      {msg.timestamp}
+                    </span>
+                    {msg.sender === "user" && (
+                      <button
+                        className="ml-2"
+                        onClick={() => {
+                          setEditingMessage(msg);
+                          setIsEditingModalOpen(true);
+                        }}
+                      >
+                        ...
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div ref={messagesBottomRef} />
           </div>
           <Textarea
             className="mt-4 h-15"
             placeholder="Type your message here..."
             value={message}
+            isDisabled={pending}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -166,7 +204,11 @@ const MessageModal: React.FC<MessageModalProps> = ({
           />
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onPress={handleSendMessage}>
+          <Button
+            color="primary"
+            onPress={handleSendMessage}
+            isDisabled={pending}
+          >
             Send
             <IoIosPaperPlane className="w-5 h-5" />
           </Button>

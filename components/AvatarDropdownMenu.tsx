@@ -96,9 +96,14 @@ export default function AvatarDropdownMenu({
           variant="flat"
           onAction={(key) => onDropdownAction(key.toString())}
         >
-          <DropdownItem key="profile" className="h-14 gap-2">
+          <DropdownItem key="profile" className="gap-2">
             <p className="font-semibold">Signed in as</p>
-            <p className="font-semibold">{user.email}</p>
+            {profile?.first_name && profile?.last_name && (
+              <p className="">
+                {profile?.first_name + " " + profile?.last_name}
+              </p>
+            )}
+            <p className="">{user.email}</p>
           </DropdownItem>
 
           <DropdownSection title="Menu" showDivider>

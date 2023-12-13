@@ -21,19 +21,18 @@ if (!process.env.NEXT_PUBLIC_RESEND_API_KEY) {
 }
 
 export const sendNewMessageEmail = async (
-  user_id: string,
-  sent_time: string,
-  text: string,
   sender_id: string,
   received_id: string,
+  sent_time: string,
+  text: string,
   reservation_id: number
 ) => {
   try {
-    const userEmail = await fetchUserEmail(user_id);
+    const userEmail = await fetchUserEmail(received_id);
     const to = userEmail.user?.email || "";
 
-    const { data: senderProfile } = await getUserProfileById(user_id);
-    const { data: ReceiverProfile } = await getUserProfileById(
+    const { data: senderProfile } = await getUserProfileById(sender_id);
+    const { data: receiverProfile } = await getUserProfileById(
       received_id.toString()
     );
 
@@ -47,7 +46,7 @@ export const sendNewMessageEmail = async (
         sent_time,
         sender: senderProfile?.first_name + " " + senderProfile?.last_name,
         receiver:
-          ReceiverProfile?.first_name + " " + ReceiverProfile?.last_name,
+          receiverProfile?.first_name + " " + receiverProfile?.last_name,
       }) as React.ReactElement,
     });
     console.log(response);

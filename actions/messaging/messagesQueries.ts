@@ -65,13 +65,15 @@ export async function insertMessage({
     },
   ]);
 
+  console.log("receiverId", receiverId);
+  console.log("sender", sender?.id);
+
   if (receiverId != null && sender != null)
     sendNewMessageEmail(
+      sender?.id,
       receiverId,
       new Date().toISOString(),
       text,
-      sender?.id,
-      receiverId,
       reservationId
     );
 
