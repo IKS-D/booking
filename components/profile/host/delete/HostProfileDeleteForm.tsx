@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { DeleteIcon } from "@/components/Icons";
 import { User } from "@supabase/supabase-js";
 import { deleteHost } from "@/actions/users/usersQueries";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface HostProfileDeleteFormProps {
   user: User;
@@ -22,25 +23,29 @@ export default function HostProfileDeleteForm({ user, listingCount, }: HostProfi
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await deleteHost({
-      userId: user.id,
-    });
+    const { error } = await deleteHost();
 
     if (error) {
       console.error(error);
-      toast.error("Something went wrong");
+      toast.error(error.message);
       return;
     }
 
-    router.push("/profile");
+    setLoading(false);
     toast.success("Host profile deleted successfully.");
+
+    // Navigate to profile page
+    router.push("/profile");
+    router.refresh();
   };
 
   return (
+    <>
+    {loading && <LoadingSpinner />}
     <div className="flex flex-col items-center rounded-lg border-2 border-neutral-700 p-4 w-1/3">
       <form onSubmit={handleOnSubmit} className="w-full flex flex-col items-center justify-center m-4">
           <div>
-            <p className="text-lg">You have {listingCount} listings.</p>
+            <p className="text-lg font-semibold">You have {listingCount} listings.</p>
           </div>
         <div className="flex items-center justify-center">
               <p className="text-lg font-semibold">{ ableToDelete ? "Are you sure you want to delete your host profile?" : "You cannot delete your host profile."}</p>
@@ -63,5 +68,6 @@ export default function HostProfileDeleteForm({ user, listingCount, }: HostProfi
         </div>
       </form>
     </div>
+    </>
   );
 }

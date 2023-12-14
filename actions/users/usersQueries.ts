@@ -1,9 +1,11 @@
 "use server";
 
 import supabase from "@/supabase/supabase";
-import { createServerClient } from "@supabase/ssr";
+import { CookieOptions, createServerClient } from "@supabase/ssr";
 import { QueryData } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
+import { getPersonalListings } from "../listings/listingsQueries";
+import { getReservations } from "../reservations/reservationsQueries";
 
 export default async function getCurrentUser() {
   const cookieStore = cookies();
@@ -234,8 +236,20 @@ export async function updateHost({
   return { host, error };
 }
 
-export async function deleteHost({ userId }: { userId: string }) {
-  let { error } = await supabase.from("hosts").delete().eq("id", userId);
+export async function deleteHost() {
+  // Get current user
+  const user = await getCurrentUser();
+
+  // Double check listings
+  const { data: listings, error: listingsError } = await getPersonalListings(user!.id);
+  if (listingsError) {
+    return { error: listingsError };
+  }
+  if (listings && listings?.length > 0) {
+    return { error: { message: "User has listings" } }
+  }
+
+  let { error } = await supabase.from("hosts").delete().eq("id", user!.id);
 
   if (error) {
     console.error(error);
@@ -253,7 +267,7 @@ export async function getHostIdByReservationId(reservationId: number) {
       listing: listings!inner (
         host_id
     )
-    ` 
+    `
     )
     .eq("id", reservationId)
     .limit(1)

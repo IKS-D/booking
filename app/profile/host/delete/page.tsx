@@ -1,7 +1,5 @@
 import HostProfileDeleteForm from "@/components/profile/host/delete/HostProfileDeleteForm";
-import getCurrentUser, {
-  getUserProfileById,
-} from "@/actions/users/usersQueries";
+import getCurrentUser from "@/actions/users/usersQueries";
 import { toast } from "sonner";
 import { getPersonalListings } from "@/actions/listings/listingsQueries";
 

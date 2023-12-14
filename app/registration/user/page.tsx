@@ -1,6 +1,6 @@
 import React from 'react'
 import UserRegistrationForm from '@/components/registration/UserRegistrationForm'
-import OAuthForm from '@/components/OAuthForm'
+import OAuthForm from '@/components/auth/OAuthForm'
 
 export default function UserRegistrationPage() {
   return (

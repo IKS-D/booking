@@ -9,6 +9,7 @@ import { User } from "@supabase/supabase-js";
 import { deleteUser } from "@/actions/auth/authQueries";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
+
 interface ProfileDeleteFormProps {
   user: User;
   reservationCount: number;
@@ -34,8 +35,10 @@ export default function UserProfileDeleteForm({ user, reservationCount, listingC
     }
 
     setLoading(false);
-    router.push("/");
     toast.success("User profile successfully deleted");
+
+    router.push("/");
+    router.refresh();
   };
 
   return (

@@ -13,10 +13,10 @@ import {
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "./Icons";
+import { EyeFilledIcon, EyeSlashFilledIcon } from "../Icons";
 import { useRouter } from "next/navigation";
 import { AuthError } from "@supabase/supabase-js";
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "../LoadingSpinner";
 import { signInUsingEmailAndPassword } from "@/actions/auth/authQueries";
 
 export default function LoginForm() {

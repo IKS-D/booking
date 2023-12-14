@@ -8,6 +8,7 @@ import { EditIcon } from "@/components/Icons";
 import { HostRegistrationFormData, HostRegistrationSchema } from "@/lib/validations/registerHost";
 import { HostProfile, insertHost, updateHost } from "@/actions/users/usersQueries";
 import { User } from "@supabase/supabase-js";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface HostProfileEditFormProps {
   user: User;
@@ -16,6 +17,7 @@ interface HostProfileEditFormProps {
 
 export default function HostProfileCreateForm({ user, hostProfile, } : HostProfileEditFormProps) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState<HostRegistrationFormData>({
     personalCode: hostProfile.personal_code,
@@ -44,11 +46,12 @@ export default function HostProfileCreateForm({ user, hostProfile, } : HostProfi
 
   const handleOnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    setLoading(true);
+
     const formValid = validateForm(formData);
 
     if (!formValid) {
-      //console.log("Form is not valid")
+      setLoading(false);
       return;
     }
 
@@ -60,10 +63,11 @@ export default function HostProfileCreateForm({ user, hostProfile, } : HostProfi
 
     if (error) {
       console.error(error);
-      toast.error("Something went wrong");
+      toast.error(error.message);
       return;
     }
 
+    setLoading(false);
     toast.success("Host profile updated successfully!");
 
     // Navigate to profile page
@@ -72,51 +76,54 @@ export default function HostProfileCreateForm({ user, hostProfile, } : HostProfi
   };
 
   return (
-    <form onSubmit={handleOnSubmit} className="w-full flex flex-col items-center justify-centerp-4">
-      <Input
-        className="max-w-md h-[75px]"
-        label="Personal code"
-        name="personalCode"
-        placeholder="Enter your personal code"
-        variant="bordered"
-        value={formData.personalCode}
+    <>
+      {loading && <LoadingSpinner />}
+      <form onSubmit={handleOnSubmit} className="w-full flex flex-col items-center justify-centerp-4">
+        <Input
+          className="max-w-md h-[75px]"
+          label="Personal code"
+          name="personalCode"
+          placeholder="Enter your personal code"
+          variant="bordered"
+          value={formData.personalCode}
           onChange={(event) => {
             setFormData({ ...formData, personalCode: event.target.value });
-            setError({ personalCode: undefined });
+            setError({ personalCode: undefined, bankAccount: error?.bankAccount });
           }}
           errorMessage={error?.personalCode}
-      />
+        />
 
-      <Input
-        className="max-w-md h-[75px]"
-        label="Bank account"
-        name="bankAccount"
-        placeholder="Enter your bank account"
-        variant="bordered"
-        value={formData.bankAccount}
+        <Input
+          className="max-w-md h-[75px]"
+          label="Bank account"
+          name="bankAccount"
+          placeholder="Enter your bank account"
+          variant="bordered"
+          value={formData.bankAccount}
           onChange={(event) => {
             setFormData({ ...formData, bankAccount: event.target.value });
-            setError({ bankAccount: undefined });
+            setError({ personalCode: error?.personalCode, bankAccount: undefined });
           }}
           errorMessage={error?.bankAccount}
-      />
+        />
 
-      <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
-      <Button
-        type="submit"
-        className="bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
-      >
-        <div className="flex items-center justify-left gap-1">
-        <EditIcon/><p className="text-md">Save changes</p>
-        </div>
-      </Button>
+        <div className="grid grid-cols-2 gap-4 w-full max-w-lg p-4 mt-4">
+          <Button
+            type="submit"
+            className="bg-primary hover:bg-primary-dark text-black font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out"
+          >
+            <div className="flex items-center justify-left gap-1">
+              <EditIcon /><p className="text-md">Save changes</p>
+            </div>
+          </Button>
 
-      <Link href="/profile" className="bg-danger hover:bg-danger-dark text-white font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out">
-        <div className="flex items-center justify-left gap-1">
-          <p className="text-md">Cancel</p>
+          <Link href="/profile" className="bg-danger hover:bg-danger-dark text-white font-semibold py-2 px-4 rounded-md inline-block transition duration-300 ease-in-out">
+            <div className="flex items-center justify-left gap-1">
+              <p className="text-md">Cancel</p>
+            </div>
+          </Link>
         </div>
-      </Link>
-      </div>
-    </form>
+      </form>
+    </>
   );
 }
