@@ -122,11 +122,15 @@ export async function deleteListing({
 }: {
   listing_id: number;
 }) {
+  const currentDate = new Date();
+  currentDate.setUTCHours(0, 0, 0, 0); // Set the time to midnight in UTC
+  
   const { data: reservations, error: reservationsError } = await supabase
     .from('reservations')
     .select('id')
     .eq('listing_id', listing_id)
-    .eq('status', 2);
+    .eq('status', 2)
+    .gt('end_date', currentDate.toISOString());
 
   if (reservationsError) {
     console.error(reservationsError);
@@ -134,7 +138,6 @@ export async function deleteListing({
   }
 
   if (reservations && reservations.length > 0) {
-    // Active reservations found, throw an error
     const errorMessage = 'Cannot delete listing with active reservations';
     console.error(errorMessage);
     return { error: errorMessage };
