@@ -13,6 +13,7 @@ import {
   hostProfileExists,
   userProfileExists,
 } from "@/actions/users/usersQueries";
+import { Button, Link } from "@nextui-org/react";
 
 // export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -28,9 +29,9 @@ export default async function TopNavbar({ user }: TopNavbarProps) {
   if (user) {
     currentUserHost = await hostProfileExists(user.id);
     // Without the check getUserProfileById throws error to console if profile doesn't exist
-    if(await userProfileExists(user.id)){
+    if (await userProfileExists(user.id)) {
       const { data, error } = await getUserProfileById(user.id);
-      if(error){
+      if (error) {
         console.error(error);
       }
       userProfile = data;
@@ -72,6 +73,12 @@ export default async function TopNavbar({ user }: TopNavbarProps) {
           {!user && (
             <div className="items-center justify-center flex gap-4">
               <ThemeSwitch />
+              <NextLink
+                href="/listings"
+                className="pr-2 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover text-primary"
+              >
+                Listings
+              </NextLink>
               <NextLink
                 href="/registration/user"
                 className="pr-2 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover text-primary"

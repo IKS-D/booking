@@ -38,7 +38,9 @@ export default async function Home() {
         <br />
         <br />
         <label className={cn(subtitle(), "text-primary font-bold")}>
-          Click your avatar in the top right corner to get started
+          {!user
+            ? "Create an account or sign in to get started"
+            : "Click your avatar in the top right corner to get started"}
         </label>
       </div>
     </section>
