@@ -1,9 +1,7 @@
 import { subtitle, title } from "@/components/primitives";
 import { cn } from "@/lib/utils";
-import { Code } from "@nextui-org/code";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { twMerge } from "tailwind-merge";
 
 export const dynamic = "force-dynamic";
 
