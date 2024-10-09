@@ -3,7 +3,7 @@
 import supabase from "@/supabase/supabase";
 import { revalidatePath } from "next/cache";
 import { sendNewReservationEmailHost } from "./email";
-import { QueryData, QueryError, QueryResult } from "@supabase/supabase-js";
+import { QueryData } from "@supabase/supabase-js";
 import { TablesInsert } from "@/supabase/database-generated.types";
 
 type ReservationsWithDetails = QueryData<ReturnType<typeof getReservations>>;

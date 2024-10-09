@@ -2,7 +2,6 @@
 
 import { buildPayseraPaymentLink } from "@/actions/reservations/payseraAPI";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { getUserProfileById } from "../users/usersQueries";
 
 export async function createPayment(
@@ -31,6 +30,5 @@ export async function createPayment(
     callbackurl: callbackUrl,
   });
 
-  // redirect(link);
   return link;
 }

@@ -1,6 +1,6 @@
 import { TablesInsert } from "@/supabase/database-generated.types";
 import * as crypto from "crypto";
-import { TypeOnlyCompatibleAliasDeclaration } from "typescript";
+
 export const md5 = (contents: string) =>
   crypto.createHash("md5").update(contents).digest("hex");
 
