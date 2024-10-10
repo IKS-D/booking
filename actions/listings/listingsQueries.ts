@@ -38,7 +38,7 @@ export type Listings = QueryData<ReturnType<typeof getListingsBase>>;
 export type Listing = Listings[0];
 
 export async function getListings() {
-  noStore();
+  // noStore();
   let { data: listings, error } = await getListingsBase();
 
   if (error) {
@@ -107,7 +107,6 @@ function getFilenameFromUrl(url: string) {
 }
 
 export async function getPersonalListings(userId: string) {
-  noStore();
   const { data, error } = await supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)').eq("host_id",userId!);
 
   if (error) {
@@ -253,6 +252,8 @@ export async function insertListing({
 }) {
   const priceInCents = Math.round(listing.day_price! * 100);
   listing.day_price = priceInCents;
+
+  // Insert the listing into the database
   let { data: addedListing, error } = await supabase
     .from("listings")
     .insert({
@@ -271,57 +272,78 @@ export async function insertListing({
     .select()
     .single();
 
+  // Return error if there is one
   if (error) {
     console.error(error);
-  } else {
-    const folderName = `listing_${addedListing!.id}`;
-    if(files && files.length !== 0){
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-    
-        const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
-        
-        const { data: fileData, error: fileError } = await supabase.storage
-          .from('images')
-          .upload(`${folderName}/${uniqueFileName}`, file);
-    
-        if (fileError) {
-          console.error('Error uploading file:', fileError);
-        } else {
-          // Get the public URL of the uploaded file
-          const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
-       
-          await supabase.from("photos").insert({
-            listing_id: addedListing!.id,
-            url: fileURL.data.publicUrl,
-          });
-        }
-      }
-    }
+    return { data: null, error };
+  }
 
-    if(!services || services.length === 0){
-      console.log("No services came");
-      return { error };
-    }
+  // Handle file uploads
+  const folderName = `listing_${addedListing!.id}`;
+  if (files && files.length !== 0) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
-    for (let i = 0; i < services.length; i++){
-      const service = services[i];
-      const priceInCents = Math.round(service.price! * 100);
-      service.price = priceInCents;
-      console.log("Service came");
-       const { error: serviceError } = await supabase.from("services").insert({
-          title: service!.title,
-          description: service!.description,
-          price: service!.price,
+      const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
+
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from('images')
+        .upload(`${folderName}/${uniqueFileName}`, file);
+
+      if (fileError) {
+        console.error('Error uploading file:', fileError);
+        return { data: null, error: fileError };
+      } else {
+        // Get the public URL of the uploaded file
+        const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
+
+        await supabase.from("photos").insert({
           listing_id: addedListing!.id,
-      });
-
-      if (serviceError) {
-        console.error('Error uploading file:', serviceError);
+          url: fileURL.data.publicUrl,
+        });
       }
     }
   }
-  return { error };
+
+  // Handle services insertion
+  if (!services || services.length === 0) {
+    console.log("No services came");
+    return { data: addedListing, error: null };
+  }
+
+  for (let i = 0; i < services.length; i++) {
+    const service = services[i];
+
+    const originalPrice = service.price;
+
+    const priceInCents = Math.round(Number(service.price) * 100);
+
+    console.log("Service came");
+
+    const { data: existingService, error: existingServiceError } = await supabase
+    .from("services")
+    .select("*")
+    .eq("title", service.title)
+    .eq("listing_id", addedListing!.id)
+    .single();
+
+    if(!existingService){
+      const { error: serviceError } = await supabase.from("services").insert({
+        title: service.title,
+        description: service.description,
+        price: priceInCents,
+        listing_id: addedListing!.id,
+      });
+
+      if (serviceError) {
+        console.error('Error uploading service:', serviceError);
+        return { data: null, error: serviceError };
+      }
+    }  
+  }
+
+  // Return the inserted listing and no errors
+  return { data: addedListing, error: null };
 }
 
 function getListingsBase() {
