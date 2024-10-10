@@ -314,8 +314,6 @@ export async function insertListing({
   for (let i = 0; i < services.length; i++) {
     const service = services[i];
 
-    const originalPrice = service.price;
-
     const priceInCents = Math.round(Number(service.price) * 100);
 
     console.log("Service came");
