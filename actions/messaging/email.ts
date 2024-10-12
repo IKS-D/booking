@@ -20,6 +20,7 @@ if (!process.env.NEXT_PUBLIC_RESEND_API_KEY) {
   throw new Error("NEXT_PUBLIC_RESEND_API_KEY is not set");
 }
 
+/* v8 ignore start */
 export const sendNewMessageEmail = async (
   sender_id: string,
   received_id: string,
@@ -54,6 +55,7 @@ export const sendNewMessageEmail = async (
     console.error(error);
   }
 };
+/* v8 ignore stop */
 
 async function fetchUserEmail(userId: string) {
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {

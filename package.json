@@ -7,10 +7,10 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
-    "vitest-ui": "vitest --ui --api 9527",
+    "vitest-ui": "vitest --ui --api 9527 --coverage.enabled=true",
+    "coverage": "vitest run --coverage",
     "playwright": "playwright test",
-    "playwright-ui": "playwright test --ui",
-    "coverage": "vitest run --coverage"
+    "playwright-ui": "playwright test --ui"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
