@@ -9,6 +9,8 @@ import {
   cancelReservation,
   insertOrderedServices,
   insertPayment,
+  getHostReservations,
+  getReservations,
 } from "@/actions/reservations/reservationsQueries";
 
 vi.mock("next/cache", () => ({
@@ -55,6 +57,20 @@ describe("Reservations Queries", () => {
 
   afterEach(async () => {
     await supabase.from("reservations").delete().eq("id", reservationId);
+  });
+
+  it("should fetch user reservations", async () => {
+    const { data: reservations, error } = await getReservations(testUserId);
+
+    expect(error).toBeNull();
+    expect(reservations).length.greaterThanOrEqual(1);
+  });
+
+  it("should fetch host reservations", async () => {
+    const { data: reservations, error } = await getHostReservations(testUserId);
+
+    expect(error).toBeNull();
+    expect(reservations).length.greaterThanOrEqual(0);
   });
 
   it("should fetch reservation by ID", async () => {
