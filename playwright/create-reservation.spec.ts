@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { a } from "vitest/dist/chunks/suite.CcK46U-P";
 
 test("Create reservation", async ({ page }) => {
   await page.goto("/listings");

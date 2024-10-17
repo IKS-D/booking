@@ -9,7 +9,7 @@ import { Reservation } from "@/types";
 import SelectDateRangeForm from "./SelectDateRangeForm";
 import AdditionalServicesForm from "./AdditionalServicesForm";
 import SummaryForm from "./SummaryForm";
-import { CreateReservationSchema } from "@/lib/validations/schema";
+import { CreateReservationSchema } from "@/lib/validations/createReservation";
 import { DateRange } from "react-day-picker";
 import { createPayment } from "@/actions/reservations/generatePayseraLink";
 import { insertReservation } from "@/actions/reservations/reservationsQueries";

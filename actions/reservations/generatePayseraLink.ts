@@ -2,7 +2,7 @@
 
 import { buildPayseraPaymentLink } from "@/actions/reservations/payseraAPI";
 import { headers } from "next/headers";
-import { getUserProfileById } from "../users/usersQueries";
+import { getUserProfileById } from "@/actions/users/usersQueries";
 
 export async function createPayment(
   totalPrice: number,
