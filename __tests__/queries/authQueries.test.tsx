@@ -1,71 +1,93 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { signUpUsingEmailAndPassword  } from "@/actions/auth/authQueries";
-import { cookies } from "next/headers";
-import { CookieOptions, createServerClient } from "@supabase/ssr";
+import { describe, it, expect, vi } from "vitest";
+import { deleteUser, signInUsingEmailAndPassword, signOut, signUpUsingEmailAndPassword  } from "@/actions/auth/authQueries";
 
-// Mock only the cookies function to bypass the requestAsyncStorage issue
+// Mock the cookies storage to bypass the requestAsyncStorage issue and check sign in and other info
+let mockCookieStorage : Record<string, string> = {}
 vi.mock("next/headers", () => ({
   cookies: vi.fn(() => ({
-    get: vi.fn(() => null), // Mock that no cookies are available
-    set: vi.fn(),           // Mock cookie set to do nothing
-    remove: vi.fn(),        // Mock cookie remove to do nothing
+    get: vi.fn((name: string) => mockCookieStorage[name] ? { value: mockCookieStorage[name] } : null),
+    set: vi.fn(({ name, value }: { name: string; value: string }) => {
+      mockCookieStorage[name] = value;  // store any cookies in the mock storage
+    }),
+    remove: vi.fn(({ name }: { name: string }) => {
+      delete mockCookieStorage[name];  // Remove the cookie from memory
+    }),
   })),
 }));
 
 describe("Auth Queries", () => {
-  const testEmail = "test@example.com";
-  const testPassword = "password123";
-  const testConfirmPassword = "password123";
+  // Get the subdomain name form the public supabase url (used for auth token finding)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const url = new URL(supabaseUrl);
+  const subdomain = url.hostname.split('.')[0];
+  const authCookieKey = "sb-" + subdomain + "-auth-token";
 
-  // Save the id of the user that is created
-  // so that it could be deleted after each test
-  let createdUserId: string | null = null;
-  
-  afterEach(async () => {
-    if (createdUserId) {
-      // Only attempt to delete if a user was created
-      const cookieStore = cookies();
-      const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,  // Use the service key for admin actions
-        {
-          cookies: {
-            get(name: string) {
-              return cookieStore.get(name)?.value;
-            },
-            set(name: string, value: string, options: CookieOptions) {
-              cookieStore.set({ name, value, ...options });
-            },
-            remove(name: string, options: CookieOptions) {
-              cookieStore.set({ name, value: "", ...options });
-            },
-          },
-        }
-      );
-
-      // Delete the created user after the test
-      await supabase.auth.admin.deleteUser(createdUserId);
-      createdUserId = null;
-    }
-
-    vi.resetAllMocks();
-  });
+  // Data for creating a new test user
+  const newTestEmail = "newtest@iksd.vercel.app";
+  const newTestPassword = "password123";
 
   it("should sign up a user successfully", async () => {
     const { responseData, error } = await signUpUsingEmailAndPassword({
-      email: testEmail,
-      password: testPassword,
-      confirmPassword: testConfirmPassword,
+      email: newTestEmail,
+      password: newTestPassword,
+      confirmPassword: newTestPassword,
     });
 
-    // Since you're using the real Supabase client, you expect actual response from your database
     expect(responseData).not.toBeNull();
     expect(error).toBeNull();
 
     if (responseData != null && responseData.user != null) {
-      expect(responseData.user.email).toBe(testEmail);
-      // Store the user ID for clean-up
-      createdUserId = responseData.user.id;
+      expect(responseData.user.email).toBe(newTestEmail);
     }
+
+    await deleteUser();
   });
+
+  it("should sign a user in successfully", async () => {
+    const { error } = await signInUsingEmailAndPassword({
+      email: process.env.TEST_USER_EMAIL!,
+      password: process.env.TEST_USER_PASSWORD!,
+    });
+
+    // Ensure there was no error in passing the request
+    expect(error).toBeNull();
+
+    // Ensure the authentication cookie was set
+    
+    const authCookie = mockCookieStorage[authCookieKey];
+    expect(authCookie).toBeDefined();
+
+    // Sign the user out after the test
+    await signOut();
+  });
+
+  it("should sign out a signed it user successfully", async () => {
+    await signInUsingEmailAndPassword({
+      email: process.env.TEST_USER_EMAIL!,
+      password: process.env.TEST_USER_PASSWORD!,
+    });
+
+    const { error } = await signOut();
+
+    expect(error).toBeNull;
+
+    const authCookie = mockCookieStorage[authCookieKey];
+    expect(authCookie == undefined || authCookie == '').toBe(true);
+  });
+
+  it("should delete a signed up user successfully", async () => {
+    await signUpUsingEmailAndPassword({
+      email: newTestEmail,
+      password: newTestPassword,
+      confirmPassword: newTestPassword,
+    });
+
+    const { error } = await deleteUser();
+
+    expect(error == null || error == undefined).toBe(true);
+
+    const authCookie = mockCookieStorage[authCookieKey];
+    expect(authCookie == undefined || authCookie == '').toBe(true);
+  });
+
 });
