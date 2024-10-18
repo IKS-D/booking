@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => ({
         "**/{next,playwright,postcss,tailwind}.config.*",
         "middleware.ts",
         "**/lib/utils.ts",
+        "**/actions/messaging/**",
       ],
     },
   },
