@@ -15,10 +15,6 @@ export async function getReservations(userId: string) {
     userId
   );
 
-  if (error) {
-    console.error(error);
-  }
-
   return { data: reservations, error: error };
 }
 
@@ -28,10 +24,6 @@ export async function getHostReservations(hostId: string) {
     hostId
   );
 
-  if (error) {
-    console.error(error);
-  }
-
   return { data: reservations, error: error };
 }
 
@@ -39,10 +31,6 @@ export async function getReservationById(reservationId: number) {
   let { data: reservation, error } = await getReservationsBase()
     .eq("id", reservationId)
     .single();
-
-  if (error) {
-    console.error(error);
-  }
 
   return { data: reservation, error: error };
 }
@@ -77,10 +65,6 @@ export async function updateReservationStatus(
     .update({ status: statusId })
     .eq("id", reservationId);
 
-  if (error) {
-    console.error(error);
-  }
-
   return { error };
 }
 
@@ -89,10 +73,6 @@ export async function rejectReservation(reservationId: string) {
     .from("reservations")
     .update({ status: 3 })
     .eq("id", reservationId);
-
-  if (error) {
-    console.error(error);
-  }
 
   revalidatePath("/reservations/host");
 
@@ -105,10 +85,6 @@ export async function confirmReservation(reservationId: string) {
     .update({ status: 2 })
     .eq("id", reservationId);
 
-  if (error) {
-    console.error(error);
-  }
-
   revalidatePath("/reservations/host");
 
   return { error };
@@ -119,10 +95,6 @@ export async function cancelReservation(reservationId: string) {
     .from("reservations")
     .update({ status: 4 })
     .eq("id", reservationId);
-
-  if (error) {
-    console.error(error);
-  }
 
   revalidatePath("/reservations");
 
@@ -159,10 +131,6 @@ export async function insertReservation({
     .select()
     .single();
 
-  if (error) {
-    console.error(error);
-  }
-
   if (reservation && orderedServices.length > 0) {
     await insertOrderedServices(reservation.id, orderedServices);
   }
@@ -185,19 +153,11 @@ export async function insertOrderedServices(
     }))
   );
 
-  if (error) {
-    console.error(error);
-  }
-
   return { error };
 }
 
 export async function insertPayment(payment: TablesInsert<"payments">) {
   let { error } = await supabase.from("payments").insert(payment).select();
-
-  if (error) {
-    console.error(error);
-  }
 
   return { error };
 }

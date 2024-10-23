@@ -20,7 +20,7 @@ vi.mock("next/cache", () => ({
 describe("Reservations Queries", () => {
   const testUserId = "32f8f198-a8c3-4dec-b5db-09d5daec2918";
   const testListingId = 1;
-  const testOrderedServices = [{ service: 1 }];
+  const testOrderedService = { service: 2 };
   const testStartDate = "2023-01-01";
   const testEndDate = "2023-01-02";
   const testTotalPrice = 100;
@@ -39,14 +39,21 @@ describe("Reservations Queries", () => {
   let reservationId: number;
 
   beforeEach(async () => {
-    const { reservation } = await insertReservation({
+    const { reservation, error } = await insertReservation({
       listingId: testListingId,
       userId: testUserId,
-      orderedServices: [],
+      orderedServices: [
+        {
+          service: 1,
+        },
+      ],
       startDate: testStartDate,
       endDate: testEndDate,
       totalPrice: testTotalPrice,
     });
+
+    expect(error).toBeNull();
+    expect(reservation).not.toBeNull();
 
     if (!reservation) {
       throw new Error("Error inserting reservation");
@@ -66,6 +73,13 @@ describe("Reservations Queries", () => {
     expect(reservations).length.greaterThanOrEqual(1);
   });
 
+  it("should return error for fetching invalid user reservations", async () => {
+    const { data: reservations, error } = await getReservations("invalid-id");
+
+    expect(error).not.toBeNull();
+    expect(reservations).toBeNull();
+  });
+
   it("should fetch host reservations", async () => {
     const { data: reservations, error } = await getHostReservations(testUserId);
 
@@ -73,14 +87,31 @@ describe("Reservations Queries", () => {
     expect(reservations).length.greaterThanOrEqual(0);
   });
 
+  it("should return error for fetching invalid host reservations", async () => {
+    const { data: reservations, error } = await getHostReservations(
+      "invalid-id"
+    );
+
+    expect(error).not.toBeNull();
+    expect(reservations).toBeNull();
+  });
+
   it("should fetch reservation by ID", async () => {
-    const { data: fetchedReservation } = await getReservationById(
+    const { data: fetchedReservation, error } = await getReservationById(
       reservationId
     );
 
     expect(fetchedReservation).toEqual(
       expect.objectContaining({ id: reservationId })
     );
+    expect(error).toBeNull();
+  });
+
+  it("should return error for fetching invalid reservation by ID", async () => {
+    const { data: fetchedReservation, error } = await getReservationById(-1);
+
+    expect(fetchedReservation).toBeNull();
+    expect(error).not.toBeNull();
   });
 
   it("should update reservation status", async () => {
@@ -140,7 +171,7 @@ describe("Reservations Queries", () => {
   });
 
   it("should insert ordered services", async () => {
-    await insertOrderedServices(reservationId, testOrderedServices);
+    await insertOrderedServices(reservationId, [testOrderedService]);
 
     const { data: fetchedReservation } = await getReservationById(
       reservationId
@@ -150,8 +181,14 @@ describe("Reservations Queries", () => {
       throw new Error("Error fetching reservation");
     }
 
-    expect(fetchedReservation.ordered_services).toHaveLength(
-      testOrderedServices.length
+    expect(fetchedReservation.ordered_services).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          service: expect.objectContaining({
+            id: testOrderedService.service,
+          }),
+        }),
+      ])
     );
   });
 

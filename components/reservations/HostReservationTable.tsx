@@ -148,7 +148,7 @@ export default function HostReservationTable({
                   </>
                 </span>
               </Tooltip>
-              {reservation.status.name === "pending" && (
+              {
                 <>
                   <Tooltip color="success" content="Confirm reservation">
                     <span className="text-lg text-success cursor-pointer active:opacity-50">
@@ -171,7 +171,7 @@ export default function HostReservationTable({
                     </span>
                   </Tooltip>
                 </>
-              )}
+              }
             </div>
           );
         default:
