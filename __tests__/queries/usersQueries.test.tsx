@@ -3,7 +3,11 @@ import { getListingById } from "@/actions/listings/listingsQueries";
 import { insertReservation } from "@/actions/reservations/reservationsQueries";
 import getCurrentUser, { deleteHost, getCurrentUserProfile, getHostIdByReservationId, getHostProfileById, getUserProfileById, hostProfileExists, insertHost, insertProfile, updateHost, updateProfile, userProfileExists } from "@/actions/users/usersQueries";
 import supabase from "@/supabase/supabase";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterAll } from "vitest";
+import * as usersQueries from "@/actions/users/usersQueries";
+import * as listingsQueries from "@/actions/listings/listingsQueries"
+import { getSupabaseServerClient } from "@/supabase/supabase-clients";
+import { PostgrestError } from "@supabase/supabase-js";
 
 // Mock the cookies storage to bypass the requestAsyncStorage issue and check sign in and other info
 let mockCookieStorage : Record<string, string> = {}
@@ -19,16 +23,17 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
-describe("User Queries", () => { 
+describe("Users Queries", () => { 
   // Data for creating a new test user
-  const newTestEmail = "newtest@iksd.vercel.app";
+  const newTestEmail = "newtestuser@iksd.vercel.app";
   const newTestPassword = "password123";
 
   it("should get the current user successfully", async () => {
-    await signInUsingEmailAndPassword({
+    const { error } = await signInUsingEmailAndPassword({
       email: process.env.TEST_USER_EMAIL!,
       password: process.env.TEST_USER_PASSWORD!,
     });
+    expect(error).toBeNull();
 
     try {
       const user = await getCurrentUser();
@@ -43,16 +48,18 @@ describe("User Queries", () => {
     }
   });
 
+  
   it("should get the current user's profile successfully", async () => {
-    await signInUsingEmailAndPassword({
+    const { error } = await signInUsingEmailAndPassword({
       email: process.env.TEST_USER_EMAIL!,
       password: process.env.TEST_USER_PASSWORD!,
     });
-
+    expect(error).toBeNull();
+    
     try {
       const userProfile = await getCurrentUserProfile();
       expect(userProfile).not.toBeNull();
-  
+      
       expect(userProfile?.first_name == "Sigis").toBe(true);
       expect(userProfile?.last_name == "Sigaitis").toBe(true);
     }
@@ -61,11 +68,27 @@ describe("User Queries", () => {
       await signOut();
     }
   });
+  
+  it("should return null as the current user's profile", async () => {
+    const getCurrentUserMock = vi.spyOn(usersQueries, 'default').mockResolvedValue(null);
+
+    const userProfile = await getCurrentUserProfile();
+
+    expect(userProfile).toBeNull();
+
+    getCurrentUserMock.mockReset();
+  });
 
   it("should confirm that a user's profile exists successfully", async () => {
     const response = await userProfileExists(process.env.TEST_USER_UID!);
 
     expect(response).toBe(true);
+  });
+
+  it("should deny that a user's profile exists successfully", async () => {
+    const response = await userProfileExists("00000000-0000-0000-0000-000000000000");
+
+    expect(response).toBe(false);
   });
 
   it("should get the user profile by id successfully", async () => {
@@ -83,6 +106,7 @@ describe("User Queries", () => {
       password: newTestPassword,
       confirmPassword: newTestPassword,
     });
+    expect(error).toBeNull();
 
     try {
       // Try inserting a profile for the new user
@@ -140,21 +164,28 @@ describe("User Queries", () => {
   });
 
   it("should delete a user's profile", async () => {
-    // Create a new user
-    await signUpUsingEmailAndPassword({
+    const { error: registrationError } = await signUpUsingEmailAndPassword({
       email: newTestEmail,
       password: newTestPassword,
       confirmPassword: newTestPassword,
     });
 
-    const { error } = await deleteUser();
-    expect(error == null || error == undefined).toBe(true);
+    expect(registrationError).toBeNull();
+
+    const { error: deletionError } = await deleteUser();
+    expect(deletionError).toBeNull();
   });
 
   it("should confirm that a user's host profile exists successfully", async () => {
     const response = await hostProfileExists(process.env.TEST_USER_UID!);
 
     expect(response).toBe(true);
+  });
+
+  it("should deny that a host's profile exists successfully", async () => {
+    const response = await hostProfileExists("00000000-0000-0000-0000-000000000000");
+
+    expect(response).toBe(false);
   });
 
   it("should get the host profile by id successfully", async () => {
@@ -166,14 +197,16 @@ describe("User Queries", () => {
   });
 
   it("should insert a host profile for a new user successfully", async () => {
-    // Create a new user
-    const { responseData, error } = await signUpUsingEmailAndPassword({
-      email: newTestEmail,
-      password: newTestPassword,
-      confirmPassword: newTestPassword,
-    });
-
     try {
+      // Create a new user
+      const { responseData, error: signUpError } = await signUpUsingEmailAndPassword({
+        email: newTestEmail,
+        password: newTestPassword,
+        confirmPassword: newTestPassword,
+      });
+
+      expect(signUpError).toBeNull();
+
       // Try inserting a profile for the new user
       const { host, error } = await insertHost({
         userId: responseData.user?.id!,
@@ -182,6 +215,7 @@ describe("User Queries", () => {
       });
   
       expect(error).toBeNull();
+      expect(host).not.toBeNull();
     }
     finally {
       // Cleanup the usera
@@ -239,6 +273,103 @@ describe("User Queries", () => {
     }
   });
 
+  it("should catch a PostgrestError when deleting a user's host profile", async () => {
+    // Mock getPersonalListings to throw an error
+    const mockReturnValue = {
+      data: null,
+      error: { message: "Listings error", details: "Test details" } as PostgrestError,
+    };
+
+    const getPersonalListingsMock = vi.spyOn(listingsQueries, 'getPersonalListings').mockResolvedValue(mockReturnValue);
+    
+    // Create a new user
+    const { responseData } = await signUpUsingEmailAndPassword({
+      email: newTestEmail,
+      password: newTestPassword,
+      confirmPassword: newTestPassword,
+    });
+
+    // Insert a host profile for the new user
+    await insertHost({
+      userId: responseData.user?.id!,
+      personalCode: "000000000",
+      bankAccount: "LT546645645647",
+    });
+
+    try {
+      const { error } = await deleteHost();
+      expect(error).not.toBeNull();
+      expect(error!.message).toBe("Listings error");
+    } 
+    finally {
+      // Cleanup the usera
+      getPersonalListingsMock.mockRestore();
+      await deleteHost();
+      await deleteUser();
+    }
+  });
+
+  it("should catch a custom error when deleting a user's host profile", async () => {
+    // Mock getPersonalListings to throw an error
+    const mockReturnValue = {
+      data: [
+        {
+          address: '123 Main St',
+          title: 'Cozy Apartment',
+          category_id: 0, // Example category ID
+          city: "Kaunas",
+          country: "Lietuva",
+          creation_date: new Date().toISOString(),
+          day_price: 10,
+          description: "",
+          host_id: "",
+          id: 0,
+          number_of_places: 1,
+          suspension_status: false,
+          images: [], // An array of images, can be empty for this mock
+          category: null, // Adjust this based on your type requirement
+          services: [
+            { description: "AAAAAAAAAAA",
+              id: 0,
+              listing_id: 0,
+              price: 0,
+              title: "AAAAAAAAAAA",
+            }
+          ]
+        },
+      ],
+      error: null,
+    };
+
+    const getPersonalListingsMock = vi.spyOn(listingsQueries, 'getPersonalListings').mockResolvedValue(mockReturnValue);
+    
+    // Create a new user
+    const { responseData } = await signUpUsingEmailAndPassword({
+      email: newTestEmail,
+      password: newTestPassword,
+      confirmPassword: newTestPassword,
+    });
+
+    // Insert a host profile for the new user
+    await insertHost({
+      userId: responseData.user?.id!,
+      personalCode: "000000000",
+      bankAccount: "LT546645645647",
+    });
+
+    try {
+      const { error } = await deleteHost();
+      expect(error).not.toBeNull();
+      expect(error!.message).toBe("User has listings");
+    } 
+    finally {
+      // Cleanup the usera
+      getPersonalListingsMock.mockRestore();
+      await deleteHost();
+      await deleteUser();
+    }
+  });
+
   it("should get the correct host id from the reservation id", async () => {
     const { data: listingData } = await getListingById(1);
     const { reservation } = await insertReservation({
@@ -259,5 +390,10 @@ describe("User Queries", () => {
     finally {
       await supabase.from("reservations").delete().eq("id", reservation!.id);
     }
+  });
+
+  afterAll(() => {
+    mockCookieStorage = {};
+    vi.resetAllMocks();
   });
 });

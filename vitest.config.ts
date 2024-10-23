@@ -9,6 +9,8 @@ import { loadEnv } from "vite";
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
   test: {
+    threads: false,
+    maxConcurrency: 1,
     exclude: [...configDefaults.exclude, "**/playwright/**"],
     environment: "jsdom",
     alias: {
