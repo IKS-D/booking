@@ -6,6 +6,7 @@ import {
     getListingById,
     getListings,
     getChartInformation,
+    getFilenameFromUrl,
     getPersonalListings,
     deleteListing,
     insertListing,
@@ -13,12 +14,12 @@ import {
     getListingCategories,
 } from "@/actions/listings/listingsQueries";
 import { StaticImageData } from "next/image";
+import { FileObject } from "@supabase/storage-js";
+import { getBrowsedFiles } from "./FlieList-mock-creator";
 
-vi.mock("next/cache", () => ({
-    revalidatePath: vi.fn(),
-  }));
 
-  
+
+
 describe("Listings Queries", () => {
     const testUserId = "32f8f198-a8c3-4dec-b5db-09d5daec2918";
     const testTitle = "Test Listing";
@@ -70,12 +71,37 @@ describe("Listings Queries", () => {
         }
     };
 
+    //Set-up phase
+    beforeEach(async () => {
+        vi.mock("next/cache", () => ({
+            revalidatePath: vi.fn(),
+        }));
+        const testName = expect.getState().currentTestName;
+        if (testName && !testName.includes("insertListing")) {
+            listing = await insertTestListing();
+            listingId = listing.id; 
+        } 
+    });
+
+
+    //Tear-down phase
+    afterEach(async () => {
+        vi.restoreAllMocks();
+        const testName = expect.getState().currentTestName;
+        if (testName && !testName.includes("deleteListing")) {
+            if (listingId) {
+                try {
+                  await deleteTestListing();
+                } catch (error) {
+                  console.error("Error in afterEach when deleting listing:", error);
+                }
+              }
+        }  
+      });
+
     describe("getListingById", () => {
         it("should fetch listing by ID", async () => {
             // Call the helper function to insert a listing before this test
-            listing = await insertTestListing();
-            listingId = listing.id;
-
             const { data: fetchedListing } = await getListingById(listingId);
         
             expect(fetchedListing).toEqual(
@@ -90,8 +116,6 @@ describe("Listings Queries", () => {
                   day_price: testPrice * 100, // Ensure price is converted to cents
               })
             );
-
-            await deleteTestListing();
         });
 
         it("should handle error when fetching listing with invalid ID", async () => {
@@ -107,9 +131,25 @@ describe("Listings Queries", () => {
 
     describe("insertListing", () => {
         it("should insert a new listing", async () => {
-            listing = await insertTestListing();
-            listingId = listing.id;
-            expect(listing).toEqual(
+            const { data: addedListing } = await insertListing({
+                listing: {
+                    title: testTitle,
+                    description: testDescription,
+                    country: testCountry,
+                    city: testCity,
+                    address: testAddress,
+                    number_of_places: testMaxGuests,
+                    day_price: testPrice,
+                    category_id: testCategory
+                },
+                user_id: testUserId,
+                files: emptyFiles , // This would need to be mocked as per your test framework's setup
+                services: [testService],
+            });
+
+            const listingId = addedListing?.id;
+
+            expect(addedListing).toEqual(
                 expect.objectContaining({
                     id: listingId,
                     title: testTitle,
@@ -121,8 +161,6 @@ describe("Listings Queries", () => {
                     day_price: testPrice * 100,
                 })
             );
-
-            await deleteTestListing();
         });
 
         it("should handle error when inserting a listing with invalid category", async () => {
@@ -143,6 +181,103 @@ describe("Listings Queries", () => {
             });
 
             expect(insertedListing).toBeNull(); // Ensure the listing is not inserted
+            expect(error).not.toBeNull(); // Ensure an error is returned
+        });
+
+        it("should the insert without services", async () => {
+            const { data: insertedListing, error } = await insertListing({
+                listing: {
+                    title: testTitle,
+                    description: testDescription,
+                    country: testCountry,
+                    city: testCity,
+                    address: testAddress,
+                    number_of_places: testMaxGuests,
+                    day_price: testPrice,
+                    category_id: testCategory,
+                },
+                user_id: testUserId,
+                files: emptyFiles,
+                services: [], // Use an empty array for services
+            });
+
+            expect(insertedListing).toBeDefined(); // Ensure the listing is not inserted
+
+            expect(error).toBeNull(); // Ensure an error is returned
+        });
+
+        it("should handle error when service upload goes wrong", async () => {
+
+            const mockInsertServiceError = {
+                message: "Failed to insert service",
+                details: "Additional error details",
+                hint: "",
+                code: "54321",
+            };
+    
+            const mockInsertService = vi.fn().mockResolvedValueOnce({
+                data: null, // Simulate that no service was inserted
+                error: mockInsertServiceError, // Return the simulated error
+            });
+
+            const mockInsertListing = vi.fn().mockResolvedValueOnce({
+                data: { id: 1 }, // Simulating a successful listing insertion
+                error: null,
+            });
+
+            vi.spyOn(supabase, "from").mockImplementation((tableName: string) => {
+                const queryBuilderMock = {
+                    insert: vi.fn().mockImplementation(() => {
+                        if (tableName === "listings") {
+                            return {
+                                select: vi.fn().mockReturnValue({
+                                    single: vi.fn().mockResolvedValue({
+                                        data: { id: 1 }, // Mock single listing data
+                                        error: null,
+                                    }),
+                                }),
+                            };
+                        } else if (tableName === "services") {
+                            return {
+                                    data: null,
+                                    error: {
+                                        message: "Failed to insert service",
+                                        details: "Additional error details",
+                                        hint: "",
+                                        code: "54321",
+                                    },
+                            };
+                        }
+                        return { data: null, error: null }; // Default return for other tables
+                    }),
+                    select: vi.fn(),
+                    upsert: vi.fn(),
+                    update: vi.fn(),
+                    delete: vi.fn(),
+                    headers: {},
+                    url: new URL("http://localhost"),
+                };
+    
+                return queryBuilderMock;
+            });
+
+            const { data: insertedListing, error } = await insertListing({
+                listing: {
+                    title: testTitle,
+                    description: testDescription,
+                    country: testCountry,
+                    city: testCity,
+                    address: testAddress,
+                    number_of_places: testMaxGuests,
+                    day_price: testPrice,
+                    category_id: testCategory,
+                },
+                user_id: testUserId,
+                files: emptyFiles,
+                services: [testService], // Use an empty array for services
+            });
+
+            expect(insertedListing).toBeDefined(); // Ensure the listing is not inserted
             expect(error).not.toBeNull(); // Ensure an error is returned
         });
     });
@@ -169,16 +304,67 @@ describe("Listings Queries", () => {
                 expect(typeof listing.day_price).toBe('number');
             });
         });
+
+        it("should log an error when fetching listings fails", async () => {
+
+            // More of a stub than a mock, as it only simulates the response
+            supabase.from = () => ({
+                select: () => Promise.resolve({
+                    data: null,
+                    error: {
+                        message: "Failed to fetch listing",
+                        details: "Additional error details",
+                        hint: "",
+                        code: "12345"
+                    }
+                })
+            }as any);
+        
+            // A mock for console.error
+            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+        
+            // Call the function
+            const { data, error } = await getListings();
+        
+            // Assert that console.error was called
+            expect(consoleSpy).toHaveBeenCalled();
+        
+            // Assert that console.error was called with the correct error object
+            expect(consoleSpy).toHaveBeenCalledWith({
+                message: "Failed to fetch listing",
+                details: "Additional error details",
+                hint: "",
+                code: "12345",
+            });
+        
+            // Assert the function's returned values
+            expect(data).toBeNull();
+            expect(error).not.toBeNull();
+        
+            // Restore the console mock
+            consoleSpy.mockRestore();
+        });
+
+
+    });
+
+    //Parametrized test used
+    describe('getFilenameFromUrl', () => {
+        it.each([
+            ['http://example.com/path/to/file.jpg', 'to/file.jpg'],
+            ['http://example.com/another/path/file2.png', 'path/file2.png'],
+            ['http://example.com/file3.svg', 'file3.svg'],
+            ['https://subdomain.example.com/folder/file4.jpeg', 'folder/file4.jpeg'],
+            ['invalid-url', 'invalid-url'], // Invalid URL should just return the input
+        ])('should return the correct last two parts of a URL path for %s', (url, expected) => {
+            const result = getFilenameFromUrl(url);
+            expect(result).toBe(expected);
+        });
     });
 
     describe("getChartInformation", () => {
         it("should fetch chart information", async () => {
-            listing = await insertTestListing();
-            listingId = listing.id;
-
             const { data: chartInfo } = await getChartInformation(listingId);
-
-            await deleteTestListing();
             
             expect(chartInfo).not.toBeNull();
 
@@ -194,6 +380,84 @@ describe("Listings Queries", () => {
             
             
         });
+
+        it("should log an error when listing has no city", async () => {
+            // Mock the Supabase response to simulate an error
+
+            vi.spyOn(supabase, "from").mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        single: vi.fn().mockResolvedValueOnce({
+                            data: { city: null }, // Simulate a listing without a city
+                            error: null
+                        })
+                    })
+                })
+            } as any);
+        
+            // Mock console.error
+            const consoleSpy = vi.spyOn(console, "error");
+        
+            // Call the function
+            const { data, error } = await getChartInformation(1);
+        
+            // Assert that console.error was called
+            expect(consoleSpy).toHaveBeenCalled();
+          
+            // Restore the console mock
+            consoleSpy.mockRestore();
+        });
+
+        it("should log an error if fetching number_of_places, day_price of city goes wrong", async () => {
+            // Mock the Supabase response to simulate an error
+
+
+            // This could be called a mock, due to the fact that it simulates different responses based on the query
+            vi.spyOn(supabase, "from").mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                    eq: (column: string, value: any) => {
+                        // Mock the specific query for `city` in the first case
+                        if (column === "city") {
+                            return {
+                                data: null, // Simulate a listing without a city
+                                error:{
+                                    message: "Failed to fetch listing",
+                                    details: "Additional error details",
+                                    hint: "",
+                                    code: "12345"
+                                }
+                            };
+                        }
+                        // Mock the specific query for `id` in the second case
+                        if (column === "id") {
+                            return {
+                                single: vi.fn().mockReturnValue({
+                                    data: { city: "Sample City" }, // Simulate a listing with city data
+                                    error: null,
+                                }),
+                            };
+                        }
+                        // Default return for unexpected queries
+                        return {
+                            data: null,
+                            error: "Unexpected query",
+                        };
+                    },
+            })}  as any);
+        
+            // Mock console.error
+            const consoleSpy = vi.spyOn(console, "error");
+        
+            // Call the function
+            const { data, error } = await getChartInformation(1);
+
+            // Assert that console.error was called
+            expect(consoleSpy).toHaveBeenCalled();
+          
+            // Restore the console mock
+            consoleSpy.mockRestore();
+        });
+
 
         it("should handle error when fetching chart information for invalid listingId", async () => {
             const invalidListingId = -1; // Use an ID that doesn't exist or is out of range
@@ -237,8 +501,6 @@ describe("Listings Queries", () => {
 
     describe("updateListing", () => {
         it("should update a listing", async () => {
-            listing = await insertTestListing();
-            listingId = listing.id;
 
             const updatedTitle = "Updated Title";
             const updatedDescription = "Updated Description";
@@ -268,19 +530,12 @@ describe("Listings Queries", () => {
                     day_price: updatedPrice * 100,
                 })
             );
-
-            await deleteTestListing();
         });
     });
 
     describe("getPersonalListings", () => {
         it("should fetch personal listings", async () => {
-    
-            await insertTestListing(); // Insert a test listing associated with testUserId
-    
             const { data: personalListings } = await getPersonalListings(testUserId); // Fetch personal listings
-    
-            await deleteTestListing(); // Clean up by deleting the test listing
     
             // Check if personalListings is an array
             expect(Array.isArray(personalListings)).toBe(true);
@@ -297,9 +552,6 @@ describe("Listings Queries", () => {
 
     describe("deleteListing", () => {
         it("should delete a listing", async () => {
-            listing = await insertTestListing();
-            listingId = listing.id;
-
             const { error } = await deleteListing({ listing_id: listingId });
 
             expect(error).toBeNull();
@@ -318,6 +570,178 @@ describe("Listings Queries", () => {
             const { error } = await deleteListing({ listing_id: invalidListingId });
 
             expect(error).toBeNull();
+        });
+
+        it("should return an error when an error is achieved when fetching reservations", async () => {
+            // Mock the Supabase response to simulate an error
+            vi.spyOn(supabase, "from").mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        eq: vi.fn().mockReturnValue({
+                            gt: vi.fn().mockResolvedValueOnce({
+                                data: null,
+                                error: {
+                                    message: "Failed to fetch reservations",
+                                    details: "Additional error details",
+                                    hint: "",
+                                    code: "12345",
+                                },
+                            }),
+                        }),
+                    }),
+                }),
+            } as any);
+        
+            // Call the function
+            const { error } = await deleteListing({ listing_id: 1 });
+        
+            // Assert that an error was returned
+            expect(error).not.toBeNull();
+        });
+
+        it('should return an error if there are active reservations', async () => {
+            // Mock Supabase to return active reservations
+
+            // This could be called a stub, due to the fact that it only simulates a response and doesn't have any logic
+            vi.spyOn(supabase, 'from').mockReturnValue({
+              select: vi.fn().mockReturnValue({
+                eq: vi.fn().mockReturnValue({
+                  eq: vi.fn().mockReturnValue({
+                    gt: vi.fn().mockResolvedValueOnce({
+                      data: [{ id: 1 }, { id: 2 }], // Mock active reservations
+                      error: null,
+                    }),
+                  }),
+                }),
+              }),
+            } as any);
+        
+            const result = await deleteListing({ listing_id: 1 });
+        
+            expect(result.error).toBe('Cannot delete listing with active reservations');
+        });
+
+        it("should return an error when an error is achieved when fetching photos", async () => {
+            // Mock the Supabase response for reservations query to simulate success
+            
+            vi.spyOn(supabase, "from").mockImplementation((tableName: string) => {
+                const queryBuilderMock = {
+                    select: vi.fn().mockReturnValue({
+                        eq: vi.fn().mockImplementation((column: string, value: any) => {
+                            if (tableName === "reservations") {
+                                if (column === "listing_id") {
+                                    return {
+                                        eq: vi.fn().mockReturnValue({
+                                            gt: vi.fn().mockResolvedValueOnce({
+                                                data: [], // No active reservations
+                                                error: null,
+                                            }),
+                                        }),
+                                    };
+                                }
+                            } else if (tableName === "photos") {
+                                if (column === "listing_id") {
+                                    return {
+                                        data: null,
+                                        error: {
+                                            message: "Failed to fetch photos",
+                                            details: "Additional error details",
+                                            hint: "",
+                                            code: "67890",
+                                        },
+                                    };
+                                }
+                            }
+                            return {}; // Default case if column or table doesn't match
+                        }),
+                    }),
+                    // Include other properties of PostgrestQueryBuilder to match the type
+                    insert: vi.fn(),
+                    upsert: vi.fn(),
+                    update: vi.fn(),
+                    delete: vi.fn(),
+                    headers: {},
+                    url: new URL("http://localhost"),
+                };
+            
+                return queryBuilderMock;
+            });
+        
+            // Call the function
+            const { error } = await deleteListing({ listing_id: 1 });
+        
+            // Assert that an error was returned
+            expect(error).not.toBeNull();
+            expect(error).toEqual({
+                message: "Failed to fetch photos",
+                details: "Additional error details",
+                hint: "",
+                code: "67890",
+            });
+        });
+        
+        it("should return an error when an error is achieved when deleting the listing", async () => {
+            // Mock the Supabase response for reservations query to simulate success
+            vi.spyOn(supabase, "from").mockImplementation((tableName: string) => {
+                const queryBuilderMock = {
+                    select: vi.fn().mockReturnValue({
+                        eq: vi.fn().mockImplementation((column: string, value: any) => {
+                            if (tableName === "reservations") {
+                                if (column === "listing_id") {
+                                    return {
+                                        eq: vi.fn().mockReturnValue({
+                                            gt: vi.fn().mockResolvedValueOnce({
+                                                data: [], // No active reservations
+                                                error: null,
+                                            }),
+                                        }),
+                                    };
+                                }
+                            } else if (tableName === "photos") {
+                                if (column === "listing_id") {
+                                    return {
+                                        data: [],
+                                        error: null,
+                                    };
+                                }
+                            }
+                            return {}; // Default case if column or table doesn't match
+                        }),
+                    }),
+
+                    delete: vi.fn().mockReturnValue({
+                        eq: vi.fn().mockResolvedValueOnce({
+                            error: {
+                                message: "Failed to delete listing",
+                                details: "Additional error details",
+                                hint: "",
+                                code: "54321",
+                            },
+                        }),
+                    }),
+
+                    // Include other properties of PostgrestQueryBuilder to match the type
+                    insert: vi.fn(),
+                    upsert: vi.fn(),
+                    update: vi.fn(),
+                    headers: {},
+                    url: new URL("http://localhost"),
+                };
+            
+                return queryBuilderMock;
+            });
+        
+            // Call the function
+            const { error } = await deleteListing({ listing_id: 1 });
+        
+            // Assert that an error was returned
+            expect(error).not.toBeNull();
+            expect(error).toEqual({
+                message: "Failed to delete listing",
+                details: "Additional error details",
+                hint: "",
+                code: "54321",
+            });
         });
     });
 });

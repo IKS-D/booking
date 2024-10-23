@@ -11,6 +11,8 @@ export default defineConfig(({ mode }) => ({
   test: {
     exclude: [...configDefaults.exclude, "**/playwright/**"],
     environment: "jsdom",
+    threads: false,  // Disables concurrency
+    maxConcurrency: 1, // Optional: Set maximum concurrency to 1
     alias: {
       "@/": new URL("./", import.meta.url).pathname,
     },
