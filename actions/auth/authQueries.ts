@@ -1,42 +1,15 @@
 "use server";
 
-import { createServerClient, CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import { getReservations } from "../reservations/reservationsQueries";
 import { getPersonalListings } from "../listings/listingsQueries";
-
-async function getSupabaseServerClient() {
-  const cookieStore = cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: "", ...options });
-        },
-      },
-    }
-  );
-
-  return supabase;
-}
+import { getSupabaseServerClient, getSupabaseServiceClient } from "@/supabase/supabase-clients";
 
 export async function signUpUsingEmailAndPassword(data: {
   email: string;
   password: string;
   confirmPassword: string;
 }) {
-  const supabase = await getSupabaseServerClient();
-
-  const { data: responseData, error } = await supabase.auth.signUp({
+  const { data: responseData, error } = await getSupabaseServerClient().auth.signUp({
     email: data.email,
     password: data.password
   });
@@ -48,9 +21,7 @@ export async function signInUsingEmailAndPassword(data: {
   email: string;
   password: string;
 }) {
-  const supabase = await getSupabaseServerClient();
-
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error } = await getSupabaseServerClient().auth.signInWithPassword({
     email: data.email,
     password: data.password,
   });
@@ -59,36 +30,14 @@ export async function signInUsingEmailAndPassword(data: {
 }
 
 export async function signOut() {
-  const supabase = await getSupabaseServerClient();
-
-  const { error } = await supabase.auth.signOut();
+  const { error } = await getSupabaseServerClient().auth.signOut();
 
   return { error };
 }
 
 export async function deleteUser() {
-  const cookieStore = cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: "", ...options });
-        },
-      },
-    }
-  );
-
   // Get the user
-  const { data: { user }, error: getUserError } = await supabase.auth.getUser();
+  const { data: { user }, error: getUserError } = await getSupabaseServerClient().auth.getUser();
 
   if (getUserError) {
     return { error: getUserError };
@@ -125,18 +74,14 @@ export async function deleteUser() {
   }
 
   // Attempt to sign the user out
-  const { error: signOutError } = await supabase.auth.signOut();
+  const { error: signOutError } = await getSupabaseServerClient().auth.signOut();
 
   if (signOutError) {
     return { error: signOutError };
   }
 
   // Attempt to delete the user
-  const { error: deleteError } = await supabase.auth.admin.deleteUser(user!.id);
+  const { error: deleteError } = await getSupabaseServiceClient().auth.admin.deleteUser(user!.id);
 
-  if (deleteError) {
-    return { error: deleteError };
-  }
-
-  return { error: undefined };
+  return { error: deleteError };
 }
