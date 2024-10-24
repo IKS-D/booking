@@ -74,11 +74,7 @@ export async function deleteUser() {
   }
 
   // Attempt to sign the user out
-  const { error: signOutError } = await getSupabaseServerClient().auth.signOut();
-
-  if (signOutError) {
-    return { error: signOutError };
-  }
+  await signOut();
 
   // Attempt to delete the user
   const { error: deleteError } = await getSupabaseServiceClient().auth.admin.deleteUser(user!.id);
