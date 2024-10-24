@@ -1,30 +1,14 @@
 "use server";
 
 import supabase from "@/supabase/supabase";
-import { CookieOptions, createServerClient } from "@supabase/ssr";
 import { QueryData } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
 import { getPersonalListings } from "../listings/listingsQueries";
-import { getReservations } from "../reservations/reservationsQueries";
+import { getSupabaseServerClient } from "@/supabase/supabase-clients";
 
 export default async function getCurrentUser() {
-  const cookieStore = cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
-
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await getSupabaseServerClient().auth.getUser();
 
   return user;
 }
@@ -39,11 +23,8 @@ export async function getCurrentUserProfile() {
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("*")
+    .eq("id", currentUser.id)
     .single();
-
-  if (error) {
-    console.error(error);
-  }
 
   return profile;
 }
@@ -54,7 +35,8 @@ export async function userProfileExists(userId: string) {
     .from("profiles")
     .select("*")
     .eq("id", userId);
-  if (!error && (!profile || profile.length == 0)) {
+  
+  if (error || (!profile || profile.length == 0)) {
     return false;
   }
   return true;
@@ -69,10 +51,6 @@ export async function getUserProfileById(id: string) {
     .eq("id", id)
     .limit(1)
     .single();
-
-  if (error) {
-    console.error(error);
-  }
 
   return { data: profile, error: error };
 }
@@ -111,10 +89,6 @@ export async function insertProfile({
     .select()
     .single();
 
-  if (error) {
-    console.error(error);
-  }
-
   return { profile, error };
 }
 
@@ -150,10 +124,6 @@ export async function updateProfile({
     })
     .eq("id", userId);
 
-  if (error) {
-    console.error(error);
-  }
-
   return { profile, error };
 }
 
@@ -164,7 +134,7 @@ export async function hostProfileExists(userId: string) {
     .select("*")
     .eq("id", userId);
 
-  if (!error && (!host || host.length == 0)) {
+  if (error || (!host || host.length == 0)) {
     return false;
   }
   return true;
@@ -178,10 +148,6 @@ export async function getHostProfileById(id: string) {
     .select("*")
     .eq("id", id)
     .single();
-
-  if (error) {
-    console.error(error);
-  }
 
   return { data: host, error: error };
 }
@@ -205,10 +171,6 @@ export async function insertHost({
     .select()
     .single();
 
-  if (error) {
-    console.error(error);
-  }
-
   return { host, error };
 }
 
@@ -229,10 +191,6 @@ export async function updateHost({
     })
     .eq("id", userId);
 
-  if (error) {
-    console.error(error);
-  }
-
   return { host, error };
 }
 
@@ -251,10 +209,6 @@ export async function deleteHost() {
 
   let { error } = await supabase.from("hosts").delete().eq("id", user!.id);
 
-  if (error) {
-    console.error(error);
-  }
-
   return { error };
 }
 
@@ -272,10 +226,6 @@ export async function getHostIdByReservationId(reservationId: number) {
     .eq("id", reservationId)
     .limit(1)
     .single();
-
-  if (error) {
-    console.error(error);
-  }
 
   return { data: host?.listing?.host_id, error: error };
 }
