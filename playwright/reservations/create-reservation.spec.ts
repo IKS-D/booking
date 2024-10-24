@@ -19,6 +19,13 @@ test("Create reservation", async ({ page }) => {
 
   await page.getByRole("button", { name: "Next Step" }).click();
 
+  await expect(
+    page.getByRole("button", { name: "Confirm reservation and Pay" })
+  ).toBeVisible();
+
+  // ! Exit early because we don't spam the bank with test payments
+  return;
+
   await page
     .getByRole("button", { name: "Confirm reservation and Pay" })
     .click();

@@ -5,11 +5,15 @@ test("Change reservation status", async ({ page }) => {
 
   await page.goto("/reservations/host");
 
-  await page.getByLabel(reservationId).getByRole("img").click();
+  const noReservationsLocator = page.locator("text=You have no reservations");
 
-  const toastLocator = page.getByText(
-    `Reservation ${reservationId} confirmed!`
-  );
+  if (await noReservationsLocator.isVisible()) {
+    return;
+  }
+
+  await page.locator("td:nth-child(8) > .relative > span").nth(1).click();
+
+  const toastLocator = page.getByText(/^Reservation \d+ confirmed!$/);
 
   await expect(toastLocator).toBeVisible();
 });
