@@ -3,7 +3,6 @@ import { deleteUser, signInUsingEmailAndPassword, signOut, signUpUsingEmailAndPa
 import { AuthError, PostgrestError } from "@supabase/supabase-js";
 import * as reservationsQueries from "@/actions/reservations/reservationsQueries";
 import * as listingsQueries from "@/actions/listings/listingsQueries"
-import supabase from "@/supabase/supabase";
 import { getSupabaseServerClient, getSupabaseServiceClient } from "@/supabase/supabase-clients";
 
 // Mock the cookies storage to bypass the requestAsyncStorage issue and check sign in and other info
