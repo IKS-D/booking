@@ -4,8 +4,8 @@ import { a } from "vitest/dist/chunks/suite.CcK46U-P";
 test("Edit listing", async ({ page }) => {
 
     await page.goto("/listings/personal");
-
-    await page.getByLabel('2085').getByRole('img').click();
+  
+    await page.locator('span.text-lg.text-success.cursor-pointer svg').last().click();
 
     await page.fill('input[aria-label="Title"]', 'New edited name');
 
