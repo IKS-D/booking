@@ -6,7 +6,8 @@ import CreateReservationForm from "@/components/reservations/create/CreateReserv
 import { notFound } from "next/navigation";
 import React from "react";
 
-export default async function page({ params }: { params: { id: string } }) {
+export default async function page(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { data: listing, error } = await getListingById(parseInt(params.id));
   const user = await getCurrentUser();
 

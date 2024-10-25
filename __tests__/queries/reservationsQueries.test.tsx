@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import supabase from "@/supabase/supabase";
+import supabase from "@/supabase/client";
 import {
   getReservationById,
   insertReservation,

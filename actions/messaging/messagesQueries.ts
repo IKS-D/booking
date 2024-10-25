@@ -1,6 +1,6 @@
 "use server";
 
-import supabase from "@/supabase/supabase";
+import supabase from "@/supabase/client";
 import { sendNewMessageEmail } from "./email";
 import getCurrentUser, {
   getHostIdByReservationId,

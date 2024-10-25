@@ -1,14 +1,16 @@
 "use server";
 
-import supabase from "@/supabase/supabase";
+import supabase from "@/supabase/client";
 import { QueryData } from "@supabase/supabase-js";
 import { getPersonalListings } from "../listings/listingsQueries";
-import { getSupabaseServerClient } from "@/supabase/supabase-clients";
+import { createSupabaseServerClient } from "@/supabase/server";
 
 export default async function getCurrentUser() {
+  const supabaseServerClient = await createSupabaseServerClient();
+
   const {
     data: { user },
-  } = await getSupabaseServerClient().auth.getUser();
+  } = await supabaseServerClient.auth.getUser();
 
   return user;
 }
@@ -35,8 +37,8 @@ export async function userProfileExists(userId: string) {
     .from("profiles")
     .select("*")
     .eq("id", userId);
-  
-  if (error || (!profile || profile.length == 0)) {
+
+  if (error || !profile || profile.length == 0) {
     return false;
   }
   return true;
@@ -134,7 +136,7 @@ export async function hostProfileExists(userId: string) {
     .select("*")
     .eq("id", userId);
 
-  if (error || (!host || host.length == 0)) {
+  if (error || !host || host.length == 0) {
     return false;
   }
   return true;
@@ -199,12 +201,14 @@ export async function deleteHost() {
   const user = await getCurrentUser();
 
   // Double check listings
-  const { data: listings, error: listingsError } = await getPersonalListings(user!.id);
+  const { data: listings, error: listingsError } = await getPersonalListings(
+    user!.id
+  );
   if (listingsError) {
     return { error: listingsError };
   }
   if (listings && listings?.length > 0) {
-    return { error: { message: "User has listings" } }
+    return { error: { message: "User has listings" } };
   }
 
   let { error } = await supabase.from("hosts").delete().eq("id", user!.id);

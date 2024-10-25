@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  select,
-} from "@nextui-org/react";
+import { Button, Input, Textarea, Select, SelectItem } from "@nextui-org/react";
 import { AnimatePresence } from "framer-motion";
 import { useMultiplestepForm } from "@/hooks/useMultiplestepForm";
 import { toast } from "sonner";
@@ -22,13 +15,6 @@ import {
   insertListing,
 } from "@/actions/listings/listingsQueries";
 import FileUpload from "./FileUpload";
-import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate-path";
-import DynamicForm from "./DynamicForm";
-import {
-  Database,
-  Tables,
-  Enums,
-} from "../../supabase/database-generated.types";
 import { Label } from "@radix-ui/react-label";
 
 interface CreateListingFormProps {
@@ -457,7 +443,9 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
                           step="0.01"
                           placeholder="Price for one night"
                           value={
-                            (service.price !== undefined && service.price !== -1) ? service.price.toString() : ""
+                            service.price !== undefined && service.price !== -1
+                              ? service.price.toString()
+                              : ""
                           }
                           onChange={(e) => {
                             const rawValue = e.target.value;

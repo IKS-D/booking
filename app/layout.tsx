@@ -9,8 +9,7 @@ import TopNavbar from "@/components/TopNavbar";
 import { Toaster } from "sonner";
 import { cookies } from "next/headers";
 import ClientOnly from "@/components/ClientOnly";
-import { createServerClient } from "@supabase/ssr";
-import { getCurrentUserProfile } from "@/actions/users/usersQueries";
+import { createSupabaseServerClient } from "@/supabase/server";
 
 export const metadata: Metadata = {
   title: {
@@ -39,22 +38,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
+  const supabaseServerClient = await createSupabaseServerClient();
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabaseServerClient.auth.getUser();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -70,7 +58,7 @@ export default async function RootLayout({
           fontSans.variable
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+        <Providers>
           <ClientOnly>
             <div className="flex flex-col h-full">
               {/* Header */}

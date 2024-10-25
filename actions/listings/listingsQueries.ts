@@ -1,8 +1,8 @@
 import { revalidate } from "@/components/TopNavbar";
-import supabase from "@/supabase/supabase";
+import supabase from "@/supabase/client";
 import { QueryData, QueryResult } from "@supabase/supabase-js";
 import { nanoid } from "nanoid";
-import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
+import { unstable_noStore as noStore, revalidatePath } from "next/cache";
 
 interface Params {
   listingId?: string;
@@ -38,9 +38,7 @@ export type Listings = QueryData<ReturnType<typeof getListingsBase>>;
 export type Listing = Listings[0];
 
 export async function getListings() {
-
   let { data: listings, error } = await getListingsBase();
-
 
   console.log(error);
 
@@ -53,7 +51,7 @@ export async function getListings() {
 
 export type AverageData = QueryData<ReturnType<typeof getChartInformation>>;
 
-export async function getChartInformation(listingId: number){
+export async function getChartInformation(listingId: number) {
   const { data: listing, error: listingError } = await supabase
     .from("listings")
     .select("city")
@@ -77,13 +75,13 @@ export async function getChartInformation(listingId: number){
     .select("number_of_places, day_price")
     .eq("city", city);
 
-    if (error) {
-      console.error(error);
-      return { data: null, error };
-    }
+  if (error) {
+    console.error(error);
+    return { data: null, error };
+  }
 
-    const groupedListings: Record<number, number[]> = {};
-    listings?.forEach((listing) => {
+  const groupedListings: Record<number, number[]> = {};
+  listings?.forEach((listing) => {
     const numberOfPlaces = listing.number_of_places;
     const price = listing.day_price;
 
@@ -107,12 +105,14 @@ export async function getChartInformation(listingId: number){
 export function getFilenameFromUrl(url: string): string {
   try {
     const urlObj = new URL(url); // Ensure it's a valid URL
-    const urlParts = urlObj.pathname.split('/').filter(Boolean); // Split and remove empty parts
-    
+    const urlParts = urlObj.pathname.split("/").filter(Boolean); // Split and remove empty parts
+
     if (urlParts.length >= 2) {
-      return `${urlParts[urlParts.length - 2]}/${urlParts[urlParts.length - 1]}`;
+      return `${urlParts[urlParts.length - 2]}/${
+        urlParts[urlParts.length - 1]
+      }`;
     }
-    
+
     return urlParts[0];
   } catch (error) {
     // If the URL is invalid, return it as-is
@@ -121,40 +121,41 @@ export function getFilenameFromUrl(url: string): string {
 }
 
 export async function getPersonalListings(userId: string) {
-  const { data, error } = await supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)').eq("host_id",userId!);
+  const { data, error } = await supabase
+    .from("listings")
+    .select(
+      "*, category: listing_category (name), services: services (*), images: photos (url)"
+    )
+    .eq("host_id", userId!);
 
   return { data, error };
 }
 
-export async function deleteListing({
-  listing_id,
-}: {
-  listing_id: number;
-}) {
+export async function deleteListing({ listing_id }: { listing_id: number }) {
   const currentDate = new Date();
   currentDate.setUTCHours(0, 0, 0, 0); // Set the time to midnight in UTC
-  
+
   const { data: reservations, error: reservationsError } = await supabase
-    .from('reservations')
-    .select('id')
-    .eq('listing_id', listing_id)
-    .eq('status', 2)
-    .gt('end_date', currentDate.toISOString());
+    .from("reservations")
+    .select("id")
+    .eq("listing_id", listing_id)
+    .eq("status", 2)
+    .gt("end_date", currentDate.toISOString());
 
   if (reservationsError) {
     return { error: reservationsError };
   }
 
   if (reservations && reservations.length > 0) {
-    const errorMessage = 'Cannot delete listing with active reservations';
+    const errorMessage = "Cannot delete listing with active reservations";
     return { error: errorMessage };
   }
 
   // Retrieve the list of photo URLs associated with the listing
   const { data: photos, error: photosError } = await supabase
-    .from('photos')
-    .select('url')
-    .eq('listing_id', listing_id);
+    .from("photos")
+    .select("url")
+    .eq("listing_id", listing_id);
 
   if (photosError) {
     return { error: photosError };
@@ -162,9 +163,9 @@ export async function deleteListing({
 
   // Delete the listing
   const { error: listingDeleteError } = await supabase
-    .from('listings')
+    .from("listings")
     .delete()
-    .eq('id', listing_id);
+    .eq("id", listing_id);
 
   if (listingDeleteError) {
     return { error: listingDeleteError };
@@ -172,19 +173,19 @@ export async function deleteListing({
 
   /* v8 ignore next 14 */
   if (photos && photos.length > 0) {
-    console.log('Photos found:', photos);
+    console.log("Photos found:", photos);
     for (const photo of photos) {
-        const filename = getFilenameFromUrl(photo.url);
-        const { data: removed, error: photoDeleteError } = await supabase.storage
-            .from('images')
-            .remove([filename]);
-          
-        if (photoDeleteError) {
-            return { error: photoDeleteError };
-        }
+      const filename = getFilenameFromUrl(photo.url);
+      const { data: removed, error: photoDeleteError } = await supabase.storage
+        .from("images")
+        .remove([filename]);
+
+      if (photoDeleteError) {
+        return { error: photoDeleteError };
+      }
     }
   }
-  console.log('All photos deleted successfully');
+  console.log("All photos deleted successfully");
   return { error: null };
 }
 
@@ -204,14 +205,13 @@ export async function updateListing({
   files: FileList;
   listing_id: number;
 }) {
-
   const priceInCents = Math.round(editedListing.day_price! * 100);
   editedListing.day_price = priceInCents;
 
   const { error: updateError } = await supabase
-    .from('listings')
+    .from("listings")
     .update(editedListing)
-    .eq('id', listing_id);
+    .eq("id", listing_id);
 
   const folderName = `listing_${listing_id}`;
 
@@ -220,17 +220,19 @@ export async function updateListing({
     const file = files[i];
 
     const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
-    
+
     const { data: fileData, error: fileError } = await supabase.storage
-      .from('images')
+      .from("images")
       .upload(`${folderName}/${uniqueFileName}`, file);
 
     if (fileError) {
-      console.error('Error uploading file:', fileError);
+      console.error("Error uploading file:", fileError);
     } else {
       // Get the public URL of the uploaded file
-      const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
-   
+      const fileURL = supabase.storage
+        .from("images")
+        .getPublicUrl(fileData.path);
+
       await supabase.from("photos").insert({
         listing_id: listing_id,
         url: fileURL.data.publicUrl,
@@ -288,14 +290,16 @@ export async function insertListing({
       const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
 
       const { data: fileData, error: fileError } = await supabase.storage
-        .from('images')
+        .from("images")
         .upload(`${folderName}/${uniqueFileName}`, file);
 
       if (fileError) {
         return { data: null, error: fileError };
       } else {
         // Get the public URL of the uploaded file
-        const fileURL = supabase.storage.from('images').getPublicUrl(fileData.path);
+        const fileURL = supabase.storage
+          .from("images")
+          .getPublicUrl(fileData.path);
 
         await supabase.from("photos").insert({
           listing_id: addedListing!.id,
@@ -311,11 +315,10 @@ export async function insertListing({
   }
 
   for (let i = 0; i < services.length; i++) {
-
     const service = services[i];
-  
+
     const priceInCents = Math.round(Number(service.price) * 100);
-  
+
     // Correct placement of closing curly brace
     const { error } = await supabase.from("services").insert({
       title: service.title,
@@ -323,7 +326,7 @@ export async function insertListing({
       price: priceInCents,
       listing_id: addedListing!.id,
     }); // Close the insert object here
-  
+
     // Error handling happens outside the insert object
     if (error) {
       return { data: addedListing, error };
@@ -335,13 +338,19 @@ export async function insertListing({
 }
 
 function getListingsBase() {
-  return supabase.from("listings").select('*, category: listing_category (name), services: services (*), images: photos (url)');
+  return supabase
+    .from("listings")
+    .select(
+      "*, category: listing_category (name), services: services (*), images: photos (url)"
+    );
 }
 
 export type Categories = QueryData<ReturnType<typeof getListingCategories>>;
 
-export async function getListingCategories(){
-  let { data: categories, error } = await supabase.from("listing_category").select('*');                                       
+export async function getListingCategories() {
+  let { data: categories, error } = await supabase
+    .from("listing_category")
+    .select("*");
 
   return { data: categories, error };
 }

@@ -9,7 +9,7 @@ export async function createPayment(
   reservation_id: number,
   user_id: string
 ) {
-  const header = headers();
+  const header = await headers();
   const host = header.get("host");
 
   const callbackUrl = process.env.NEXT_PUBLIC_PAYSERA_CALLBACK_URL;

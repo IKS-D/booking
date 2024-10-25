@@ -32,7 +32,6 @@ const AnimatedFormWrapper = ({
 }: FormWrapperProps) => {
   return (
     <motion.div
-      className="flex flex-col gap-5"
       variants={formVariants}
       initial="hidden"
       animate="visible"

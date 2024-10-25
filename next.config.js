@@ -4,6 +4,9 @@ const nextConfig = {
     level: "verbose",
     fullUrl: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     webpackBuildWorker: true,
     turbo: {

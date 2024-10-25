@@ -1,5 +1,4 @@
-import { CookieOptions, createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createSupabaseServerClient } from "@/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -9,32 +8,39 @@ export async function GET(request: Request) {
   const header = request.headers;
 
   if (code) {
-    const cookieStore = cookies();
-
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-          set(name: string, value: string, options: CookieOptions) {
-            cookieStore.set({ name, value, ...options });
-          },
-          remove(name: string, options: CookieOptions) {
-            cookieStore.set({ name, value: "", ...options });
-          },
-        },
-      }
-    );
-
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) {
-      // There was an error creating a session
-      console.error(error);
-    }
+    const supabase = await createSupabaseServerClient();
+    await supabase.auth.exchangeCodeForSession(code);
   }
+
+  // if (code) {
+  //   const cookieStore = await cookies();
+
+  //   const supabase = await getSupabaseServerClient();
+
+  //     createServerClient(
+  //     process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  //     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  //     {
+  //       cookies: {
+  //         get(name: string) {
+  //           return cookieStore.get(name)?.value;
+  //         },
+  //         set(name: string, value: string, options: CookieOptions) {
+  //           cookieStore.set({ name, value, ...options });
+  //         },
+  //         remove(name: string, options: CookieOptions) {
+  //           cookieStore.set({ name, value: "", ...options });
+  //         },
+  //       },
+  //     }
+  //   );
+
+  //   const { error } = await supabase.auth.exchangeCodeForSession(code);
+  //   if (error) {
+  //     // There was an error creating a session
+  //     console.error(error);
+  //   }
+  // }
   // Determine the destination based on the origin
   const destination = origin === "/login" ? "/" : "/registration/profile";
   const protocol = header.get("x-forwarded-proto") || "http";

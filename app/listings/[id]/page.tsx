@@ -8,11 +8,12 @@ import { useEffect, useMemo, useRef } from "react";
 import ListingContent from "../../../components/listings/ListingContent";
 import ListingChart from "../../../components/listings/ListingChart";
 
-export default async function ListingPage({
-  params,
-}: {
-  params: { id: number };
-}) {
+export default async function ListingPage(
+  props: {
+    params: Promise<{ id: number }>;
+  }
+) {
+  const params = await props.params;
   const { data: average, error: chartError } = await getChartInformation(
     params.id
   );

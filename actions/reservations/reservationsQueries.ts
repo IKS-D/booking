@@ -1,6 +1,6 @@
 "use server";
 
-import supabase from "@/supabase/supabase";
+import supabase from "@/supabase/client";
 import { revalidatePath } from "next/cache";
 import { sendNewReservationEmailHost } from "./email";
 import { QueryData } from "@supabase/supabase-js";
