@@ -1,8 +1,6 @@
-import { revalidate } from "@/components/TopNavbar";
-import supabase from "@/supabase/client";
-import { QueryData, QueryResult } from "@supabase/supabase-js";
+import { createSupabaseBrowserClient } from "@/supabase/client";
+import { QueryData } from "@supabase/supabase-js";
 import { nanoid } from "nanoid";
-import { unstable_noStore as noStore, revalidatePath } from "next/cache";
 
 interface Params {
   listingId?: string;
@@ -14,7 +12,7 @@ interface Params {
 export type ListingWithDetails = QueryData<ReturnType<typeof getListingById>>;
 
 export async function getListingById(listingId: number) {
-  const { data, error } = await supabase
+  const { data, error } = await createSupabaseBrowserClient()
     .from("listings")
     .select(
       `
@@ -52,11 +50,12 @@ export async function getListings() {
 export type AverageData = QueryData<ReturnType<typeof getChartInformation>>;
 
 export async function getChartInformation(listingId: number) {
-  const { data: listing, error: listingError } = await supabase
-    .from("listings")
-    .select("city")
-    .eq("id", listingId)
-    .single();
+  const { data: listing, error: listingError } =
+    await createSupabaseBrowserClient()
+      .from("listings")
+      .select("city")
+      .eq("id", listingId)
+      .single();
 
   if (listingError) {
     console.error(listingError);
@@ -70,7 +69,7 @@ export async function getChartInformation(listingId: number) {
     return { data: null, error: "City not found for the listing" };
   }
 
-  const { data: listings, error } = await supabase
+  const { data: listings, error } = await createSupabaseBrowserClient()
     .from("listings")
     .select("number_of_places, day_price")
     .eq("city", city);
@@ -121,7 +120,7 @@ export function getFilenameFromUrl(url: string): string {
 }
 
 export async function getPersonalListings(userId: string) {
-  const { data, error } = await supabase
+  const { data, error } = await createSupabaseBrowserClient()
     .from("listings")
     .select(
       "*, category: listing_category (name), services: services (*), images: photos (url)"
@@ -135,12 +134,13 @@ export async function deleteListing({ listing_id }: { listing_id: number }) {
   const currentDate = new Date();
   currentDate.setUTCHours(0, 0, 0, 0); // Set the time to midnight in UTC
 
-  const { data: reservations, error: reservationsError } = await supabase
-    .from("reservations")
-    .select("id")
-    .eq("listing_id", listing_id)
-    .eq("status", 2)
-    .gt("end_date", currentDate.toISOString());
+  const { data: reservations, error: reservationsError } =
+    await createSupabaseBrowserClient()
+      .from("reservations")
+      .select("id")
+      .eq("listing_id", listing_id)
+      .eq("status", 2)
+      .gt("end_date", currentDate.toISOString());
 
   if (reservationsError) {
     return { error: reservationsError };
@@ -152,17 +152,18 @@ export async function deleteListing({ listing_id }: { listing_id: number }) {
   }
 
   // Retrieve the list of photo URLs associated with the listing
-  const { data: photos, error: photosError } = await supabase
-    .from("photos")
-    .select("url")
-    .eq("listing_id", listing_id);
+  const { data: photos, error: photosError } =
+    await createSupabaseBrowserClient()
+      .from("photos")
+      .select("url")
+      .eq("listing_id", listing_id);
 
   if (photosError) {
     return { error: photosError };
   }
 
   // Delete the listing
-  const { error: listingDeleteError } = await supabase
+  const { error: listingDeleteError } = await createSupabaseBrowserClient()
     .from("listings")
     .delete()
     .eq("id", listing_id);
@@ -176,9 +177,10 @@ export async function deleteListing({ listing_id }: { listing_id: number }) {
     console.log("Photos found:", photos);
     for (const photo of photos) {
       const filename = getFilenameFromUrl(photo.url);
-      const { data: removed, error: photoDeleteError } = await supabase.storage
-        .from("images")
-        .remove([filename]);
+      const { data: removed, error: photoDeleteError } =
+        await createSupabaseBrowserClient()
+          .storage.from("images")
+          .remove([filename]);
 
       if (photoDeleteError) {
         return { error: photoDeleteError };
@@ -208,7 +210,7 @@ export async function updateListing({
   const priceInCents = Math.round(editedListing.day_price! * 100);
   editedListing.day_price = priceInCents;
 
-  const { error: updateError } = await supabase
+  const { error: updateError } = await createSupabaseBrowserClient()
     .from("listings")
     .update(editedListing)
     .eq("id", listing_id);
@@ -221,19 +223,20 @@ export async function updateListing({
 
     const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
 
-    const { data: fileData, error: fileError } = await supabase.storage
-      .from("images")
-      .upload(`${folderName}/${uniqueFileName}`, file);
+    const { data: fileData, error: fileError } =
+      await createSupabaseBrowserClient()
+        .storage.from("images")
+        .upload(`${folderName}/${uniqueFileName}`, file);
 
     if (fileError) {
       console.error("Error uploading file:", fileError);
     } else {
       // Get the public URL of the uploaded file
-      const fileURL = supabase.storage
-        .from("images")
+      const fileURL = createSupabaseBrowserClient()
+        .storage.from("images")
         .getPublicUrl(fileData.path);
 
-      await supabase.from("photos").insert({
+      await createSupabaseBrowserClient().from("photos").insert({
         listing_id: listing_id,
         url: fileURL.data.publicUrl,
       });
@@ -257,7 +260,7 @@ export async function insertListing({
   listing.day_price = priceInCents;
 
   // Insert the listing into the database
-  let { data: addedListing, error } = await supabase
+  let { data: addedListing, error } = await createSupabaseBrowserClient()
     .from("listings")
     .insert({
       address: listing.address!,
@@ -289,19 +292,20 @@ export async function insertListing({
 
       const uniqueFileName = `${Date.now()}_${nanoid()}_${file.name}`;
 
-      const { data: fileData, error: fileError } = await supabase.storage
-        .from("images")
-        .upload(`${folderName}/${uniqueFileName}`, file);
+      const { data: fileData, error: fileError } =
+        await createSupabaseBrowserClient()
+          .storage.from("images")
+          .upload(`${folderName}/${uniqueFileName}`, file);
 
       if (fileError) {
         return { data: null, error: fileError };
       } else {
         // Get the public URL of the uploaded file
-        const fileURL = supabase.storage
-          .from("images")
+        const fileURL = createSupabaseBrowserClient()
+          .storage.from("images")
           .getPublicUrl(fileData.path);
 
-        await supabase.from("photos").insert({
+        await createSupabaseBrowserClient().from("photos").insert({
           listing_id: addedListing!.id,
           url: fileURL.data.publicUrl,
         });
@@ -320,12 +324,14 @@ export async function insertListing({
     const priceInCents = Math.round(Number(service.price) * 100);
 
     // Correct placement of closing curly brace
-    const { error } = await supabase.from("services").insert({
-      title: service.title,
-      description: service.description,
-      price: priceInCents,
-      listing_id: addedListing!.id,
-    }); // Close the insert object here
+    const { error } = await createSupabaseBrowserClient()
+      .from("services")
+      .insert({
+        title: service.title,
+        description: service.description,
+        price: priceInCents,
+        listing_id: addedListing!.id,
+      }); // Close the insert object here
 
     // Error handling happens outside the insert object
     if (error) {
@@ -338,7 +344,7 @@ export async function insertListing({
 }
 
 function getListingsBase() {
-  return supabase
+  return createSupabaseBrowserClient()
     .from("listings")
     .select(
       "*, category: listing_category (name), services: services (*), images: photos (url)"
@@ -348,7 +354,7 @@ function getListingsBase() {
 export type Categories = QueryData<ReturnType<typeof getListingCategories>>;
 
 export async function getListingCategories() {
-  let { data: categories, error } = await supabase
+  let { data: categories, error } = await createSupabaseBrowserClient()
     .from("listing_category")
     .select("*");
 

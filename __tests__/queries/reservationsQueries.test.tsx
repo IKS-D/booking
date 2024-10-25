@@ -1,5 +1,4 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import supabase from "@/supabase/client";
 import {
   getReservationById,
   insertReservation,
@@ -12,6 +11,7 @@ import {
   getHostReservations,
   getReservations,
 } from "@/actions/reservations/reservationsQueries";
+import { createSupabaseBrowserClient } from "@/supabase/client";
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
@@ -63,7 +63,10 @@ describe("Reservations Queries", () => {
   });
 
   afterEach(async () => {
-    await supabase.from("reservations").delete().eq("id", reservationId);
+    await createSupabaseBrowserClient()
+      .from("reservations")
+      .delete()
+      .eq("id", reservationId);
   });
 
   it("should fetch user reservations", async () => {
@@ -196,13 +199,13 @@ describe("Reservations Queries", () => {
     const { error } = await insertPayment(testPayment);
     expect(error).toBeNull();
 
-    const { data: payments } = await supabase
+    const { data: payments } = await createSupabaseBrowserClient()
       .from("payments")
       .select()
       .eq("payment_number", testPayment.payment_number);
     expect(payments).toHaveLength(1);
 
-    await supabase
+    await createSupabaseBrowserClient()
       .from("payments")
       .delete()
       .eq("payment_number", testPayment.payment_number);

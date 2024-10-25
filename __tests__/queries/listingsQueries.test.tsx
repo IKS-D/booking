@@ -1,7 +1,4 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import image1 from "../assets/jpeg444.jpg";
-import { Buffer } from "buffer";
-import supabase from "@/supabase/client";
 import {
   getListingById,
   getListings,
@@ -13,9 +10,7 @@ import {
   updateListing,
   getListingCategories,
 } from "@/actions/listings/listingsQueries";
-import { StaticImageData } from "next/image";
-import { FileObject } from "@supabase/storage-js";
-import { getBrowsedFiles } from "./FlieList-mock-creator";
+import { createSupabaseBrowserClient } from "@/supabase/client";
 
 describe("Listings Queries", () => {
   const testUserId = "32f8f198-a8c3-4dec-b5db-09d5daec2918";
@@ -222,41 +217,43 @@ describe("Listings Queries", () => {
         error: null,
       });
 
-      vi.spyOn(supabase, "from").mockImplementation((tableName: string) => {
-        const queryBuilderMock = {
-          insert: vi.fn().mockImplementation(() => {
-            if (tableName === "listings") {
-              return {
-                select: vi.fn().mockReturnValue({
-                  single: vi.fn().mockResolvedValue({
-                    data: { id: 1 }, // Mock single listing data
-                    error: null,
+      vi.spyOn(createSupabaseBrowserClient(), "from").mockImplementation(
+        (tableName: string) => {
+          const queryBuilderMock = {
+            insert: vi.fn().mockImplementation(() => {
+              if (tableName === "listings") {
+                return {
+                  select: vi.fn().mockReturnValue({
+                    single: vi.fn().mockResolvedValue({
+                      data: { id: 1 }, // Mock single listing data
+                      error: null,
+                    }),
                   }),
-                }),
-              };
-            } else if (tableName === "services") {
-              return {
-                data: null,
-                error: {
-                  message: "Failed to insert service",
-                  details: "Additional error details",
-                  hint: "",
-                  code: "54321",
-                },
-              };
-            }
-            return { data: null, error: null }; // Default return for other tables
-          }),
-          select: vi.fn(),
-          upsert: vi.fn(),
-          update: vi.fn(),
-          delete: vi.fn(),
-          headers: {},
-          url: new URL("http://localhost"),
-        };
+                };
+              } else if (tableName === "services") {
+                return {
+                  data: null,
+                  error: {
+                    message: "Failed to insert service",
+                    details: "Additional error details",
+                    hint: "",
+                    code: "54321",
+                  },
+                };
+              }
+              return { data: null, error: null }; // Default return for other tables
+            }),
+            select: vi.fn(),
+            upsert: vi.fn(),
+            update: vi.fn(),
+            delete: vi.fn(),
+            headers: {},
+            url: new URL("http://localhost"),
+          };
 
-        return queryBuilderMock;
-      });
+          return queryBuilderMock;
+        }
+      );
 
       const { data: insertedListing, error } = await insertListing({
         listing: {
@@ -304,7 +301,7 @@ describe("Listings Queries", () => {
 
     it("should log an error when fetching listings fails", async () => {
       // More of a stub than a mock, as it only simulates the response
-      supabase.from = () =>
+      createSupabaseBrowserClient().from = () =>
         ({
           select: () =>
             Promise.resolve({
@@ -383,7 +380,7 @@ describe("Listings Queries", () => {
     it("should log an error when listing has no city", async () => {
       // Mock the Supabase response to simulate an error
 
-      vi.spyOn(supabase, "from").mockReturnValue({
+      vi.spyOn(createSupabaseBrowserClient(), "from").mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValueOnce({
@@ -411,7 +408,7 @@ describe("Listings Queries", () => {
       // Mock the Supabase response to simulate an error
 
       // This could be called a mock, due to the fact that it simulates different responses based on the query
-      vi.spyOn(supabase, "from").mockReturnValue({
+      vi.spyOn(createSupabaseBrowserClient(), "from").mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: (column: string, value: any) => {
             // Mock the specific query for `city` in the first case
@@ -570,7 +567,7 @@ describe("Listings Queries", () => {
 
     it("should return an error when an error is achieved when fetching reservations", async () => {
       // Mock the Supabase response to simulate an error
-      vi.spyOn(supabase, "from").mockReturnValue({
+      vi.spyOn(createSupabaseBrowserClient(), "from").mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
@@ -599,7 +596,7 @@ describe("Listings Queries", () => {
       // Mock Supabase to return active reservations
 
       // This could be called a stub, due to the fact that it only simulates a response and doesn't have any logic
-      vi.spyOn(supabase, "from").mockReturnValue({
+      vi.spyOn(createSupabaseBrowserClient(), "from").mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
@@ -622,48 +619,50 @@ describe("Listings Queries", () => {
     it("should return an error when an error is achieved when fetching photos", async () => {
       // Mock the Supabase response for reservations query to simulate success
 
-      vi.spyOn(supabase, "from").mockImplementation((tableName: string) => {
-        const queryBuilderMock = {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockImplementation((column: string, value: any) => {
-              if (tableName === "reservations") {
-                if (column === "listing_id") {
-                  return {
-                    eq: vi.fn().mockReturnValue({
-                      gt: vi.fn().mockResolvedValueOnce({
-                        data: [], // No active reservations
-                        error: null,
+      vi.spyOn(createSupabaseBrowserClient(), "from").mockImplementation(
+        (tableName: string) => {
+          const queryBuilderMock = {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockImplementation((column: string, value: any) => {
+                if (tableName === "reservations") {
+                  if (column === "listing_id") {
+                    return {
+                      eq: vi.fn().mockReturnValue({
+                        gt: vi.fn().mockResolvedValueOnce({
+                          data: [], // No active reservations
+                          error: null,
+                        }),
                       }),
-                    }),
-                  };
+                    };
+                  }
+                } else if (tableName === "photos") {
+                  if (column === "listing_id") {
+                    return {
+                      data: null,
+                      error: {
+                        message: "Failed to fetch photos",
+                        details: "Additional error details",
+                        hint: "",
+                        code: "67890",
+                      },
+                    };
+                  }
                 }
-              } else if (tableName === "photos") {
-                if (column === "listing_id") {
-                  return {
-                    data: null,
-                    error: {
-                      message: "Failed to fetch photos",
-                      details: "Additional error details",
-                      hint: "",
-                      code: "67890",
-                    },
-                  };
-                }
-              }
-              return {}; // Default case if column or table doesn't match
+                return {}; // Default case if column or table doesn't match
+              }),
             }),
-          }),
-          // Include other properties of PostgrestQueryBuilder to match the type
-          insert: vi.fn(),
-          upsert: vi.fn(),
-          update: vi.fn(),
-          delete: vi.fn(),
-          headers: {},
-          url: new URL("http://localhost"),
-        };
+            // Include other properties of PostgrestQueryBuilder to match the type
+            insert: vi.fn(),
+            upsert: vi.fn(),
+            update: vi.fn(),
+            delete: vi.fn(),
+            headers: {},
+            url: new URL("http://localhost"),
+          };
 
-        return queryBuilderMock;
-      });
+          return queryBuilderMock;
+        }
+      );
 
       // Call the function
       const { error } = await deleteListing({ listing_id: 1 });
@@ -680,54 +679,56 @@ describe("Listings Queries", () => {
 
     it("should return an error when an error is achieved when deleting the listing", async () => {
       // Mock the Supabase response for reservations query to simulate success
-      vi.spyOn(supabase, "from").mockImplementation((tableName: string) => {
-        const queryBuilderMock = {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockImplementation((column: string, value: any) => {
-              if (tableName === "reservations") {
-                if (column === "listing_id") {
-                  return {
-                    eq: vi.fn().mockReturnValue({
-                      gt: vi.fn().mockResolvedValueOnce({
-                        data: [], // No active reservations
-                        error: null,
+      vi.spyOn(createSupabaseBrowserClient(), "from").mockImplementation(
+        (tableName: string) => {
+          const queryBuilderMock = {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockImplementation((column: string, value: any) => {
+                if (tableName === "reservations") {
+                  if (column === "listing_id") {
+                    return {
+                      eq: vi.fn().mockReturnValue({
+                        gt: vi.fn().mockResolvedValueOnce({
+                          data: [], // No active reservations
+                          error: null,
+                        }),
                       }),
-                    }),
-                  };
+                    };
+                  }
+                } else if (tableName === "photos") {
+                  if (column === "listing_id") {
+                    return {
+                      data: [],
+                      error: null,
+                    };
+                  }
                 }
-              } else if (tableName === "photos") {
-                if (column === "listing_id") {
-                  return {
-                    data: [],
-                    error: null,
-                  };
-                }
-              }
-              return {}; // Default case if column or table doesn't match
+                return {}; // Default case if column or table doesn't match
+              }),
             }),
-          }),
 
-          delete: vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValueOnce({
-              error: {
-                message: "Failed to delete listing",
-                details: "Additional error details",
-                hint: "",
-                code: "54321",
-              },
+            delete: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValueOnce({
+                error: {
+                  message: "Failed to delete listing",
+                  details: "Additional error details",
+                  hint: "",
+                  code: "54321",
+                },
+              }),
             }),
-          }),
 
-          // Include other properties of PostgrestQueryBuilder to match the type
-          insert: vi.fn(),
-          upsert: vi.fn(),
-          update: vi.fn(),
-          headers: {},
-          url: new URL("http://localhost"),
-        };
+            // Include other properties of PostgrestQueryBuilder to match the type
+            insert: vi.fn(),
+            upsert: vi.fn(),
+            update: vi.fn(),
+            headers: {},
+            url: new URL("http://localhost"),
+          };
 
-        return queryBuilderMock;
-      });
+          return queryBuilderMock;
+        }
+      );
 
       // Call the function
       const { error } = await deleteListing({ listing_id: 1 });

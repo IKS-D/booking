@@ -1,10 +1,10 @@
 "use server";
 
-import supabase from "@/supabase/client";
 import { sendNewMessageEmail } from "./email";
 import getCurrentUser, {
   getHostIdByReservationId,
 } from "../users/usersQueries";
+import { createSupabaseBrowserClient } from "@/supabase/client";
 
 export async function getMessagesForCurrentUser(reservationId: number) {
   const currentUser = await getCurrentUser();
@@ -17,7 +17,7 @@ export async function getMessagesForCurrentUser(reservationId: number) {
     return null;
   }
 
-  let { data: messages, error } = await supabase
+  let { data: messages, error } = await createSupabaseBrowserClient()
     .from("messages")
     .select("*")
     .filter("reservation_id", "eq", reservationId)
@@ -55,15 +55,17 @@ export async function insertMessage({
     return null;
   }
 
-  let { error } = await supabase.from("messages").insert([
-    {
-      sent_time: new Date().toISOString(),
-      text: text,
-      sender_id: sender?.id ?? "",
-      received_id: receiverId ?? "",
-      reservation_id: reservationId,
-    },
-  ]);
+  let { error } = await createSupabaseBrowserClient()
+    .from("messages")
+    .insert([
+      {
+        sent_time: new Date().toISOString(),
+        text: text,
+        sender_id: sender?.id ?? "",
+        received_id: receiverId ?? "",
+        reservation_id: reservationId,
+      },
+    ]);
 
   console.log("receiverId", receiverId);
   console.log("sender", sender?.id);
@@ -84,7 +86,7 @@ export async function insertMessage({
 }
 
 export async function getUserIdFromReservation(reservationId: number) {
-  let { data: reservation, error } = await supabase
+  let { data: reservation, error } = await createSupabaseBrowserClient()
     .from("reservations")
     .select("user_id")
     .eq("id", reservationId)
@@ -106,7 +108,7 @@ export async function updateMessageText({
   messageId: number;
   newText: string;
 }) {
-  const { data, error } = await supabase
+  const { data, error } = await createSupabaseBrowserClient()
     .from("messages")
     .update({ text: newText })
     .match({ id: messageId });
@@ -126,7 +128,7 @@ export async function deleteMessage(messageId: number) {
     return null;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await createSupabaseBrowserClient()
     .from("messages")
     .delete()
     .match({ id: messageId });
@@ -146,7 +148,7 @@ export async function getMessageById(messageId: number) {
     return null;
   }
 
-  const { data: message, error } = await supabase
+  const { data: message, error } = await createSupabaseBrowserClient()
     .from("messages")
     .select("*")
     .eq("id", messageId)

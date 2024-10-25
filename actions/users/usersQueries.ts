@@ -1,9 +1,9 @@
 "use server";
 
-import supabase from "@/supabase/client";
 import { QueryData } from "@supabase/supabase-js";
 import { getPersonalListings } from "../listings/listingsQueries";
 import { createSupabaseServerClient } from "@/supabase/server";
+import { createSupabaseBrowserClient } from "@/supabase/client";
 
 export default async function getCurrentUser() {
   const supabaseServerClient = await createSupabaseServerClient();
@@ -22,7 +22,7 @@ export async function getCurrentUserProfile() {
     return null;
   }
 
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await createSupabaseBrowserClient()
     .from("profiles")
     .select("*")
     .eq("id", currentUser.id)
@@ -33,7 +33,7 @@ export async function getCurrentUserProfile() {
 
 export async function userProfileExists(userId: string) {
   // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
-  let { data: profile, error } = await supabase
+  let { data: profile, error } = await createSupabaseBrowserClient()
     .from("profiles")
     .select("*")
     .eq("id", userId);
@@ -47,7 +47,7 @@ export async function userProfileExists(userId: string) {
 export type UserProfile = QueryData<ReturnType<typeof getUserProfileById>>;
 
 export async function getUserProfileById(id: string) {
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await createSupabaseBrowserClient()
     .from("profiles")
     .select("*")
     .eq("id", id)
@@ -76,7 +76,7 @@ export async function insertProfile({
   country: string;
   city: string;
 }) {
-  let { data: profile, error } = await supabase
+  let { data: profile, error } = await createSupabaseBrowserClient()
     .from("profiles")
     .insert({
       id: userId,
@@ -113,7 +113,7 @@ export async function updateProfile({
   country: string;
   city: string;
 }) {
-  let { data: profile, error } = await supabase
+  let { data: profile, error } = await createSupabaseBrowserClient()
     .from("profiles")
     .update({
       first_name: firstName,
@@ -131,7 +131,7 @@ export async function updateProfile({
 
 export async function hostProfileExists(userId: string) {
   // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
-  let { data: host, error } = await supabase
+  let { data: host, error } = await createSupabaseBrowserClient()
     .from("hosts")
     .select("*")
     .eq("id", userId);
@@ -145,7 +145,7 @@ export async function hostProfileExists(userId: string) {
 export type HostProfile = QueryData<ReturnType<typeof getHostProfileById>>;
 
 export async function getHostProfileById(id: string) {
-  const { data: host, error } = await supabase
+  const { data: host, error } = await createSupabaseBrowserClient()
     .from("hosts")
     .select("*")
     .eq("id", id)
@@ -163,7 +163,7 @@ export async function insertHost({
   personalCode: string;
   bankAccount: string;
 }) {
-  let { data: host, error } = await supabase
+  let { data: host, error } = await createSupabaseBrowserClient()
     .from("hosts")
     .insert({
       id: userId,
@@ -185,7 +185,7 @@ export async function updateHost({
   personalCode: string;
   bankAccount: string;
 }) {
-  let { data: host, error } = await supabase
+  let { data: host, error } = await createSupabaseBrowserClient()
     .from("hosts")
     .update({
       personal_code: personalCode,
@@ -211,13 +211,16 @@ export async function deleteHost() {
     return { error: { message: "User has listings" } };
   }
 
-  let { error } = await supabase.from("hosts").delete().eq("id", user!.id);
+  let { error } = await createSupabaseBrowserClient()
+    .from("hosts")
+    .delete()
+    .eq("id", user!.id);
 
   return { error };
 }
 
 export async function getHostIdByReservationId(reservationId: number) {
-  const { data: host, error } = await supabase
+  const { data: host, error } = await createSupabaseBrowserClient()
     .from("reservations")
     .select(
       `

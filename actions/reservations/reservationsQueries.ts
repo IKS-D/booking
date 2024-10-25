@@ -1,10 +1,10 @@
 "use server";
 
-import supabase from "@/supabase/client";
 import { revalidatePath } from "next/cache";
 import { sendNewReservationEmailHost } from "./email";
 import { QueryData } from "@supabase/supabase-js";
 import { TablesInsert } from "@/supabase/database-generated.types";
+import { createSupabaseBrowserClient } from "@/supabase/client";
 
 type ReservationsWithDetails = QueryData<ReturnType<typeof getReservations>>;
 export type ReservationWithDetails = ReservationsWithDetails[0];
@@ -36,8 +36,10 @@ export async function getReservationById(reservationId: number) {
 }
 
 function getReservationsBase() {
-  return supabase.from("reservations").select(
-    `
+  return createSupabaseBrowserClient()
+    .from("reservations")
+    .select(
+      `
     *,
     listing: listings!inner (
       *,
@@ -53,14 +55,14 @@ function getReservationsBase() {
       *
     )
   `
-  );
+    );
 }
 
 export async function updateReservationStatus(
   reservationId: string,
   statusId: number
 ) {
-  let { error } = await supabase
+  let { error } = await createSupabaseBrowserClient()
     .from("reservations")
     .update({ status: statusId })
     .eq("id", reservationId);
@@ -69,7 +71,7 @@ export async function updateReservationStatus(
 }
 
 export async function rejectReservation(reservationId: string) {
-  let { error } = await supabase
+  let { error } = await createSupabaseBrowserClient()
     .from("reservations")
     .update({ status: 3 })
     .eq("id", reservationId);
@@ -80,7 +82,7 @@ export async function rejectReservation(reservationId: string) {
 }
 
 export async function confirmReservation(reservationId: string) {
-  let { error } = await supabase
+  let { error } = await createSupabaseBrowserClient()
     .from("reservations")
     .update({ status: 2 })
     .eq("id", reservationId);
@@ -91,7 +93,7 @@ export async function confirmReservation(reservationId: string) {
 }
 
 export async function cancelReservation(reservationId: string) {
-  let { error } = await supabase
+  let { error } = await createSupabaseBrowserClient()
     .from("reservations")
     .update({ status: 4 })
     .eq("id", reservationId);
@@ -116,7 +118,7 @@ export async function insertReservation({
   endDate: string;
   totalPrice: number;
 }) {
-  let { data: reservation, error } = await supabase
+  let { data: reservation, error } = await createSupabaseBrowserClient()
     .from("reservations")
     .insert({
       // new Date().toLocaleString("en-GB", { timeZone: "Europe/Vilnius" })
@@ -146,18 +148,23 @@ export async function insertOrderedServices(
   reservationId: number,
   orderedServices: { service: number }[]
 ) {
-  let { error } = await supabase.from("ordered_services").insert(
-    orderedServices.map((orderedService) => ({
-      reservation_id: reservationId,
-      service_id: orderedService.service,
-    }))
-  );
+  let { error } = await createSupabaseBrowserClient()
+    .from("ordered_services")
+    .insert(
+      orderedServices.map((orderedService) => ({
+        reservation_id: reservationId,
+        service_id: orderedService.service,
+      }))
+    );
 
   return { error };
 }
 
 export async function insertPayment(payment: TablesInsert<"payments">) {
-  let { error } = await supabase.from("payments").insert(payment).select();
+  let { error } = await createSupabaseBrowserClient()
+    .from("payments")
+    .insert(payment)
+    .select();
 
   return { error };
 }
