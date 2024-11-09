@@ -5,12 +5,14 @@ import { DateRange } from "react-day-picker";
 
 type SelectDateRangeFormProps = {
   onDateRangeUpdate: (data: DateRange) => void;
-  formData: any;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
 };
 
 const SelectDateRangeForm = ({
   onDateRangeUpdate,
-  formData,
+  startDate,
+  endDate,
 }: SelectDateRangeFormProps) => {
   return (
     <AnimatedFormWrapper
@@ -21,17 +23,17 @@ const SelectDateRangeForm = ({
       <div className="mt-[20px]">
         <DatePickerWithRange
           range={{
-            from: formData.start_date,
-            to: formData.end_date,
+            from: startDate,
+            to: endDate
           }}
           onRangeChange={(dateRange) => {
             onDateRangeUpdate(dateRange);
           }}
         />
-        {formData.start_date && formData.end_date && (
+        {startDate && endDate && (
           <p className="text-md pt-2 pl-1">
             Your reservation will be for{" "}
-            {differenceInDays(formData.end_date, formData.start_date)} days.
+            {differenceInDays(endDate, startDate)} days.
           </p>
         )}
       </div>

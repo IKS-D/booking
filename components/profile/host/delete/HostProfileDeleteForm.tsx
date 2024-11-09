@@ -14,7 +14,7 @@ interface HostProfileDeleteFormProps {
   listingCount: number;
 }
 
-export default function HostProfileDeleteForm({ user, listingCount, }: HostProfileDeleteFormProps) {
+export default function HostProfileDeleteForm({ listingCount, }: HostProfileDeleteFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const ableToDelete = (listingCount == 0);

@@ -1,6 +1,5 @@
 import { UserProfile } from "@/actions/users/usersQueries";
-import { EditIcon, DeleteIcon } from "../../Icons";
-import { Input, Avatar, Link, } from "@nextui-org/react";
+import { Input, Avatar, } from "@nextui-org/react";
 import { User } from "@supabase/supabase-js";
 
 interface UserProfileCardProps {
@@ -8,7 +7,7 @@ interface UserProfileCardProps {
   userProfile: UserProfile;
 }
 
-export default async function UserProfileCard({ user, userProfile, }: UserProfileCardProps) {
+export default async function UserProfileCard({ userProfile, }: UserProfileCardProps) {
   return (
     <div className="w-full flex flex-col items-center justify-center">
       <Avatar className="mb-4 h-[100px] w-[100px]" 

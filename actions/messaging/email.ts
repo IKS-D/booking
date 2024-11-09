@@ -65,7 +65,7 @@ async function fetchUserEmail(userId: string) {
     },
   });
 
-  const { data, error } = await supabase.auth.admin.getUserById(userId);
+  const { data } = await supabase.auth.admin.getUserById(userId);
 
   return data;
 }

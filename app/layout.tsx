@@ -7,7 +7,6 @@ import { fontSans } from "@/config/fonts";
 import { Link } from "@nextui-org/link";
 import TopNavbar from "@/components/TopNavbar";
 import { Toaster } from "sonner";
-import { cookies } from "next/headers";
 import ClientOnly from "@/components/ClientOnly";
 import { createSupabaseServerClient } from "@/supabase/server";
 
@@ -18,9 +17,9 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: "/iksd.svg",
+    shortcut: "/iksd.svg",
+    apple: "/iksd.svg",
   },
 };
 

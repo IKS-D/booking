@@ -22,7 +22,7 @@ export async function getCurrentUserProfile() {
     return null;
   }
 
-  const { data: profile, error } = await createSupabaseBrowserClient()
+  const { data: profile } = await createSupabaseBrowserClient()
     .from("profiles")
     .select("*")
     .eq("id", currentUser.id)
@@ -33,7 +33,7 @@ export async function getCurrentUserProfile() {
 
 export async function userProfileExists(userId: string) {
   // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
-  let { data: profile, error } = await createSupabaseBrowserClient()
+  const { data: profile, error } = await createSupabaseBrowserClient()
     .from("profiles")
     .select("*")
     .eq("id", userId);
@@ -76,7 +76,7 @@ export async function insertProfile({
   country: string;
   city: string;
 }) {
-  let { data: profile, error } = await createSupabaseBrowserClient()
+  const { data: profile, error } = await createSupabaseBrowserClient()
     .from("profiles")
     .insert({
       id: userId,
@@ -113,7 +113,7 @@ export async function updateProfile({
   country: string;
   city: string;
 }) {
-  let { data: profile, error } = await createSupabaseBrowserClient()
+  const { data: profile, error } = await createSupabaseBrowserClient()
     .from("profiles")
     .update({
       first_name: firstName,
@@ -131,7 +131,7 @@ export async function updateProfile({
 
 export async function hostProfileExists(userId: string) {
   // not using getUserProfileById because it throws error due to .single() when profile doesn't exist
-  let { data: host, error } = await createSupabaseBrowserClient()
+  const { data: host, error } = await createSupabaseBrowserClient()
     .from("hosts")
     .select("*")
     .eq("id", userId);
@@ -163,7 +163,7 @@ export async function insertHost({
   personalCode: string;
   bankAccount: string;
 }) {
-  let { data: host, error } = await createSupabaseBrowserClient()
+  const { data: host, error } = await createSupabaseBrowserClient()
     .from("hosts")
     .insert({
       id: userId,
@@ -185,7 +185,7 @@ export async function updateHost({
   personalCode: string;
   bankAccount: string;
 }) {
-  let { data: host, error } = await createSupabaseBrowserClient()
+  const { data: host, error } = await createSupabaseBrowserClient()
     .from("hosts")
     .update({
       personal_code: personalCode,
@@ -211,7 +211,7 @@ export async function deleteHost() {
     return { error: { message: "User has listings" } };
   }
 
-  let { error } = await createSupabaseBrowserClient()
+  const { error } = await createSupabaseBrowserClient()
     .from("hosts")
     .delete()
     .eq("id", user!.id);

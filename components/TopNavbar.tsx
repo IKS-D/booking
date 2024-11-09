@@ -1,11 +1,10 @@
 import { Navbar } from "@nextui-org/navbar";
 import { NavbarBrand } from "@nextui-org/navbar";
-import { NavbarContent, NavbarItem } from "@nextui-org/navbar";
+import { NavbarContent } from "@nextui-org/navbar";
 import NextLink from "next/link";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import BookingLogo from "./BookingLogo";
 import AvatarDropdownMenu from "./AvatarDropdownMenu";
-import { BiBell } from "react-icons/bi";
 import { User } from "@supabase/supabase-js";
 import {
   UserProfile,
@@ -13,7 +12,6 @@ import {
   hostProfileExists,
   userProfileExists,
 } from "@/actions/users/usersQueries";
-import { Button, Link } from "@nextui-org/react";
 
 // export const dynamic = "force-dynamic";
 export const revalidate = 0;

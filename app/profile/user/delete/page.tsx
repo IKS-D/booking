@@ -1,7 +1,5 @@
 import UserProfileDeleteForm from "@/components/profile/user/delete/UserProfileDeleteForm";
-import getCurrentUser, {
-  getUserProfileById,
-} from "@/actions/users/usersQueries";
+import getCurrentUser from "@/actions/users/usersQueries";
 import { getReservations } from "@/actions/reservations/reservationsQueries";
 import { toast } from "sonner";
 import { getPersonalListings } from "@/actions/listings/listingsQueries";

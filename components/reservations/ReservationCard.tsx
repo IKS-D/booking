@@ -26,7 +26,6 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
   onAction,
   disabledCancel: disabled,
   actionLabel,
-  currentUser,
 }) => {
   const listing = reservation.listing!;
 

@@ -247,6 +247,7 @@ export const EyeSlashFilledIcon = (props: IconSvgProps) => (
 );
 
 export const CameraIcon = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fill,
   size,
   height,

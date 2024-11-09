@@ -10,7 +10,7 @@ type ReservationsWithDetails = QueryData<ReturnType<typeof getReservations>>;
 export type ReservationWithDetails = ReservationsWithDetails[0];
 
 export async function getReservations(userId: string) {
-  let { data: reservations, error } = await getReservationsBase().eq(
+  const { data: reservations, error } = await getReservationsBase().eq(
     "user_id",
     userId
   );
@@ -19,7 +19,7 @@ export async function getReservations(userId: string) {
 }
 
 export async function getHostReservations(hostId: string) {
-  let { data: reservations, error } = await getReservationsBase().eq(
+  const { data: reservations, error } = await getReservationsBase().eq(
     "listing.host_id",
     hostId
   );
@@ -28,7 +28,7 @@ export async function getHostReservations(hostId: string) {
 }
 
 export async function getReservationById(reservationId: number) {
-  let { data: reservation, error } = await getReservationsBase()
+  const { data: reservation, error } = await getReservationsBase()
     .eq("id", reservationId)
     .single();
 
@@ -62,7 +62,7 @@ export async function updateReservationStatus(
   reservationId: string,
   statusId: number
 ) {
-  let { error } = await createSupabaseBrowserClient()
+  const { error } = await createSupabaseBrowserClient()
     .from("reservations")
     .update({ status: statusId })
     .eq("id", reservationId);
@@ -71,7 +71,7 @@ export async function updateReservationStatus(
 }
 
 export async function rejectReservation(reservationId: string) {
-  let { error } = await createSupabaseBrowserClient()
+  const { error } = await createSupabaseBrowserClient()
     .from("reservations")
     .update({ status: 3 })
     .eq("id", reservationId);
@@ -82,7 +82,7 @@ export async function rejectReservation(reservationId: string) {
 }
 
 export async function confirmReservation(reservationId: string) {
-  let { error } = await createSupabaseBrowserClient()
+  const { error } = await createSupabaseBrowserClient()
     .from("reservations")
     .update({ status: 2 })
     .eq("id", reservationId);
@@ -93,7 +93,7 @@ export async function confirmReservation(reservationId: string) {
 }
 
 export async function cancelReservation(reservationId: string) {
-  let { error } = await createSupabaseBrowserClient()
+  const { error } = await createSupabaseBrowserClient()
     .from("reservations")
     .update({ status: 4 })
     .eq("id", reservationId);
@@ -118,7 +118,7 @@ export async function insertReservation({
   endDate: string;
   totalPrice: number;
 }) {
-  let { data: reservation, error } = await createSupabaseBrowserClient()
+  const { data: reservation, error } = await createSupabaseBrowserClient()
     .from("reservations")
     .insert({
       // new Date().toLocaleString("en-GB", { timeZone: "Europe/Vilnius" })
@@ -148,7 +148,7 @@ export async function insertOrderedServices(
   reservationId: number,
   orderedServices: { service: number }[]
 ) {
-  let { error } = await createSupabaseBrowserClient()
+  const { error } = await createSupabaseBrowserClient()
     .from("ordered_services")
     .insert(
       orderedServices.map((orderedService) => ({
@@ -161,7 +161,7 @@ export async function insertOrderedServices(
 }
 
 export async function insertPayment(payment: TablesInsert<"payments">) {
-  let { error } = await createSupabaseBrowserClient()
+  const { error } = await createSupabaseBrowserClient()
     .from("payments")
     .insert(payment)
     .select();

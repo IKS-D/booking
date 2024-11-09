@@ -13,10 +13,6 @@ interface ListingCardProps {
 
 const ListingCard: React.FC<ListingCardProps> = ({
   listing,
-  onAction,
-  disabled,
-  actionLabel,
-  actionId = "",
 }) => {
   return (
     <Link href={`/listings/[id]`} as={`/listings/${listing.id}`} passHref>

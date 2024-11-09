@@ -1,13 +1,12 @@
 import { getListings } from "@/actions/listings/listingsQueries";
 import ListingsContent from "../../components/listings/ListingsContent";
-import { useRouter } from "next/navigation";
 import NotFoundComponent from "@/components/NotFoundComponent";
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 const ListingsPage = async () => {
-  const { data: listings, error } = await getListings();
+  const { data: listings } = await getListings();
   if (!listings || listings.length === 0) {
     return (
       <div className="h-full flex flex-col justify-center items-center">

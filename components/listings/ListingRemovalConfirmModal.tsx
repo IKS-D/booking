@@ -9,7 +9,6 @@ import {
   ModalFooter,
 } from "@nextui-org/modal";
 import { Button } from "@nextui-org/react";
-import { BsWindowSidebar } from "react-icons/bs";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 

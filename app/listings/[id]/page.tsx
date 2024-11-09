@@ -2,25 +2,17 @@ import {
   getListingById,
   getChartInformation,
 } from "@/actions/listings/listingsQueries";
-import { Image } from "@nextui-org/react";
 import Head from "next/head";
-import { useEffect, useMemo, useRef } from "react";
 import ListingContent from "../../../components/listings/ListingContent";
 import ListingChart from "../../../components/listings/ListingChart";
 
-export default async function ListingPage(
-  props: {
-    params: Promise<{ id: number }>;
-  }
-) {
+export default async function ListingPage(props: {
+  params: Promise<{ id: number }>;
+}) {
   const params = await props.params;
-  const { data: average, error: chartError } = await getChartInformation(
-    params.id
-  );
+  const { data: average } = await getChartInformation(params.id);
 
-  const id = params.id; // Extract the 'id' from the URL
-
-  const { data: listing, error } = await getListingById(params.id);
+  const { data: listing } = await getListingById(params.id);
 
   if (!listing) {
     return (
@@ -45,6 +37,7 @@ export default async function ListingPage(
         <script
           type="text/javascript"
           src="https://www.gstatic.com/charts/loader.js"
+          async
         ></script>
       </Head>
       <div>

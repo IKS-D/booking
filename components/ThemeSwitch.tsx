@@ -8,7 +8,6 @@ import { useIsSSR } from "@react-aria/ssr";
 import clsx from "clsx";
 import { MoonFilledIcon, SunFilledIcon } from "./Icons";
 
-
 export interface ThemeSwitchProps {
   className?: string;
   classNames?: SwitchProps["classNames"];
@@ -22,7 +21,11 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
   const isSSR = useIsSSR();
 
   const onChange = () => {
-    theme === "light" ? setTheme("dark") : setTheme("light");
+    if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
   };
 
   const {

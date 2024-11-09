@@ -14,7 +14,6 @@ import {
   updateListing,
 } from "@/actions/listings/listingsQueries";
 import FileUpload from "./FileUpload";
-import { List } from "postcss/lib/list";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -33,7 +32,6 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
   const [selectedFiles, setSelectedFiles] = React.useState<FileList | null>(
     null
   );
-  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
 
   const router = useRouter();
 
@@ -136,8 +134,6 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
                 const rawValue = event.target.value;
                 const regex = /^\d+(\.\d{0,2})?$/; // Allow up to two decimal places
                 if (rawValue === "" || regex.test(rawValue)) {
-                  const value =
-                    rawValue === "" ? undefined : parseFloat(rawValue);
                   handleInputChange("day_price", event.target.value);
                 }
               }}

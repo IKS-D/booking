@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Table,
   TableHeader,
@@ -6,9 +6,7 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Chip,
   Tooltip,
-  ChipProps,
   Pagination,
   useDisclosure,
 } from "@nextui-org/react";
@@ -17,10 +15,7 @@ import ListingRemovalConfirmModal from "@/components/listings/ListingRemovalConf
 import ListingEditModal from "@/components/listings/ListingEditModal";
 
 import { DeleteIcon } from "../Icons";
-import { Reservation } from "@/types";
-import { IoMdCheckmark as CheckmarkIcon } from "react-icons/io";
 import { format } from "date-fns";
-import { toast } from "sonner";
 import { Listing, Listings } from "@/actions/listings/listingsQueries";
 
 const columns = [
@@ -34,12 +29,6 @@ const columns = [
   { name: "CREATION DATE", uid: "created_at" },
   { name: "ACTIONS", uid: "actions" },
 ];
-
-const statusColorMap: Record<string, ChipProps["color"]> = {
-  confirmed: "success",
-  canceled: "danger",
-  pending: "warning",
-};
 
 interface PersonalListingsTableProps {
   listings: Listings;
@@ -68,18 +57,24 @@ export default function PersonalListingsTable({
     null
   );
 
-  const removeListing = (listing: Listing) => {
-    setSelectedListing(listing);
-    removeModal.onOpenChange();
-  };
-
-  const editListing = (listing: Listing) => {
-    setSelectedListing(listing);
-    editModal.onOpenChange();
-  };
-
   const editModal = useDisclosure();
   const removeModal = useDisclosure();
+
+  const removeListing = useCallback(
+    (listing: Listing) => {
+      setSelectedListing(listing);
+      removeModal.onOpenChange();
+    },
+    [removeModal]
+  );
+
+  const editListing = useCallback(
+    (listing: Listing) => {
+      setSelectedListing(listing);
+      editModal.onOpenChange();
+    },
+    [editModal]
+  );
 
   const renderCell = React.useCallback(
     (listing: Listing, columnKey: React.Key) => {
@@ -170,7 +165,7 @@ export default function PersonalListingsTable({
           return <></>;
       }
     },
-    []
+    [editListing, removeListing]
   );
 
   return (

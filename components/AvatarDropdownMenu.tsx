@@ -13,7 +13,6 @@ import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { UserProfile } from "@/actions/users/usersQueries";
 import { signOut } from "@/actions/auth/authQueries";
-import { error } from "console";
 import { toast } from "sonner";
 
 interface AvatarDropdownMenuProps {
@@ -31,7 +30,11 @@ export default function AvatarDropdownMenu({
   const router = useRouter();
 
   const onThemeChange = () => {
-    theme === "light" ? setTheme("dark") : setTheme("light");
+    if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("light");
+    }
   };
 
   const onLogout = async () => {

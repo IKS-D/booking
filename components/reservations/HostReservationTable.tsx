@@ -178,7 +178,7 @@ export default function HostReservationTable({
           return <></>;
       }
     },
-    []
+    [detailsModal, onConfirm, onReject]
   );
 
   return (

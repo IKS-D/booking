@@ -17,7 +17,6 @@ interface HostReservationsContentProps {
 
 const HostReservationsContent: React.FC<HostReservationsContentProps> = ({
   reservations,
-  currentUser,
 }) => {
   return (
     <div className="max-w-full items-center">

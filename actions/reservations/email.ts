@@ -25,7 +25,7 @@ export const sendNewReservationEmailHost = async (reservation_id: number) => {
   }
 
   const { data, error: authError } = await supabase.auth.admin.getUserById(
-    reservation.listing?.host_id!
+    reservation.listing?.host_id
   );
 
   /* v8 ignore next 3 */
@@ -46,7 +46,7 @@ export const sendNewReservationEmailHost = async (reservation_id: number) => {
       }) as React.ReactElement,
     });
     /* v8 ignore next 3 */
-  } catch (error) {
+  } catch {
     return { error: new Error("Failed to send email") };
   }
 };

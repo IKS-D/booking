@@ -1,9 +1,7 @@
 import { forwardRef } from "react";
 import type { LinkProps } from "next/link";
 import type { AnchorHTMLAttributes } from "react";
-import Link from "next/link";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 

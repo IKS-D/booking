@@ -117,8 +117,9 @@ const ReservationDetailsModal: React.FC<ReservationDetailsProps> = ({
                     <label className={subtitle({})}>Additional services</label>
 
                     <div className="flex flex-row gap-2">
-                      {reservation.ordered_services.map((service) => (
+                      {reservation.ordered_services.map((service, index) => (
                         <Input
+                          key={index}
                           label={service.service?.title}
                           value={`${(service.service?.price || 0) / 100} €`}
                           readOnly

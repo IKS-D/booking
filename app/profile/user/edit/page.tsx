@@ -1,10 +1,9 @@
-import { cookies } from "next/headers";
 import getCurrentUser, { getUserProfileById } from "@/actions/users/usersQueries";
 import UserProfileEditForm from "@/components/profile/user/edit/UserProfileEditForm";
 
 export default async function UserProfileEditPage() {
   const user = await getCurrentUser();
-  const { data: userProfile, error } = await getUserProfileById(user!.id);
+  const { data: userProfile } = await getUserProfileById(user!.id);
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4">

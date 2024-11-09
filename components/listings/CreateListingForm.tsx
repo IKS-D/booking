@@ -165,7 +165,7 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
 
     if (currentStepIndex === 4) {
       let hasErrors = false;
-      let newErrors = [...serviceErrors];
+      const newErrors = [...serviceErrors];
 
       services.forEach((service, index) => {
         // If the array at the current index doesn't exist, create an empty array
@@ -206,9 +206,6 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
     nextStep,
     isFirstStep,
     isLastStep,
-    steps,
-    goTo,
-    showSuccessMsg,
   } = useMultiplestepForm(5);
 
   return (

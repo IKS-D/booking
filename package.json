@@ -1,17 +1,17 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "eslint": "eslint --stats",
-    "test": "vitest",
-    "vitest-ui": "vitest --ui --api 9527 --coverage.enabled=true",
+    "vitest": "vitest",
+    "vitest:ui": "vitest --ui --api 9527 --coverage.enabled=true",
     "coverage": "vitest run --coverage",
     "playwright": "playwright test",
-    "playwright-ui": "playwright test --ui"
+    "playwright:ui": "playwright test --ui"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.0",

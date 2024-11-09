@@ -5,7 +5,7 @@ interface FileUploadProps {
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileChange }) => {
-  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [, setSelectedFiles] = useState<FileList | null>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;

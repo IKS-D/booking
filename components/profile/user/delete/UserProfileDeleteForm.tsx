@@ -16,7 +16,7 @@ interface ProfileDeleteFormProps {
   listingCount: number;
 }
 
-export default function UserProfileDeleteForm({ user, reservationCount, listingCount, }: ProfileDeleteFormProps) {
+export default function UserProfileDeleteForm({ reservationCount, listingCount, }: ProfileDeleteFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const ableToDelete = (reservationCount == 0 && listingCount == 0);

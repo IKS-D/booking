@@ -33,14 +33,8 @@ export default function CreateReservationForm({
     start_date?: string[] | undefined;
     end_date?: string[] | undefined;
   }>();
-  const {
-    previousStep,
-    nextStep,
-    currentStepIndex,
-    isFirstStep,
-    isLastStep,
-    showSuccessMsg,
-  } = useMultiplestepForm(3);
+  const { previousStep, nextStep, currentStepIndex, isFirstStep, isLastStep } =
+    useMultiplestepForm(3);
 
   const totalPrice = () => {
     const servicesPrice =
@@ -95,8 +89,8 @@ export default function CreateReservationForm({
     toast.success("Reservation created successfully");
 
     const payseraLink = await createPayment(
-      reservation?.total_price!,
-      reservation?.id!,
+      reservation?.total_price || -1,
+      reservation?.id || -1,
       user.id!
     );
     window.location.href = payseraLink;
@@ -118,7 +112,8 @@ export default function CreateReservationForm({
               <div className="flex flex-col">
                 <SelectDateRangeForm
                   key="step1"
-                  formData={formData}
+                  startDate={formData.start_date}
+                  endDate={formData.end_date}
                   onDateRangeUpdate={(dateRange) => {
                     validateForm(dateRange);
                     setFormData({
@@ -130,14 +125,20 @@ export default function CreateReservationForm({
                 />
                 <div className="mt-2">
                   {error?.start_date &&
-                    error.start_date.map((err) => (
-                      <p className="pl-1 font-medium text-xs text-red-500">
+                    error.start_date.map((err, index) => (
+                      <p
+                        key={index}
+                        className="pl-1 font-medium text-xs text-red-500"
+                      >
                         {err}
                       </p>
                     ))}
                   {error?.end_date &&
-                    error.end_date.map((err) => (
-                      <p className="pl-1 font-medium text-xs text-red-500">
+                    error.end_date.map((err, index) => (
+                      <p
+                        key={index}
+                        className="pl-1 font-medium text-xs text-red-500"
+                      >
                         {err}
                       </p>
                     ))}

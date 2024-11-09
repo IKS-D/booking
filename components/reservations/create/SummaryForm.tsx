@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@nextui-org/react";
-import { Listing, Reservation } from "@/types";
+import { Reservation } from "@/types";
 import { ListingWithDetails } from "@/actions/listings/listingsQueries";
 
 interface SummaryFormProps {

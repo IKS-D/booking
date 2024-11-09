@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-import { Image, Button, Divider, Textarea, Input } from "@nextui-org/react";
-import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
-import { AverageData, Listing } from "@/actions/listings/listingsQueries";
+import { useCallback, useEffect, useRef } from "react";
+import { AverageData } from "@/actions/listings/listingsQueries";
 
 type ListingChartProps = {
   average: AverageData;
@@ -11,9 +9,8 @@ type ListingChartProps = {
 
 const ListingChart: React.FC<ListingChartProps> = ({ average }) => {
   const pieEl = useRef<HTMLDivElement>(null);
-  const barEl = useRef<HTMLDivElement>(null);
 
-  const drawChart = () => {
+  const drawChart = useCallback(() => {
     const data = new google.visualization.DataTable();
     const options = {
       title: "The average price of rent for the amount of people in this city",
@@ -60,7 +57,7 @@ const ListingChart: React.FC<ListingChartProps> = ({ average }) => {
     );
 
     pieChart.draw(data, options);
-  };
+  }, [average]);
 
   useEffect(() => {
     console.log("Component mounted");
@@ -84,7 +81,7 @@ const ListingChart: React.FC<ListingChartProps> = ({ average }) => {
     return () => {
       document.head.removeChild(script);
     };
-  }, []);
+  }, [drawChart]);
 
   return (
     <section className="relative z-0">

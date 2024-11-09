@@ -17,7 +17,7 @@ export async function getMessagesForCurrentUser(reservationId: number) {
     return null;
   }
 
-  let { data: messages, error } = await createSupabaseBrowserClient()
+  const { data: messages, error } = await createSupabaseBrowserClient()
     .from("messages")
     .select("*")
     .filter("reservation_id", "eq", reservationId)
@@ -55,7 +55,7 @@ export async function insertMessage({
     return null;
   }
 
-  let { error } = await createSupabaseBrowserClient()
+  const { error } = await createSupabaseBrowserClient()
     .from("messages")
     .insert([
       {
@@ -86,7 +86,7 @@ export async function insertMessage({
 }
 
 export async function getUserIdFromReservation(reservationId: number) {
-  let { data: reservation, error } = await createSupabaseBrowserClient()
+  const { data: reservation, error } = await createSupabaseBrowserClient()
     .from("reservations")
     .select("user_id")
     .eq("id", reservationId)

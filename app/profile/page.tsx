@@ -10,12 +10,12 @@ import { Link } from "@nextui-org/react";
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();
-  const { data: userProfile, error: profileError } = await getUserProfileById(
+  const { data: userProfile } = await getUserProfileById(
     user!.id
   );
-  var hostProfile;
+  let hostProfile;
   if (await hostProfileExists(user!.id)) {
-    const { data: recvHostProfile, error: hostError } =
+    const { data: recvHostProfile } =
       await getHostProfileById(user!.id);
     hostProfile = recvHostProfile;
   } else {

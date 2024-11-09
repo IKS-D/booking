@@ -41,7 +41,7 @@ const validateUrl = (photo: string) => {
   try {
     new URL(photo);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 };

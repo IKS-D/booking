@@ -18,7 +18,7 @@ export async function createSupabaseServerClient() {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
-          } catch (error) {}
+          } catch {}
         },
       },
     }
@@ -41,7 +41,7 @@ export async function createSupabaseServiceClient() {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
-          } catch (error) {}
+          } catch {}
         },
       },
     }

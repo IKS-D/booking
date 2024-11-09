@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@nextui-org/button";
-import { Checkbox } from "@nextui-org/checkbox";
 import { Input } from "@nextui-org/input";
 import { Spacer } from "@nextui-org/spacer";
 import {
@@ -15,7 +14,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../Icons";
 import { useRouter } from "next/navigation";
-import { AuthError } from "@supabase/supabase-js";
 import LoadingSpinner from "../LoadingSpinner";
 import { signInUsingEmailAndPassword } from "@/actions/auth/authQueries";
 
@@ -30,7 +28,6 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setError,
   } = useForm<LoginUserFormData>({
     resolver: zodResolver(loginUserSchema),
   });
@@ -123,7 +120,7 @@ export default function LoginForm() {
         {/* or sign up */}
         <Spacer y={1} />
         <div className="flex flex-col items-center">
-          <label className="text-md">Don't have an account?</label>
+          <label className="text-md">Don&apos;t have an account?</label>
           <Link href="/registration/user">
             <p className="text-md text-primary">Sign up</p>
           </Link>

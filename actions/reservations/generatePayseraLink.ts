@@ -18,7 +18,7 @@ export async function createPayment(
     throw new Error("NEXT_PUBLIC_PAYSERA_CALLBACK_URL not found");
   }
 
-  const { data: userProfile, error } = await getUserProfileById(user_id);
+  const { data: userProfile } = await getUserProfileById(user_id);
 
   const link = buildPayseraPaymentLink({
     orderid: reservation_id?.toString(),

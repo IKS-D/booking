@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { EditIcon } from "@/components/Icons";
 import { HostRegistrationFormData, HostRegistrationSchema } from "@/lib/validations/registerHost";
-import { HostProfile, insertHost, updateHost } from "@/actions/users/usersQueries";
+import { HostProfile, updateHost } from "@/actions/users/usersQueries";
 import { User } from "@supabase/supabase-js";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
@@ -55,7 +55,7 @@ export default function HostProfileCreateForm({ user, hostProfile, } : HostProfi
       return;
     }
 
-    const { host, error } = await updateHost({
+    const { error } = await updateHost({
       userId: user.id,
       personalCode: formData.personalCode,
       bankAccount: formData.bankAccount,

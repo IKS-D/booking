@@ -14,7 +14,6 @@ interface PersonalListingsContentProps {
 
 const PersonalListingsContent: React.FC<PersonalListingsContentProps> = ({
   listings,
-  currentUser,
 }) => {
   return (
     <div className="max-w-full items-center">

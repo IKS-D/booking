@@ -2,13 +2,11 @@
 
 import { User } from "@supabase/supabase-js";
 import React, { useState } from "react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { Avatar, Button, Input, Link } from "@nextui-org/react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ProfileRegistrationFormData, ProfileRegistrationSchema } from "@/lib/validations/registerProfile";
-import { UserProfile, insertProfile, updateProfile } from "@/actions/users/usersQueries";
+import { UserProfile, updateProfile } from "@/actions/users/usersQueries";
 import { EditIcon } from "../../../Icons";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
@@ -66,7 +64,7 @@ export default function UserProfileEditForm({ user, userProfile, }: ProfileEditF
       return;
     }
 
-    const { profile, error } = await updateProfile({
+    const { error } = await updateProfile({
       userId: user.id,
       firstName: formData.firstName,
       lastName: formData.lastName,

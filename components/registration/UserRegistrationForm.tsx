@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Button, Input } from "@nextui-org/react";
 import { toast } from "sonner";
 import { UserRegistrationFormData, UserRegistrationSchema } from "@/lib/validations/registerUser";
-import { AuthError } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../Icons";
 import LoadingSpinner from "../LoadingSpinner";
@@ -27,7 +26,6 @@ export default function UserRegistrationForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setError,
   } = useForm<UserRegistrationFormData>({
     resolver: zodResolver(UserRegistrationSchema),
   }); 

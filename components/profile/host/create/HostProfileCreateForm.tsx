@@ -51,7 +51,7 @@ export default function HostProfileCreateForm({ user, }: HostProfileCreateFormPr
       return;
     }
 
-    const { host, error } = await insertHost({
+    const { error } = await insertHost({
       userId: user.id,
       personalCode: formData.personalCode,
       bankAccount: formData.bankAccount,

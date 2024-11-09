@@ -34,7 +34,7 @@ const AdditionalServicesForm = ({
       .map((service) => service.title);
 
     return values.join(", ").replaceAll("_", " ");
-  }, [selectedKeys]);
+  }, [selectedKeys, additionalServices]);
 
   const servicesPrice = React.useMemo(() => {
     if (selectedKeys.size === 0) return 0;
@@ -46,7 +46,7 @@ const AdditionalServicesForm = ({
       .map((service) => service.price);
 
     return values.reduce((a, b) => a + b, 0);
-  }, [selectedKeys]);
+  }, [selectedKeys, additionalServices]);
 
   const onSelectionChange = (keys: Set<string>) => {
     setSelectedKeys(keys);
@@ -86,8 +86,7 @@ const AdditionalServicesForm = ({
             closeOnSelect={false}
             selectionMode="multiple"
             selectedKeys={selectedKeys}
-            // @ts-ignore
-            onSelectionChange={onSelectionChange}
+            onSelectionChange={(keys) => onSelectionChange(keys as Set<string>)}
           >
             {additionalServices.map((service) => (
               <DropdownItem

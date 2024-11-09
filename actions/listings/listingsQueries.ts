@@ -2,11 +2,6 @@ import { createSupabaseBrowserClient } from "@/supabase/client";
 import { QueryData } from "@supabase/supabase-js";
 import { nanoid } from "nanoid";
 
-interface Params {
-  listingId?: string;
-  userId?: string;
-  authorId?: string;
-}
 
 // If making changes to this code, make sure it doesn't break create reservation page
 export type ListingWithDetails = QueryData<ReturnType<typeof getListingById>>;
@@ -36,7 +31,7 @@ export type Listings = QueryData<ReturnType<typeof getListingsBase>>;
 export type Listing = Listings[0];
 
 export async function getListings() {
-  let { data: listings, error } = await getListingsBase();
+  const { data: listings, error } = await getListingsBase();
 
   console.log(error);
 
@@ -113,7 +108,7 @@ export function getFilenameFromUrl(url: string): string {
     }
 
     return urlParts[0];
-  } catch (error) {
+  } catch {
     // If the URL is invalid, return it as-is
     return url;
   }
@@ -177,7 +172,7 @@ export async function deleteListing({ listing_id }: { listing_id: number }) {
     console.log("Photos found:", photos);
     for (const photo of photos) {
       const filename = getFilenameFromUrl(photo.url);
-      const { data: removed, error: photoDeleteError } =
+      const { error: photoDeleteError } =
         await createSupabaseBrowserClient()
           .storage.from("images")
           .remove([filename]);
@@ -260,7 +255,7 @@ export async function insertListing({
   listing.day_price = priceInCents;
 
   // Insert the listing into the database
-  let { data: addedListing, error } = await createSupabaseBrowserClient()
+  const { data: addedListing, error } = await createSupabaseBrowserClient()
     .from("listings")
     .insert({
       address: listing.address!,
@@ -354,7 +349,7 @@ function getListingsBase() {
 export type Categories = QueryData<ReturnType<typeof getListingCategories>>;
 
 export async function getListingCategories() {
-  let { data: categories, error } = await createSupabaseBrowserClient()
+  const { data: categories, error } = await createSupabaseBrowserClient()
     .from("listing_category")
     .select("*");
 

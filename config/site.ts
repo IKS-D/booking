@@ -1,4 +1,4 @@
-import { BiHomeAlt, BiFile, BiLogoGithub } from "react-icons/bi";
+import { BiHomeAlt, BiLogoGithub } from "react-icons/bi";
 
 export type SiteConfig = typeof siteConfig;
 

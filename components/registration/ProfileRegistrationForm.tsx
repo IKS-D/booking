@@ -36,7 +36,6 @@ export default function ProfileRegistrationForm({
     getValues,
     formState: { errors, isSubmitting },
     reset,
-    setError,
   } = useForm<ProfileRegistrationFormData>({
     resolver: zodResolver(ProfileRegistrationSchema),
   });
@@ -44,7 +43,7 @@ export default function ProfileRegistrationForm({
   const onSubmit = async (data: ProfileRegistrationFormData) => {
     setLoading(true);
 
-    const { profile, error } = await insertProfile({
+    const { error } = await insertProfile({
       userId: user.id,
       firstName: data.firstName,
       lastName: data.lastName,

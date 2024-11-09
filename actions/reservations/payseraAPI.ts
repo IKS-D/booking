@@ -56,6 +56,7 @@ export const buildPayseraPaymentLink = (params: PayseraParams) => {
   return `${base_url}?data=${data}&sign=${sign}`;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const decodePayseraData = (data: string, ss1: string, _ss2: string) => {
   const password = process.env.NEXT_PUBLIC_PAYSERA_PASSWORD;
 
@@ -63,7 +64,7 @@ export const decodePayseraData = (data: string, ss1: string, _ss2: string) => {
     throw new Error("Paysera Project Password not found");
   }
 
-  let replacedData = data.replace(/-/g, "+").replace(/_/g, "/");
+  const replacedData = data.replace(/-/g, "+").replace(/_/g, "/");
 
   let decodedData = Buffer.from(replacedData, "base64").toString("utf-8");
   decodedData = decodeURIComponent(decodedData).replace(/\+/g, " ");

@@ -8,7 +8,7 @@ interface HostProfileCardProps {
   hostProfile: HostProfile | null;
 }
 
-export default async function HostProfileCard({ user, hostProfile, }: HostProfileCardProps) {
+export default async function HostProfileCard({ hostProfile, }: HostProfileCardProps) {
   return (
     <div className="w-full flex flex-col items-center justify-center">
       <div className="text-lg font-bold mb-4">Your host profile</div>

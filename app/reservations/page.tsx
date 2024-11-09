@@ -1,9 +1,7 @@
 import getCurrentUser from "@/actions/users/usersQueries";
 import { getReservations } from "@/actions/reservations/reservationsQueries";
 import ReservationsContent from "../../components/reservations/ReservationsContent";
-import { notFound } from "next/navigation";
 import NotFoundComponent from "@/components/NotFoundComponent";
-import { unstable_SuspenseList } from "react";
 import { unstable_noStore as noStore } from "next/cache";
 
 const ReservationsPage = async () => {
@@ -18,7 +16,7 @@ const ReservationsPage = async () => {
     );
   }
 
-  const { data: reservations, error } = await getReservations(currentUser.id);
+  const { data: reservations } = await getReservations(currentUser.id);
 
   if (!reservations || reservations.length === 0) {
     return (
