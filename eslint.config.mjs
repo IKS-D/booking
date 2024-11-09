@@ -27,6 +27,7 @@ const config = [
       "__tests__/*",
       "playwright/*",
       "*.config.*",
+      "playwright-report/*",
     ],
   },
 ];
