@@ -4,6 +4,7 @@ import js from "@eslint/js";
 import ts from "typescript-eslint";
 import { FlatCompat } from "@eslint/eslintrc";
 import { fixupConfigRules } from "@eslint/compat";
+import eslintPlugin from "./packages/eslint-plugin/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,9 +18,7 @@ const patchedConfig = fixupConfigRules([
   ...compat.extends("next/core-web-vitals"),
 ]);
 
-const config = [
-  ...patchedConfig,
-  ...ts.configs.recommended,
+export default ts.config(
   {
     ignores: [
       ".next/*",
@@ -30,6 +29,13 @@ const config = [
       "playwright-report/*",
     ],
   },
-];
-
-export default config;
+  {
+    extends: [...patchedConfig, ...ts.configs.recommended],
+    plugins: {
+      eslintPlugin: eslintPlugin,
+    },
+    rules: {
+      "eslintPlugin/explicit-generics": ["error", { functionNames: ["post"] }],
+    },
+  }
+);
