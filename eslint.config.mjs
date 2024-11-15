@@ -36,6 +36,8 @@ export default ts.config(
     },
     rules: {
       "eslintPlugin/explicit-generics": ["error", { functionNames: ["post"] }],
+      "eslintPlugin/no-ternary-true-false": "error",
+      "eslintPlugin/no-and-operator-for-errors": "error",
     },
   }
 );

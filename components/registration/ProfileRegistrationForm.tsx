@@ -172,7 +172,7 @@ export default function ProfileRegistrationForm({
           className="max-w-md h-[75px]"
           {...register("photo")}
           errorMessage={errors.photo && (errors.photo.message as string)}
-          isInvalid={errors.photo ? true : false}
+          isInvalid={errors.photo === undefined}
           disabled={isSubmitting}
           isRequired
           label="Photo"
