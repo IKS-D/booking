@@ -88,7 +88,7 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("firstName")}
-          errorMessage={errors.firstName && (errors.firstName.message as string)}
+          errorMessage={errors.firstName?.message}
           isInvalid={!!errors.firstName}
           disabled={isSubmitting}
           isRequired
@@ -101,7 +101,7 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("lastName")}
-          errorMessage={errors.lastName && (errors.lastName.message as string)}
+          errorMessage={errors.lastName?.message}
           isInvalid={!!errors.lastName}
           disabled={isSubmitting}
           isRequired
@@ -113,7 +113,7 @@ export default function ProfileRegistrationForm({
 
         <Input
           className="max-w-md h-[75px]"
-          errorMessage={errors.dateOfBirth && (errors.dateOfBirth.message as string)}
+          errorMessage={errors.dateOfBirth?.message}
           isInvalid={!!errors.dateOfBirth}
           disabled={isSubmitting}
           isRequired
@@ -132,7 +132,7 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("phoneNumber")}
-          errorMessage={errors.phoneNumber && (errors.phoneNumber.message as string)}
+          errorMessage={errors.phoneNumber?.message}
           isInvalid={!!errors.phoneNumber}
           disabled={isSubmitting}
           isRequired
@@ -145,7 +145,7 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("country")}
-          errorMessage={errors.country && (errors.country.message as string)}
+          errorMessage={errors.country?.message}
           isInvalid={!!errors.country}
           disabled={isSubmitting}
           isRequired
@@ -158,7 +158,7 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("city")}
-          errorMessage={errors.city && (errors.city.message as string)}
+          errorMessage={errors.city?.message}
           isInvalid={!!errors.city}
           disabled={isSubmitting}
           isRequired
@@ -171,7 +171,7 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("photo")}
-          errorMessage={errors.photo && (errors.photo.message as string)}
+          errorMessage={errors.photo?.message}
           isInvalid={errors.photo === undefined}
           disabled={isSubmitting}
           isRequired

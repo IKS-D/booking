@@ -64,7 +64,7 @@ export default function UserRegistrationForm() {
         <Input
           className="max-w-md h-[75px]"
           {...register("email")}
-          errorMessage={errors.email && (errors.email.message as string)}
+          errorMessage={errors.email?.message}
           isInvalid={!!errors.email}
           disabled={isSubmitting}
           label="Email"
@@ -89,7 +89,7 @@ export default function UserRegistrationForm() {
             </button>
           }
           {...register("password")}
-          errorMessage={errors.password && (errors.password.message as string)}
+          errorMessage={errors.password?.message}
           isInvalid={!!errors.password}
           disabled={isSubmitting}
           label="Password"
@@ -102,7 +102,7 @@ export default function UserRegistrationForm() {
         <Input
           className="max-w-md h-[75px]"
           {...register("confirmPassword")}
-          errorMessage={errors.confirmPassword && (errors.confirmPassword.message as string)}
+          errorMessage={errors.confirmPassword?.message}
           isInvalid={!!errors.confirmPassword}
           disabled={isSubmitting}
           label="Repeat password"

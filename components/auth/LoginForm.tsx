@@ -68,7 +68,7 @@ export default function LoginForm() {
         <Input
           className="max-w-sm h-[75px]"
           {...register("email")}
-          errorMessage={errors.email && (errors.email.message as string)}
+          errorMessage={errors.email?.message}
           isInvalid={!!errors.email}
           isClearable
           label="Email"
@@ -99,7 +99,7 @@ export default function LoginForm() {
           variant="bordered"
           placeholder="Enter your password"
           {...register("password")}
-          errorMessage={errors.password && (errors.password.message as string)}
+          errorMessage={errors.password?.message}
         />
 
         {/* <Spacer y={3} />
