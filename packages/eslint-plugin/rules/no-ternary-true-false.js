@@ -10,6 +10,7 @@ export const noTernary = createRule({
         docs: {
             description: "disallow ternary operators with true and false",
         },
+        fixable: 'code',
         schema: [],
     },
     defaultOptions: [],
@@ -28,6 +29,9 @@ export const noTernary = createRule({
                         node,
                         messageId: "default",
                         data: { callee: node },
+                        fix(fixer) {
+                            return fixer.replaceText(node, "!!" + context.sourceCode.getText(node.test));
+                        },
                     });
                 }
             },
