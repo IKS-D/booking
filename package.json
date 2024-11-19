@@ -12,7 +12,8 @@
     "coverage": "vitest run --coverage",
     "playwright": "playwright test",
     "playwright:ui": "playwright test --ui",
-    "build:eslint-plugin": "cd packages/eslint-plugin && npm run build"
+    "build:eslint-plugin": "cd packages/eslint-plugin && npm run build",
+    "count:lines": "scc -c"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.0",

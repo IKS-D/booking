@@ -1,0 +1,9 @@
+playwright
+package.json
+tsconfig.json
+tslint.json
+.env.local
+components.json
+*.config.*
+__tests__
+supabase/database-generated.types.ts
