@@ -88,8 +88,8 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("firstName")}
-          errorMessage={errors.firstName && (errors.firstName.message as string)}
-          isInvalid={errors.firstName ? true : false}
+          errorMessage={errors.firstName?.message}
+          isInvalid={!!errors.firstName}
           disabled={isSubmitting}
           isRequired
           label="First name"
@@ -101,8 +101,8 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("lastName")}
-          errorMessage={errors.lastName && (errors.lastName.message as string)}
-          isInvalid={errors.lastName ? true : false}
+          errorMessage={errors.lastName?.message}
+          isInvalid={!!errors.lastName}
           disabled={isSubmitting}
           isRequired
           label="Last name"
@@ -113,8 +113,8 @@ export default function ProfileRegistrationForm({
 
         <Input
           className="max-w-md h-[75px]"
-          errorMessage={errors.dateOfBirth && (errors.dateOfBirth.message as string)}
-          isInvalid={errors.dateOfBirth ? true : false}
+          errorMessage={errors.dateOfBirth?.message}
+          isInvalid={!!errors.dateOfBirth}
           disabled={isSubmitting}
           isRequired
           type="date"
@@ -132,8 +132,8 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("phoneNumber")}
-          errorMessage={errors.phoneNumber && (errors.phoneNumber.message as string)}
-          isInvalid={errors.phoneNumber ? true : false}
+          errorMessage={errors.phoneNumber?.message}
+          isInvalid={!!errors.phoneNumber}
           disabled={isSubmitting}
           isRequired
           label="Phone number"
@@ -145,8 +145,8 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("country")}
-          errorMessage={errors.country && (errors.country.message as string)}
-          isInvalid={errors.country ? true : false}
+          errorMessage={errors.country?.message}
+          isInvalid={!!errors.country}
           disabled={isSubmitting}
           isRequired
           label="Country"
@@ -158,8 +158,8 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("city")}
-          errorMessage={errors.city && (errors.city.message as string)}
-          isInvalid={errors.city ? true : false}
+          errorMessage={errors.city?.message}
+          isInvalid={!!errors.city}
           disabled={isSubmitting}
           isRequired
           label="City"
@@ -171,7 +171,7 @@ export default function ProfileRegistrationForm({
         <Input
           className="max-w-md h-[75px]"
           {...register("photo")}
-          errorMessage={errors.photo && (errors.photo.message as string)}
+          errorMessage={errors.photo?.message}
           isInvalid={errors.photo === undefined}
           disabled={isSubmitting}
           isRequired
