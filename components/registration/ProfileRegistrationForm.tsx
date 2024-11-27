@@ -58,8 +58,6 @@ export default function ProfileRegistrationForm({
       // Display the server error
       toast.error("Something went wrong: " + error.message);
 
-      console.error(error);
-
       setLoading(false);
       return;
     }

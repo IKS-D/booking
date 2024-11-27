@@ -26,7 +26,6 @@ export default function HostProfileDeleteForm({ listingCount, }: HostProfileDele
     const { error } = await deleteHost();
 
     if (error) {
-      console.error(error);
       toast.error(error.message);
       return;
     }

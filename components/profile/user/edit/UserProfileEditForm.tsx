@@ -55,7 +55,6 @@ export default function UserProfileEditForm({ user, userProfile, }: ProfileEditF
   const handleOnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log(formData);
     const formValid = validateForm(formData);
 
     if (!formValid) {
@@ -76,7 +75,6 @@ export default function UserProfileEditForm({ user, userProfile, }: ProfileEditF
     });
 
     if (error) {
-      console.error(error);
       toast.error("Something went wrong");
       return;
     }

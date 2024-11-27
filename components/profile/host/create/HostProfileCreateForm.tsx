@@ -58,7 +58,6 @@ export default function HostProfileCreateForm({ user, }: HostProfileCreateFormPr
     });
 
     if (error) {
-      console.error(error);
       toast.error(error.message);
       setLoading(false);
       return;

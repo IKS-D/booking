@@ -14,8 +14,6 @@ const ReservationsContent: React.FC<ReservationsContentProps> = ({
   reservations,
   currentUser,
 }) => {
-  console.log("ReservationsContent", reservations);
-
   return (
     <div className="max-w-full items-center">
       <label className={title({ size: "sm" })}>Reservations</label>

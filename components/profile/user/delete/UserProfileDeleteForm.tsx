@@ -28,7 +28,6 @@ export default function UserProfileDeleteForm({ reservationCount, listingCount, 
     const { error } = await deleteUser();
 
     if (error) {
-      console.error(error);
       toast.error(error.message);
       setLoading(false);
       return;

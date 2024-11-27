@@ -60,9 +60,6 @@ const ListingEditModal: React.FC<ListingEditModalProps> = ({
     if (files) {
       // Handle the files (either a single file or multiple files)
       setSelectedFiles(files);
-    } else {
-      // Handle the case where no files are selected
-      console.log("No files selected");
     }
   };
 

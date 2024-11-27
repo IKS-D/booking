@@ -9,7 +9,6 @@ export default async function HostProfileDeletePage() {
     user!.id
   );
   if (listingsError) {
-    console.error(listingsError);
     toast.error(listingsError.message);
   }
   const listingCount = listings ? listings?.length : 0;

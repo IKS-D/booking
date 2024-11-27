@@ -37,7 +37,7 @@ export const sendNewMessageEmail = async (
       received_id.toString()
     );
 
-    const response = await resend.emails.send({
+    await resend.emails.send({
       from: "Booking <booking@namiokai.tech>",
       to: to,
       subject: "You have a new message",
@@ -50,10 +50,7 @@ export const sendNewMessageEmail = async (
           receiverProfile?.first_name + " " + receiverProfile?.last_name,
       }) as React.ReactElement,
     });
-    console.log(response);
-  } catch (error) {
-    console.error(error);
-  }
+  } catch {}
 };
 /* v8 ignore stop */
 

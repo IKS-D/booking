@@ -24,7 +24,6 @@ export async function getMessagesForCurrentUser(reservationId: number) {
     .or(`sender_id.eq.${currentUser.id},received_id.eq.${currentUser.id}`);
 
   if (error) {
-    console.error(error);
     return null;
   }
 
@@ -41,7 +40,6 @@ export async function insertMessage({
   const { user_id: guestId } = await getUserIdFromReservation(reservationId);
 
   if (!guestId) {
-    console.error("Reservation not found or error fetching reservation");
     return null;
   }
 
@@ -51,7 +49,6 @@ export async function insertMessage({
   const receiverId = sender?.id === hostId ? guestId : hostId;
 
   if (!receiverId) {
-    console.error("Receiver not found or error fetching receiver");
     return null;
   }
 
@@ -67,9 +64,6 @@ export async function insertMessage({
       },
     ]);
 
-  console.log("receiverId", receiverId);
-  console.log("sender", sender?.id);
-
   if (receiverId != null && sender != null)
     sendNewMessageEmail(
       sender?.id,
@@ -80,7 +74,6 @@ export async function insertMessage({
     );
 
   if (error) {
-    console.error(error);
     return null;
   }
 }
@@ -94,7 +87,6 @@ export async function getUserIdFromReservation(reservationId: number) {
     .single();
 
   if (error) {
-    console.error(error);
     return { user_id: null, error: error };
   }
 
@@ -114,7 +106,6 @@ export async function updateMessageText({
     .match({ id: messageId });
 
   if (error) {
-    console.error(error);
     return null;
   }
 
@@ -134,7 +125,6 @@ export async function deleteMessage(messageId: number) {
     .match({ id: messageId });
 
   if (error) {
-    console.error(error);
     return null;
   }
 
@@ -155,7 +145,6 @@ export async function getMessageById(messageId: number) {
     .single();
 
   if (error) {
-    console.error(error);
     return null;
   }
 

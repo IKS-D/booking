@@ -51,8 +51,7 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
         }
 
         setCategories(categories || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+      } catch {
         toast.error("Something went wrong");
       }
     };
@@ -81,9 +80,6 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
     if (files) {
       // Handle the files (either a single file or multiple files)
       setSelectedFiles(files);
-    } else {
-      // Handle the case where no files are selected
-      console.log("No files selected");
     }
   };
 
@@ -171,20 +167,15 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
         // If the array at the current index doesn't exist, create an empty array
         newErrors[index] = newErrors[index] || [];
 
-        console.log(index);
-
         if (service.title === "") {
-          console.log("gerai");
           newErrors[index][0] = true;
           hasErrors = true;
         }
         if (service.description === "") {
-          console.log("gerai");
           newErrors[index][1] = true;
           hasErrors = true;
         }
         if (service.price === -1 || service.price < 1) {
-          console.log("gerai");
           newErrors[index][2] = true;
           hasErrors = true;
         }
@@ -192,7 +183,6 @@ export default function CreateListingForm({ user }: CreateListingFormProps) {
 
       // Update the state with the entire newErrors array
       setServiceErrors(newErrors);
-      console.log(newErrors);
 
       return !hasErrors;
     }

@@ -10,7 +10,6 @@ export default async function UserProfileDeletePage() {
   const { data: reservations, error: reservationsError } =
     await getReservations(user!.id);
   if (reservationsError) {
-    console.error(reservationsError);
     toast.error(reservationsError.message);
   }
   let reservationCount = 0;
@@ -32,7 +31,6 @@ export default async function UserProfileDeletePage() {
     user!.id
   );
   if (listingsError) {
-    console.error(listingsError);
     toast.error(listingsError.message);
   }
   const listingCount = listings ? listings?.length : 0;

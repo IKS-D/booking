@@ -56,9 +56,6 @@ const AdditionalServicesForm = ({
       selectedKeysArray.includes(service.id.toString())
     );
 
-    console.log("selectedServices", selectedServices);
-    console.log("selectedKeys", selectedKeys);
-
     onAdditionalServicesUpdate(selectedServices);
   };
 

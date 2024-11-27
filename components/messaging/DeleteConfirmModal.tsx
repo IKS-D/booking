@@ -22,22 +22,17 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
   onConfirm,
   messageId,
 }) => {
-
   const handleDelete = async () => {
     try {
       await deleteMessage(messageId);
-      onConfirm(); 
-    } catch (error) {
-      console.error(error);
-    }
+      onConfirm();
+    } catch {}
   };
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="md">
       <ModalContent>
         <ModalHeader>Confirm Deletion</ModalHeader>
-        <ModalBody>
-          Are you sure you want to delete this message?
-        </ModalBody>
+        <ModalBody>Are you sure you want to delete this message?</ModalBody>
         <ModalFooter>
           <Button
             color="primary"

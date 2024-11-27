@@ -38,7 +38,6 @@ export default function LoginForm() {
     const { error } = await signInUsingEmailAndPassword(data);
 
     if (error) {
-      console.error(error);
       toast.error(error.message);
       setLoading(false);
       return;

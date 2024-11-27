@@ -20,10 +20,6 @@ export async function getListingById(listingId: number) {
     .eq("id", listingId)
     .single();
 
-  if (error) {
-    console.error(error);
-  }
-
   return { data, error };
 }
 
@@ -32,12 +28,6 @@ export type Listing = Listings[0];
 
 export async function getListings() {
   const { data: listings, error } = await getListingsBase();
-
-  console.log(error);
-
-  if (error) {
-    console.error(error);
-  }
 
   return { data: listings, error: error };
 }
@@ -53,14 +43,12 @@ export async function getChartInformation(listingId: number) {
       .single();
 
   if (listingError) {
-    console.error(listingError);
     return { data: null, error: listingError };
   }
 
   const city = listing?.city;
 
   if (!city) {
-    console.error("City not found for the listing");
     return { data: null, error: "City not found for the listing" };
   }
 
@@ -70,7 +58,6 @@ export async function getChartInformation(listingId: number) {
     .eq("city", city);
 
   if (error) {
-    console.error(error);
     return { data: null, error };
   }
 
@@ -169,7 +156,6 @@ export async function deleteListing({ listing_id }: { listing_id: number }) {
 
   /* v8 ignore next 14 */
   if (photos && photos.length > 0) {
-    console.log("Photos found:", photos);
     for (const photo of photos) {
       const filename = getFilenameFromUrl(photo.url);
       const { error: photoDeleteError } =
@@ -182,7 +168,6 @@ export async function deleteListing({ listing_id }: { listing_id: number }) {
       }
     }
   }
-  console.log("All photos deleted successfully");
   return { error: null };
 }
 
@@ -224,7 +209,6 @@ export async function updateListing({
         .upload(`${folderName}/${uniqueFileName}`, file);
 
     if (fileError) {
-      console.error("Error uploading file:", fileError);
     } else {
       // Get the public URL of the uploaded file
       const fileURL = createSupabaseBrowserClient()

@@ -60,7 +60,6 @@ const ListingChart: React.FC<ListingChartProps> = ({ average }) => {
   }, [average]);
 
   useEffect(() => {
-    console.log("Component mounted");
     const onLoadCallback = () => {
       // Move the drawChart call here
       drawChart();

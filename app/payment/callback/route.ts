@@ -4,9 +4,6 @@ import { decodePayseraData } from "@/actions/reservations/payseraAPI";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  console.info("Payment callback route");
-  console.info("request", request);
-
   const body = await request.text();
   const params = new URLSearchParams(body);
 
@@ -24,11 +21,8 @@ export async function POST(request: Request) {
   }
 
   const payment = decodePayseraData(data, ss1, ss2);
-  const { error } = await insertPayment(payment);
+  await insertPayment(payment);
 
-  if (error) {
-    console.error(error);
-  }
 
   return new Response("OK", {
     headers: {

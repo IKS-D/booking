@@ -76,9 +76,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
         } else {
           setChatMessages([]);
         }
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
+      } catch {}
     };
 
     if (isOpen) {
@@ -128,9 +126,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
       } else {
         setChatMessages([]);
       }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
+    } catch {}
 
     setPending(false);
   };

@@ -41,7 +41,6 @@ export default function AvatarDropdownMenu({
     const { error } = await signOut();
 
     if (error) {
-      console.error(error);
       toast.error("There was an error while signing out: " + error.message);
       return;
     }

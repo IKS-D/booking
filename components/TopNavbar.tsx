@@ -28,10 +28,8 @@ export default async function TopNavbar({ user }: TopNavbarProps) {
     currentUserHost = await hostProfileExists(user.id);
     // Without the check getUserProfileById throws error to console if profile doesn't exist
     if (await userProfileExists(user.id)) {
-      const { data, error } = await getUserProfileById(user.id);
-      if (error) {
-        console.error(error);
-      }
+      const { data } = await getUserProfileById(user.id);
+
       userProfile = data;
     }
   }
