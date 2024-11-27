@@ -5,6 +5,8 @@
     "turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
+    "docker:build": "docker build -t booking-app .",
+    "docker:run": "docker run --name booking-app -p 3000:3000 booking-app",
     "lint": "next lint",
     "eslint": "eslint --stats",
     "vitest": "vitest",
