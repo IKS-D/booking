@@ -94,6 +94,7 @@ const publicRoutes = [
   "/auth/sign-out",
   "/auth/callback",
   "/payment/callback",
+  "/auth/login",
 ];
 
 const hostRoutes = ["/reservations/host", "/listings/personal"];

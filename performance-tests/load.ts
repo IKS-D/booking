@@ -12,6 +12,17 @@ export const options: Options = {
   ],
 };
 
+export function setup() {
+  const formData = {
+    email: "test@iksd.vercel.app",
+    password: "admin123",
+  };
+  const headers = { "Content-Type": "application/json" };
+  const result = http.post(`${BASE_URL}/auth/login`, formData, { headers: headers });
+
+  return { token: result.json("data.token") };
+}
+
 // eslint-disable-next-line import/no-anonymous-default-export
 export default function () {
   const res = http.get(`${BASE_URL}/listings`);

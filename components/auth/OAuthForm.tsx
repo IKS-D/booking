@@ -42,6 +42,8 @@ export default function OAuthForm() {
           <Image
             src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
             alt="Google Icon"
+            width={30}
+            height={30}
             className="w-[30px]"
           />
           Sign in with Google
