@@ -232,7 +232,7 @@ export async function insertListing({
 }: {
   listing: Partial<Listing>;
   user_id: string;
-  files: FileList;
+  files?: FileList;
   services: ServiceInput[];
 }) {
   const priceInCents = Math.round(listing.day_price! * 100);

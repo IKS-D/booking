@@ -95,6 +95,7 @@ const publicRoutes = [
   "/auth/callback",
   "/payment/callback",
   "/auth/login",
+  "/api/listings",
 ];
 
 const hostRoutes = ["/reservations/host", "/listings/personal"];

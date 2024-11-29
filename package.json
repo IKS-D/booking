@@ -6,7 +6,8 @@
     "build": "next build",
     "start": "next start",
     "docker:build": "docker build -t booking-app .",
-    "docker:run": "docker run --name booking-app -p 3000:3000 booking-app",
+    "docker:run": "docker run -d --name booking-app -p 3000:3000 booking-app",
+    "docker:clean": "docker stop booking-app && docker rm booking-app",
     "lint": "next lint",
     "eslint": "eslint --stats",
     "vitest": "vitest",
@@ -16,10 +17,8 @@
     "playwright:ui": "playwright test --ui",
     "build:eslint-plugin": "cd packages/eslint-plugin && npm run build",
     "count:lines": "scc -c",
-    "k6:load": "k6 run performance-tests/load.ts --compatibility-mode=experimental_enhanced --out dashboard",
-    "k6:stress": "k6 run performance-tests/stress.ts --compatibility-mode=experimental_enhanced --out dashboard",
-    "k6:spike": "k6 run performance-tests/spike.ts --compatibility-mode=experimental_enhanced --out dashboard",
-    "k6:soak": "k6 run performance-tests/soak.ts --compatibility-mode=experimental_enhanced --out dashboard"
+    "k6:load-read": "k6 run performance-tests/load-read.ts --compatibility-mode=experimental_enhanced --out dashboard=export=performance-tests/reports/test-report-read.html",
+    "k6:load-write": "k6 run performance-tests/load-write.ts --compatibility-mode=experimental_enhanced --out dashboard=export=performance-tests/reports/test-report-write.html"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.0",
