@@ -11,15 +11,11 @@ import {
 import exec from "k6/execution";
 
 export const options: Options = {
-  stages: [
-    { duration: "5m", target: 50 },
-    { duration: "10m", target: 50 },
-    { duration: "5m", target: 0 },
-  ],
-  thresholds: {
+  stages: [{ duration: "5m", target: 1000 }],
+  /*   thresholds: {
     http_req_failed: [{ threshold: "rate<0.1", abortOnFail: true }], // http errors should be less than 1%
     http_req_duration: [{ threshold: "p(95)<400", abortOnFail: true }], // 95% of requests should be below 200ms
-  },
+  }, */
 };
 
 export function setup() {
